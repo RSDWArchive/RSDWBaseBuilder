@@ -1,0 +1,2668 @@
+{
+  "profiles": {
+    "Prop": {
+      "max": 1.0,
+      "min": 0.9,
+      "vert_loss": 0.01,
+      "horiz_loss": 0.01
+    },
+    "Stackable_Prop": {
+      "max": 10.0,
+      "min": 0.5,
+      "vert_loss": 0.5,
+      "horiz_loss": 0.5
+    },
+    "Tier1_Foundation": {
+      "max": 1515.0,
+      "min": 30.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.0
+    },
+    "Tier1_Beam": {
+      "max": 1515.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.5
+    },
+    "Tier1_Base": {
+      "max": 965.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.5
+    },
+    "Tier2_Foundation": {
+      "max": 2415.0,
+      "min": 30.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.0
+    },
+    "Tier2_Beam": {
+      "max": 2415.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.5
+    },
+    "Tier2_Base": {
+      "max": 1565.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.5
+    },
+    "Tier3_Foundation": {
+      "max": 3215.0,
+      "min": 30.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.25
+    },
+    "Tier3_Beam": {
+      "max": 3215.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.25
+    },
+    "Tier3_Base": {
+      "max": 1865.0,
+      "min": 10.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 2.5
+    },
+    "FarmPlot": {
+      "max": 900.0,
+      "min": 20.0,
+      "vert_loss": 1.0,
+      "horiz_loss": 1.0
+    },
+    "Tier_0_Foundation": {
+      "max": 450.0,
+      "min": 10.0,
+      "vert_loss": 0.1,
+      "horiz_loss": 0.1
+    },
+    "Tier_0_Base": {
+      "max": 100.0,
+      "min": 10.0,
+      "vert_loss": 0.15,
+      "horiz_loss": 0.15
+    }
+  },
+  "default_snapping_radius_cm": 80.0,
+  "count": 644,
+  "mapping": {
+    "BP_BaseBuilding_ArcheryTarget_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Armchair_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_ArmourMannequin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Barrel_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_BedRoll_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Bed_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Bookcase_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Building_Protection_Totem_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_CapeHook_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_CapeRack_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chair_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chair_Oak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chair_Stool_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chandelier_Blue_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chandelier_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chandelier_Green_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chandelier_Purple_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chandelier_Red_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chest_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chest_Iron_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Chest_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Armadyl_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Bandos_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Guthix_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Saradomin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Zamorak_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Coffin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Coffin_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Statue_01v1_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Statue_02v1_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_04_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_05_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_06_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_07_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_08_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_09_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Onions_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Peaches_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Stack_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Banner_Wall_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Drum_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_04_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Pelt_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Stool_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_04_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_03_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_EarlyAdopterTapestry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Hanging_Tools_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Pot_Bench_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_SawHorse_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Keg_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Broken_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Grave_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Headstone_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Headstone_02_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Magic_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Magic_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Mining_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Anima_Wild_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Granite_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Stone_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Diamond_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Jade_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Opal_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Sapphire_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Topaz_Red_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Medium_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Small_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_20_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_5_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_20_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_5_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_20_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_5_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_20_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_5_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_20_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_5_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Textile_TextileKit_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Bin_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Pile_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Single_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Vault_Core_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Material_Vault_Shard_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Dwellberry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Onion_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Redberry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Wintumber_Tree_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Air_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Astral_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Earth_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Fire_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Law_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Nature_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Rune_Water_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Spectral_Book_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Storage_Shelf_Glass_Vials_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Decoration_Tombstone_01_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Blue_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Dwellberry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Green_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Orange_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Red_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Redberry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Drink_Infusion_Yellow_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_FishingBarrel_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Dinner_Omelette_Pungent_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Dinner_Roast_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Dinner_Steak_Eggs_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Dinner_Vegball_Sweet_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Fryup_Cheeky_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Fryup_Vegan_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Soup_Pumpkin_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Stew_BeefTomato_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Food_Stew_Meat_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Lodestone_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_LumberStorage_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_PanRack_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_PersonalChest_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_PlantPot_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Rug_Rect2_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Rug_Rect_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Scarecrow_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Shelf_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Shelf_Oak_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Stairs_45_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TableRound_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TableRound_Oak_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Table_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Table_Oak_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Table_Side_C": {
+      "profile": "Stackable_Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TackleBox_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Blue_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Green_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Purple_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Red_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Blue_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Green_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Natural_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Purple_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Red_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Blue_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Green_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Purple_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Red_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Type2_Blue_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Type2_Green_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Type2_Natural_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Type2_Purple_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Torch_Type2_Red_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_TrainingDummy_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_WeaponRack_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Windowbox_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_BaseBuilding_Windowbox_Oak_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_Cauldron_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_CookingBench_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_FletchingBench_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_Jewelry_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_PotteryWheel_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_Rune_Altar_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_StartingBench_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_Stone_Range_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Crafting_WeaponBench_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_FarmPlot1x1_T1_C": {
+      "profile": "FarmPlot",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_FarmPlot1x1_T2_C": {
+      "profile": "FarmPlot",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_FarmPlot1x1_T3_C": {
+      "profile": "FarmPlot",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Farm_Barrel_Water_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Farm_Barrel_Water_Large_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Farm_RainCatcher_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Farm_Well_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_PostService_PostiePeteDispenser_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_AdvancedSmelter_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Campfire_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_CharcoalKiln_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Composter_New_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Composter_New_Super_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Grill_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Grindstone_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Loom_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Sawmill_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Smelter_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Spinning_Wheel_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Stonecutter_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_Station_Tanner_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Large_Diagonal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Large_Horizontal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Large_Shallow_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Large_Steep_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Large_Vertical_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Medium_Diagonal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Medium_Horizontal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Medium_Shallow_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Medium_Steep_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thick_Medium_Vertical_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Large_Diagonal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Large_Horizontal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Large_Shallow_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Large_Steep_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Large_Vertical_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Medium_Diagonal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Medium_Horizontal_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Medium_Shallow_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Medium_Steep_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Beam_Thin_Medium_Vertical_C": {
+      "profile": "Tier1_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Door_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T1_Floor_Large_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Floor_Large_Triangle_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Floor_Medium_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Floor_Medium_Triangle_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Floor_Small_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Foundation_Large_C": {
+      "profile": "Tier1_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Foundation_Large_Triangle_C": {
+      "profile": "Tier1_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Foundation_Medium_C": {
+      "profile": "Tier1_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Foundation_Medium_Triangle_C": {
+      "profile": "Tier1_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Pallisades_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Pallisades_Gate_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Triangle_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Triangle_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Valley_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Large_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Triangle_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Triangle_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Valley_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Medium_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Valley_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Small_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Valley_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Large_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Valley_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Medium_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Hip_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Hip_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Valley_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Roof_Thatch_Small_Valley_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Stairs_InnerCorner_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Stairs_OuterCorner_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Stairs_Straight_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Stairs_Straight_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Doorframe_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Doorframe_Double_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Narrow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Narrow_Doorframe_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Narrow_Windowframe_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Windowframe_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Large_Windowframe_Double_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Medium_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Medium_Diagonal_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Medium_Diagonal_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Medium_Shallow_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Medium_Shallow_Inverted_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Wall_Small_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T1_Window_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T2_Beam_Thick_Large_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Large_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Large_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Large_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Large_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Medium_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Medium_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Medium_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Medium_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thick_Medium_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Large_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Large_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Large_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Large_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Large_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Medium_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Medium_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Medium_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Medium_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Beam_Thin_Medium_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Door_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T2_Floor_Large_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Floor_Large_Triangle_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Floor_Medium_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Floor_Medium_Triangle_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Floor_Small_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Foundation_Large_C": {
+      "profile": "Tier2_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Foundation_Large_Triangle_C": {
+      "profile": "Tier2_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Foundation_Medium_C": {
+      "profile": "Tier2_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Foundation_Medium_Triangle_C": {
+      "profile": "Tier2_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Pallisades_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Pallisades_Gate_C": {
+      "profile": "Tier1_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Hip_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Hip_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Hip_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Triangle_Steep_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Valley_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Valley_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Large_Valley_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Hip_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Hip_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Hip_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Triangle_Steep_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Valley_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Valley_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Medium_Valley_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Hip_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Hip_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Hip_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Valley_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Valley_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Roof_Small_Valley_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_Curved_InnerCorner_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_Curved_OuterCorner_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_InnerCorner_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_OuterCorner_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_Straight_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Stairs_Straight_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Doorframe_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Doorframe_Double_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Narrow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Narrow_Doorframe_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Narrow_Windowframe_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Shallow_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Steep_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Windowframe_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Large_Windowframe_Double_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Diagonal_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Diagonal_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Shallow_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Shallow_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Steep_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Medium_Steep_Inverted_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Wall_Small_C": {
+      "profile": "Tier2_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T2_Window_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T3_Beam_Thick_Large_Diagonal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Large_Horizontal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Large_Shallow_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Large_Steep_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Large_Vertical_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Medium_Diagonal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Medium_Horizontal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Medium_Shallow_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Medium_Steep_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Medium_Vertical_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Diagonal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Horizontal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Shallow_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Steep_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Vertical_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Diagonal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Horizontal_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Shallow_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Steep_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Vertical_C": {
+      "profile": "Tier3_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thick_Type3_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Large_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Large_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Large_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Large_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Large_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Medium_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Medium_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Medium_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Medium_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Medium_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Diagonal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Horizontal_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Shallow_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Steep_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type3_Medium_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Beam_Thin_Type3_Vertical_C": {
+      "profile": "Tier2_Beam",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_CastleDoor_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T3_Door_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 200.0
+    },
+    "BP_T3_FenceEnd_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Fence_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Floor_Large_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Floor_Large_Triangle_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Floor_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Floor_Medium_Triangle_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Floor_Small_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Foundation_Large_C": {
+      "profile": "Tier3_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Foundation_Large_Triangle_C": {
+      "profile": "Tier3_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Foundation_Medium_C": {
+      "profile": "Tier3_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Foundation_Medium_Triangle_C": {
+      "profile": "Tier3_Foundation",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Hip_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Hip_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Triangle_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Triangle_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Valley_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Large_Valley_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Hip_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Hip_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Triangle_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Triangle_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Valley_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Medium_Valley_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Hip_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Hip_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Valley_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Roof_Small_Valley_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_InnerCorner_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_Narrow_Straight_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_Narrow_Straight_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_OuterCorner_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_Straight_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Stairs_Straight_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Type2_Floor_Large_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Type2_Floor_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_CurvedWindow_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Castle_Doorframe_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Doorframe_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Doorframe_Double_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Doorframe_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_1_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_2_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_3_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_4_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_StainedGlass_6_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Narrow_Windowframe_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Shallow_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Special_Windowed_1_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Special_Windowed_2_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Special_Windowed_3_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Special_Windowed_4_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Special_Windowed_5_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Large_Windowframe_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Curved_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Curved_Shallow_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Diagonal_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Diagonal_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Shallow_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Medium_Shallow_Inverted_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Plain_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Slit_Medium_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_Small_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_T3_Wall_StainedGlass_6_C": {
+      "profile": "Tier3_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_UpgradeProp_Crucible_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_UpgradeProp_Loom_Harness_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "BP_UpgradeProp_Tanners_Kit_C": {
+      "profile": "Prop",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Floor_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Foundation_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Roof_26_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Roof_45_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Wall_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    },
+    "PROXY_BP_BaseBuilding_Wall_Small_C": {
+      "profile": "Tier_0_Base",
+      "snapping_radius_cm": 80.0
+    }
+  }
+}

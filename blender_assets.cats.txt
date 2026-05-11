@@ -1,0 +1,45 @@
+# This is an Asset Catalog Definition file for Blender.
+#
+# Empty lines and lines starting with # will be ignored.
+# The first non-ignored line should be the version indicator.
+# Other lines are of the format "UUID:catalog/path:simple name"
+
+VERSION 1
+
+9ae278c0-f58b-5de3-83a9-ea59271396e2:Building:Building
+4a6ea8bd-c97a-5e6a-8891-796178b04e38:Building/Tier 1:Tier 1
+b67c30fa-34dd-5f35-a9e7-20d404b97141:Building/Tier 2:Tier 2
+10f952d6-de8c-53df-9a9a-cc84b7aa468f:Building/Tier 3:Tier 3
+2246e30d-9e48-5c8a-a933-da484a584203:Crafting Stations:Crafting Stations
+0b91819b-8515-5f58-a8c5-2e12e7c6a029:Decorations:Decorations
+4c50f147-a86f-5cef-86d4-e9205f00db49:Decorations/Banners:Banners
+76d51c34-a3eb-561d-bfdf-d399eaf10984:Decorations/Banners/Double:Double
+52097fc9-d6f0-5b9c-95f0-c8d2eec3349b:Decorations/Banners/Framed:Framed
+9fef60f3-1e41-55a2-9575-67d81a7d20b3:Decorations/Banners/Single:Single
+b647da4b-e1d8-5efb-9608-ab67f336e7bf:Decorations/Banners/Wall Horizontal:Wall Horizontal
+7dbe8c42-46ff-5524-930d-f850c662cd7d:Decorations/Banners/Wall Vertical:Wall Vertical
+d7dcb960-aac8-50af-a92d-beb9bc267a2f:Decorations/Dragonkin:Dragonkin
+0cf0fa4f-5943-5e90-96c2-2e94ef4ee84d:Decorations/Fishing:Fishing
+c0a889f1-0f0b-54de-ac9b-e3c13e10128e:Decorations/Garou:Garou
+9c55ab27-1bb6-56d9-9082-d1a7bc86383a:Decorations/Quest:Quest
+d3dd3be9-77aa-5d4c-a700-bac0d0206fb2:Decorations/Workshop:Workshop
+007ea6ca-c58e-571f-bc70-87c3a22751a5:Farming:Farming
+f8e2312f-eaf4-534a-9c3a-91cf0e83f7a5:Furniture:Furniture
+7a93aa73-8147-5cd0-8c59-07d441ff034d:Furniture/AntiGriefing:AntiGriefing
+b3adf786-9084-5ef2-ae25-6756780beffb:Furniture/Archery Target 01:Archery Target 01
+a2806af2-a766-5445-9be4-4c9358ca88af:Furniture/Arm Chair:Arm Chair
+8eb14633-269c-5d3d-97bf-10c7bcab2fca:Furniture/Bed:Bed
+52c335de-2f86-5de2-a72f-f3fb67dca88c:Furniture/Bookcase:Bookcase
+8d2e488f-448e-520f-ab48-3f1bd0f62fcf:Furniture/Chair:Chair
+5fd61009-74a3-5960-8f5b-0b10d527a80a:Furniture/Chest:Chest
+3f6d765c-ba0a-5ace-8d22-68ba65525d2b:Furniture/Misc:Misc
+34349bfc-5092-59c5-9f59-dbc75674eb9a:Furniture/Rug:Rug
+7ec9f513-0b3c-57c3-84fc-b5e11615e5bf:Furniture/Shelf:Shelf
+5e3e9ce8-59ee-58d3-9cf6-35cc3b9f6f72:Furniture/Side Table:Side Table
+f5329c00-6b45-5517-a80c-f4588e930bcc:Furniture/Sleeping Mat:Sleeping Mat
+ec606ef2-4dc0-542f-9e25-466a54e0151e:Furniture/Stool:Stool
+c9f5a9a3-3559-5e6e-bf5f-62b2e8f4c341:Furniture/Storage:Storage
+627ba8cf-683c-5d9c-b2c4-ac916254c782:Furniture/Table:Table
+40b2136a-68cb-596a-8904-37e4511568c1:Furniture/Tackle Box:Tackle Box
+d42bada2-71a7-5f06-94a1-aad0c918e1b8:Furniture/Torches:Torches
+1535083a-617e-5312-a042-945ae3b4fbeb:Misc:Misc

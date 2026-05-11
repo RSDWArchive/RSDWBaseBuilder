@@ -1,0 +1,2589 @@
+{
+  "count": 646,
+  "mapping": {
+    "BP_BaseBuilding_ArcheryTarget_C": {
+      "piece_data_index": 3,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_ArcheryTarget.BUILDPIECE_Interior_ArcheryTarget"
+    },
+    "BP_BaseBuilding_Armchair_C": {
+      "piece_data_index": 4,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Armchair.BUILDPIECE_Interior_Armchair"
+    },
+    "BP_BaseBuilding_ArmourMannequin_C": {
+      "piece_data_index": 51,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_ArmourMannequin.BUILDPIECE_ArmourMannequin"
+    },
+    "BP_BaseBuilding_Barrel_C": {
+      "piece_data_index": 57,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_Interior_Barrel.BUILDPIECE_Interior_Barrel"
+    },
+    "BP_BaseBuilding_BedRoll_C": {
+      "piece_data_index": 6,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_BedRoll.BUILDPIECE_Interior_BedRoll"
+    },
+    "BP_BaseBuilding_Bed_C": {
+      "piece_data_index": 5,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Bed.BUILDPIECE_Interior_Bed"
+    },
+    "BP_BaseBuilding_Bookcase_C": {
+      "piece_data_index": 7,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Bookcase.BUILDPIECE_Interior_Bookcase"
+    },
+    "BP_BaseBuilding_Building_Protection_Totem_C": {
+      "piece_data_index": 146,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AntiGriefing/DA_BaseBuilding_Building_Protection_Totem.DA_BaseBuilding_Building_Protection_Totem"
+    },
+    "BP_BaseBuilding_CapeHook_C": {
+      "piece_data_index": 52,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_CapeHook.BUILDPIECE_CapeHook"
+    },
+    "BP_BaseBuilding_CapeRack_C": {
+      "piece_data_index": 53,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_CapeRack.BUILDPIECE_CapeRack"
+    },
+    "BP_BaseBuilding_Chair_C": {
+      "piece_data_index": 8,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Chair.BUILDPIECE_Interior_Chair"
+    },
+    "BP_BaseBuilding_Chair_Oak_C": {
+      "piece_data_index": 9,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Chair_Oak.BUILDPIECE_Interior_Chair_Oak"
+    },
+    "BP_BaseBuilding_Chair_Stool_C": {
+      "piece_data_index": 16,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Stool.BUILDPIECE_Interior_Stool"
+    },
+    "BP_BaseBuilding_Chandelier_Blue_C": {
+      "piece_data_index": 27,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Chandelier_Blue.BUILDPIECE_Prop_Chandelier_Blue"
+    },
+    "BP_BaseBuilding_Chandelier_C": {
+      "piece_data_index": 26,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Chandelier.BUILDPIECE_Prop_Chandelier"
+    },
+    "BP_BaseBuilding_Chandelier_Green_C": {
+      "piece_data_index": 28,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Chandelier_Green.BUILDPIECE_Prop_Chandelier_Green"
+    },
+    "BP_BaseBuilding_Chandelier_Purple_C": {
+      "piece_data_index": 29,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Chandelier_Purple.BUILDPIECE_Prop_Chandelier_Purple"
+    },
+    "BP_BaseBuilding_Chandelier_Red_C": {
+      "piece_data_index": 30,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Chandelier_Red.BUILDPIECE_Prop_Chandelier_Red"
+    },
+    "BP_BaseBuilding_Chest_C": {
+      "piece_data_index": 54,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_Chest.BUILDPIECE_Chest"
+    },
+    "BP_BaseBuilding_Chest_Iron_C": {
+      "piece_data_index": 55,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_Chest_Iron.BUILDPIECE_Chest_Iron"
+    },
+    "BP_BaseBuilding_Chest_Small_C": {
+      "piece_data_index": 56,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_Chest_Small.BUILDPIECE_Chest_Small"
+    },
+    "BP_BaseBuilding_Crate_C": {
+      "piece_data_index": 58,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_Interior_Crate.BUILDPIECE_Interior_Crate"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Armadyl_C": {
+      "piece_data_index": 165,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_01_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_01_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Bandos_C": {
+      "piece_data_index": 192,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_01_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_01_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Guthix_C": {
+      "piece_data_index": 219,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_01_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_01_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Saradomin_C": {
+      "piece_data_index": 246,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_01_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_01_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_01_Zamorak_C": {
+      "piece_data_index": 273,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_01_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_01_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Armadyl_C": {
+      "piece_data_index": 166,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_02_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_02_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Bandos_C": {
+      "piece_data_index": 193,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_02_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_02_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Guthix_C": {
+      "piece_data_index": 220,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_02_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_02_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Saradomin_C": {
+      "piece_data_index": 247,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_02_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_02_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_02_Zamorak_C": {
+      "piece_data_index": 274,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_02_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_02_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Armadyl_C": {
+      "piece_data_index": 167,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_03_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_03_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Bandos_C": {
+      "piece_data_index": 194,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_03_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_03_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Guthix_C": {
+      "piece_data_index": 221,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_03_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_03_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Saradomin_C": {
+      "piece_data_index": 248,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_03_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_03_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_03_Zamorak_C": {
+      "piece_data_index": 275,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_03_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_03_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Armadyl_C": {
+      "piece_data_index": 168,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_04_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_04_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Bandos_C": {
+      "piece_data_index": 195,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_04_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_04_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Guthix_C": {
+      "piece_data_index": 222,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_04_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_04_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Saradomin_C": {
+      "piece_data_index": 249,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_04_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_04_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_04_Zamorak_C": {
+      "piece_data_index": 276,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_04_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_04_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Armadyl_C": {
+      "piece_data_index": 169,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_05_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_05_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Bandos_C": {
+      "piece_data_index": 196,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_05_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_05_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Guthix_C": {
+      "piece_data_index": 223,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_05_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_05_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Saradomin_C": {
+      "piece_data_index": 250,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_05_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_05_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_05_Zamorak_C": {
+      "piece_data_index": 277,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_05_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_05_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Armadyl_C": {
+      "piece_data_index": 170,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Flag_06_Armadyl.DA_BaseBuilding_Decoration_Banner_Flag_06_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Bandos_C": {
+      "piece_data_index": 197,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Flag_06_Bandos.DA_BaseBuilding_Decoration_Banner_Flag_06_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Guthix_C": {
+      "piece_data_index": 224,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Flag_06_Guthix.DA_BaseBuilding_Decoration_Banner_Flag_06_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Saradomin_C": {
+      "piece_data_index": 251,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Flag_06_Saradomin.DA_BaseBuilding_Decoration_Banner_Flag_06_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Flag_06_Zamorak_C": {
+      "piece_data_index": 278,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Flag_06_Zamorak.DA_BaseBuilding_Decoration_Banner_Flag_06_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Armadyl_C": {
+      "piece_data_index": 171,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Hanging_01_Armadyl.DA_BaseBuilding_Decoration_Banner_Hanging_01_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Bandos_C": {
+      "piece_data_index": 198,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Hanging_01_Bandos.DA_BaseBuilding_Decoration_Banner_Hanging_01_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Guthix_C": {
+      "piece_data_index": 225,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Hanging_01_Guthix.DA_BaseBuilding_Decoration_Banner_Hanging_01_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Saradomin_C": {
+      "piece_data_index": 252,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Hanging_01_Saradomin.DA_BaseBuilding_Decoration_Banner_Hanging_01_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_01_Zamorak_C": {
+      "piece_data_index": 279,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Hanging_01_Zamorak.DA_BaseBuilding_Decoration_Banner_Hanging_01_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Armadyl_C": {
+      "piece_data_index": 172,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Hanging_02_Armadyl.DA_BaseBuilding_Decoration_Banner_Hanging_02_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Bandos_C": {
+      "piece_data_index": 199,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Hanging_02_Bandos.DA_BaseBuilding_Decoration_Banner_Hanging_02_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Guthix_C": {
+      "piece_data_index": 226,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Hanging_02_Guthix.DA_BaseBuilding_Decoration_Banner_Hanging_02_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Saradomin_C": {
+      "piece_data_index": 253,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Hanging_02_Saradomin.DA_BaseBuilding_Decoration_Banner_Hanging_02_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_02_Zamorak_C": {
+      "piece_data_index": 280,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Hanging_02_Zamorak.DA_BaseBuilding_Decoration_Banner_Hanging_02_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Armadyl_C": {
+      "piece_data_index": 173,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Armadyl/DA_BaseBuilding_Decoration_Banner_Hanging_03_Armadyl.DA_BaseBuilding_Decoration_Banner_Hanging_03_Armadyl"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Bandos_C": {
+      "piece_data_index": 200,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Bandos/DA_BaseBuilding_Decoration_Banner_Hanging_03_Bandos.DA_BaseBuilding_Decoration_Banner_Hanging_03_Bandos"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Guthix_C": {
+      "piece_data_index": 227,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Guthix/DA_BaseBuilding_Decoration_Banner_Hanging_03_Guthix.DA_BaseBuilding_Decoration_Banner_Hanging_03_Guthix"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Saradomin_C": {
+      "piece_data_index": 254,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Saradomin/DA_BaseBuilding_Decoration_Banner_Hanging_03_Saradomin.DA_BaseBuilding_Decoration_Banner_Hanging_03_Saradomin"
+    },
+    "BP_BaseBuilding_Decoration_Banner_Hanging_03_Zamorak_C": {
+      "piece_data_index": 281,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Banners/Zamorak/DA_BaseBuilding_Decoration_Banner_Hanging_03_Zamorak.DA_BaseBuilding_Decoration_Banner_Hanging_03_Zamorak"
+    },
+    "BP_BaseBuilding_Decoration_Coffin_01_C": {
+      "piece_data_index": 130,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Coffin_01.DA_BaseBuilding_Decoration_Coffin_01"
+    },
+    "BP_BaseBuilding_Decoration_Coffin_02_C": {
+      "piece_data_index": 131,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Coffin_02.DA_BaseBuilding_Decoration_Coffin_02"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_01_C": {
+      "piece_data_index": 132,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_01.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_01"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_02_C": {
+      "piece_data_index": 133,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_02.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_02"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_03_C": {
+      "piece_data_index": 134,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_03.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_03"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_01_C": {
+      "piece_data_index": 135,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_01.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_01"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_02_C": {
+      "piece_data_index": 136,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_02.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_02"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_03_C": {
+      "piece_data_index": 137,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_03.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_03"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Statue_01v1_C": {
+      "piece_data_index": 138,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Statue_01v1.DA_BaseBuilding_Decoration_Dragonkin_Statue_01v1"
+    },
+    "BP_BaseBuilding_Decoration_Dragonkin_Statue_02v1_C": {
+      "piece_data_index": 139,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Statue_02v1.DA_BaseBuilding_Decoration_Dragonkin_Statue_02v1"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_01_C": {
+      "piece_data_index": 645,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_01.DA_BaseBuilding_Decoration_Fishing_Trophy_01"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_02_C": {
+      "piece_data_index": 644,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_02.DA_BaseBuilding_Decoration_Fishing_Trophy_02"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_03_C": {
+      "piece_data_index": 643,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_03.DA_BaseBuilding_Decoration_Fishing_Trophy_03"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_04_C": {
+      "piece_data_index": 642,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_04.DA_BaseBuilding_Decoration_Fishing_Trophy_04"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_05_C": {
+      "piece_data_index": 641,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_05.DA_BaseBuilding_Decoration_Fishing_Trophy_05"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_06_C": {
+      "piece_data_index": 640,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_06.DA_BaseBuilding_Decoration_Fishing_Trophy_06"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_07_C": {
+      "piece_data_index": 639,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_07.DA_BaseBuilding_Decoration_Fishing_Trophy_07"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_08_C": {
+      "piece_data_index": 638,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_08.DA_BaseBuilding_Decoration_Fishing_Trophy_08"
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_09_C": {
+      "piece_data_index": 637,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_09.DA_BaseBuilding_Decoration_Fishing_Trophy_09"
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Onions_C": {
+      "piece_data_index": 328,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Bowl_Onions.DA_BaseBuilding_Decoration_Food_Bowl_Onions"
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Peaches_C": {
+      "piece_data_index": 329,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Bowl_Peaches.DA_BaseBuilding_Decoration_Food_Bowl_Peaches"
+    },
+    "BP_BaseBuilding_Decoration_Food_Bowl_Stack_01_C": {
+      "piece_data_index": 330,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Bowl_Stack_01.DA_BaseBuilding_Decoration_Food_Bowl_Stack_01"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Banner_Wall_C": {
+      "piece_data_index": 370,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Banner_Wall.DA_BaseBuilding_Decoration_Garou_Banner_Wall"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Drum_C": {
+      "piece_data_index": 371,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Drum.DA_BaseBuilding_Decoration_Garou_Drum"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_01_C": {
+      "piece_data_index": 372,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_01.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_01"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_02_C": {
+      "piece_data_index": 373,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_02.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_02"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_03_C": {
+      "piece_data_index": 374,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_03.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_03"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_04_C": {
+      "piece_data_index": 375,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_04.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_04"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Hanging_Pelt_01_C": {
+      "piece_data_index": 376,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Pelt_01.DA_BaseBuilding_Decoration_Garou_Hanging_Pelt_01"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Stool_C": {
+      "piece_data_index": 377,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Stool.DA_BaseBuilding_Decoration_Garou_Stool"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_01_C": {
+      "piece_data_index": 378,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_01.DA_BaseBuilding_Decoration_Garou_Trophy_01"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_02_C": {
+      "piece_data_index": 379,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_02.DA_BaseBuilding_Decoration_Garou_Trophy_02"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_03_C": {
+      "piece_data_index": 380,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_03.DA_BaseBuilding_Decoration_Garou_Trophy_03"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Trophy_04_C": {
+      "piece_data_index": 381,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_04.DA_BaseBuilding_Decoration_Garou_Trophy_04"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_01_C": {
+      "piece_data_index": 382,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_01.DA_BaseBuilding_Decoration_Garou_Tusks_01"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_02_C": {
+      "piece_data_index": 383,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_02.DA_BaseBuilding_Decoration_Garou_Tusks_02"
+    },
+    "BP_BaseBuilding_Decoration_Garou_Tusks_03_C": {
+      "piece_data_index": 384,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_03.DA_BaseBuilding_Decoration_Garou_Tusks_03"
+    },
+    "BP_BaseBuilding_Decoration_General_EarlyAdopterTapestry_C": {
+      "piece_data_index": 411,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_EarlyAdopterTapestry.DA_BaseBuilding_Decoration_General_EarlyAdopterTapestry"
+    },
+    "BP_BaseBuilding_Decoration_General_Hanging_Tools_C": {
+      "piece_data_index": 412,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Hanging_Tools.DA_BaseBuilding_Decoration_General_Hanging_Tools"
+    },
+    "BP_BaseBuilding_Decoration_General_Pot_Bench_C": {
+      "piece_data_index": 413,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Pot_Bench.DA_BaseBuilding_Decoration_General_Pot_Bench"
+    },
+    "BP_BaseBuilding_Decoration_General_SawHorse_C": {
+      "piece_data_index": 414,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_SawHorse.DA_BaseBuilding_Decoration_General_SawHorse"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_01_C": {
+      "piece_data_index": 416,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_01.DA_BaseBuilding_Decoration_General_Wood_Barrel_01"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_02_C": {
+      "piece_data_index": 417,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_02.DA_BaseBuilding_Decoration_General_Wood_Barrel_02"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Keg_C": {
+      "piece_data_index": 418,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_Keg.DA_BaseBuilding_Decoration_General_Wood_Barrel_Keg"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Pile_C": {
+      "piece_data_index": 419,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_Pile.DA_BaseBuilding_Decoration_General_Wood_Barrel_Pile"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_C": {
+      "piece_data_index": 420,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Bin_Empty.DA_BaseBuilding_Decoration_General_Wood_Bin_Empty"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack_C": {
+      "piece_data_index": 421,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack.DA_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Broken_C": {
+      "piece_data_index": 422,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Broken.DA_BaseBuilding_Decoration_General_Wood_Crate_Broken"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_C": {
+      "piece_data_index": 423,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed.DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed"
+    },
+    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack_C": {
+      "piece_data_index": 424,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack.DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack"
+    },
+    "BP_BaseBuilding_Decoration_Grave_01_C": {
+      "piece_data_index": 140,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Grave_01.DA_BaseBuilding_Decoration_Grave_01"
+    },
+    "BP_BaseBuilding_Decoration_Headstone_01_C": {
+      "piece_data_index": 141,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Headstone_01.DA_BaseBuilding_Decoration_Headstone_01"
+    },
+    "BP_BaseBuilding_Decoration_Headstone_02_C": {
+      "piece_data_index": 142,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Headstone_02.DA_BaseBuilding_Decoration_Headstone_02"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_C": {
+      "piece_data_index": 469,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan.DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing_C": {
+      "piece_data_index": 470,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_C": {
+      "piece_data_index": 471,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack.DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing_C": {
+      "piece_data_index": 472,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_C": {
+      "piece_data_index": 473,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction.DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing_C": {
+      "piece_data_index": 474,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_C": {
+      "piece_data_index": 475,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking.DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing_C": {
+      "piece_data_index": 476,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying_C": {
+      "piece_data_index": 477,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying.DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open_C": {
+      "piece_data_index": 478,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open.DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Standing_C": {
+      "piece_data_index": 479,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Magic_C": {
+      "piece_data_index": 480,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Magic.DA_BaseBuilding_Decoration_Literature_Book_Tome_Magic"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Magic_Standing_C": {
+      "piece_data_index": 481,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Magic_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Magic_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Mining_C": {
+      "piece_data_index": 482,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining.DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing_C": {
+      "piece_data_index": 483,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_C": {
+      "piece_data_index": 484,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged.DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing_C": {
+      "piece_data_index": 485,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_C": {
+      "piece_data_index": 486,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting.DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing_C": {
+      "piece_data_index": 487,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_C": {
+      "piece_data_index": 488,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting.DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting"
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing_C": {
+      "piece_data_index": 489,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing"
+    },
+    "BP_BaseBuilding_Decoration_Material_Anima_Wild_C": {
+      "piece_data_index": 555,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Anima_Wild.DA_BaseBuilding_Decoration_Material_Anima_Wild"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Granite_C": {
+      "piece_data_index": 556,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Granite.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Granite"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone_C": {
+      "piece_data_index": 557,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Stone_C": {
+      "piece_data_index": 558,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Stone.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Stone"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Bin_01_C": {
+      "piece_data_index": 559,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Blurite_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Blurite_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Medium_C": {
+      "piece_data_index": 560,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small_C": {
+      "piece_data_index": 561,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01_C": {
+      "piece_data_index": 562,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Medium_C": {
+      "piece_data_index": 563,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Small_C": {
+      "piece_data_index": 564,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Bin_01_C": {
+      "piece_data_index": 565,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Copper_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Copper_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Medium_C": {
+      "piece_data_index": 566,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Small_C": {
+      "piece_data_index": 567,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Copper_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Diamond_C": {
+      "piece_data_index": 568,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gem_Diamond.DA_BaseBuilding_Decoration_Material_Basic_Gem_Diamond"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Jade_C": {
+      "piece_data_index": 569,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gem_Jade.DA_BaseBuilding_Decoration_Material_Basic_Gem_Jade"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Opal_C": {
+      "piece_data_index": 570,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gem_Opal.DA_BaseBuilding_Decoration_Material_Basic_Gem_Opal"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Sapphire_C": {
+      "piece_data_index": 571,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gem_Sapphire.DA_BaseBuilding_Decoration_Material_Basic_Gem_Sapphire"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gem_Topaz_Red_C": {
+      "piece_data_index": 572,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gem_Topaz_Red.DA_BaseBuilding_Decoration_Material_Basic_Gem_Topaz_Red"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Bin_01_C": {
+      "piece_data_index": 573,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gold_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Gold_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Medium_C": {
+      "piece_data_index": 574,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Small_C": {
+      "piece_data_index": 575,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Gold_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Bin_01_C": {
+      "piece_data_index": 576,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Iron_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Iron_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Medium_C": {
+      "piece_data_index": 577,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Small_C": {
+      "piece_data_index": 578,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Iron_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Bin_01_C": {
+      "piece_data_index": 579,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Silver_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Silver_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Medium_C": {
+      "piece_data_index": 580,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Small_C": {
+      "piece_data_index": 581,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Silver_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Bin_01_C": {
+      "piece_data_index": 582,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Tin_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Tin_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Medium_C": {
+      "piece_data_index": 583,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Medium.DA_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Medium"
+    },
+    "BP_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Small_C": {
+      "piece_data_index": 584,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Tin_Nugget_Small"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_20_C": {
+      "piece_data_index": 635,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_20.DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_20"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_5_C": {
+      "piece_data_index": 636,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_5.DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_5"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_Single_C": {
+      "piece_data_index": 634,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_Single.DA_BaseBuilding_Decoration_Material_Processed_Blurite_Bar_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_20_C": {
+      "piece_data_index": 632,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_20.DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_20"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_5_C": {
+      "piece_data_index": 633,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_5.DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_5"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_Single_C": {
+      "piece_data_index": 631,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_Single.DA_BaseBuilding_Decoration_Material_Processed_Bronze_Bar_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Bin_01_C": {
+      "piece_data_index": 621,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Bin_01.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Pile_C": {
+      "piece_data_index": 620,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Pile.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Pile"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Single_C": {
+      "piece_data_index": 619,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Single.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Coarse_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Bin_01_C": {
+      "piece_data_index": 618,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Bin_01.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Pile_C": {
+      "piece_data_index": 617,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Pile.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Pile"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Single_C": {
+      "piece_data_index": 616,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Single.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Padded_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Bin_01_C": {
+      "piece_data_index": 615,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Bin_01.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Pile_C": {
+      "piece_data_index": 614,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Pile.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Pile"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Single_C": {
+      "piece_data_index": 613,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Single.DA_BaseBuilding_Decoration_Material_Processed_Cloth_Wool_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_20_C": {
+      "piece_data_index": 629,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_20.DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_20"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_5_C": {
+      "piece_data_index": 630,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_5.DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_5"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Gold_Bar_Single_C": {
+      "piece_data_index": 628,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_Single.DA_BaseBuilding_Decoration_Material_Processed_Gold_Bar_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_20_C": {
+      "piece_data_index": 626,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_20.DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_20"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_5_C": {
+      "piece_data_index": 627,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_5.DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_5"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Iron_Bar_Single_C": {
+      "piece_data_index": 625,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_Single.DA_BaseBuilding_Decoration_Material_Processed_Iron_Bar_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_20_C": {
+      "piece_data_index": 623,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_20.DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_20"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_5_C": {
+      "piece_data_index": 624,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_5.DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_5"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Silver_Bar_Single_C": {
+      "piece_data_index": 622,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Mining/DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_Single.DA_BaseBuilding_Decoration_Material_Processed_Silver_Bar_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Textile_TextileKit_C": {
+      "piece_data_index": 612,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Textile_TextileKit.DA_BaseBuilding_Decoration_Material_Processed_Textile_TextileKit"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Bin_01_C": {
+      "piece_data_index": 611,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Bin_01.DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Pile_C": {
+      "piece_data_index": 610,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Pile.DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Pile"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Single_C": {
+      "piece_data_index": 609,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Single.DA_BaseBuilding_Decoration_Material_Processed_Thread_Coarse_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Bin_01_C": {
+      "piece_data_index": 608,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Bin_01.DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Bin_01"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Pile_C": {
+      "piece_data_index": 600,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Pile.DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Pile"
+    },
+    "BP_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Single_C": {
+      "piece_data_index": 599,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/Textiles/DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Single.DA_BaseBuilding_Decoration_Material_Processed_Thread_Wool_Single"
+    },
+    "BP_BaseBuilding_Decoration_Material_Vault_Core_C": {
+      "piece_data_index": 585,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Vault_Core.DA_BaseBuilding_Decoration_Material_Vault_Core"
+    },
+    "BP_BaseBuilding_Decoration_Material_Vault_Shard_C": {
+      "piece_data_index": 586,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Vault_Shard.DA_BaseBuilding_Decoration_Material_Vault_Shard"
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Dwellberry_C": {
+      "piece_data_index": 598,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Dwellberry.DA_BaseBuilding_Decoration_Plants_Potted_Dwellberry"
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Onion_C": {
+      "piece_data_index": 597,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Onion.DA_BaseBuilding_Decoration_Plants_Potted_Onion"
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Redberry_C": {
+      "piece_data_index": 596,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Redberry.DA_BaseBuilding_Decoration_Plants_Potted_Redberry"
+    },
+    "BP_BaseBuilding_Decoration_Plants_Potted_Wintumber_Tree_C": {
+      "piece_data_index": 415,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wintumber_Tree.DA_BaseBuilding_Decoration_General_Wintumber_Tree"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Air_C": {
+      "piece_data_index": 601,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Air.DA_BaseBuilding_Decoration_Rune_Air"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Astral_C": {
+      "piece_data_index": 602,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Astral.DA_BaseBuilding_Decoration_Rune_Astral"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Earth_C": {
+      "piece_data_index": 603,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Earth.DA_BaseBuilding_Decoration_Rune_Earth"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Fire_C": {
+      "piece_data_index": 604,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Fire.DA_BaseBuilding_Decoration_Rune_Fire"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Law_C": {
+      "piece_data_index": 605,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Law.DA_BaseBuilding_Decoration_Rune_Law"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Nature_C": {
+      "piece_data_index": 606,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Nature.DA_BaseBuilding_Decoration_Rune_Nature"
+    },
+    "BP_BaseBuilding_Decoration_Rune_Water_C": {
+      "piece_data_index": 607,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Processed/DA_BaseBuilding_Decoration_Rune_Water.DA_BaseBuilding_Decoration_Rune_Water"
+    },
+    "BP_BaseBuilding_Decoration_Spectral_Book_C": {
+      "piece_data_index": 490,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Spectral_Book.DA_BaseBuilding_Decoration_Spectral_Book"
+    },
+    "BP_BaseBuilding_Decoration_Storage_Shelf_Glass_Vials_C": {
+      "piece_data_index": 595,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Storage/DA_BaseBuilding_Decoration_Storage_Shelf_Glass_Vials.DA_BaseBuilding_Decoration_Storage_Shelf_Glass_Vials"
+    },
+    "BP_BaseBuilding_Decoration_Tombstone_01_C": {
+      "piece_data_index": 143,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Tombstone_01.DA_BaseBuilding_Decoration_Tombstone_01"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Blue_C": {
+      "piece_data_index": 320,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Arcane.DA_BaseBuilding_Decoration_Drink_Tea_Arcane"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Dwellberry_C": {
+      "piece_data_index": 321,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Dwellberry.DA_BaseBuilding_Decoration_Drink_Tea_Dwellberry"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Green_C": {
+      "piece_data_index": 327,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Relentless.DA_BaseBuilding_Decoration_Drink_Tea_Relentless"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Orange_C": {
+      "piece_data_index": 325,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Pumpkin.DA_BaseBuilding_Decoration_Drink_Tea_Pumpkin"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Red_C": {
+      "piece_data_index": 323,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Ferocious.DA_BaseBuilding_Decoration_Drink_Tea_Ferocious"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Redberry_C": {
+      "piece_data_index": 326,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Redberry.DA_BaseBuilding_Decoration_Drink_Tea_Redberry"
+    },
+    "BP_BaseBuilding_Drink_Infusion_Yellow_C": {
+      "piece_data_index": 324,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Drink_Tea_Fleetfooted.DA_BaseBuilding_Decoration_Drink_Tea_Fleetfooted"
+    },
+    "BP_BaseBuilding_FishingBarrel_C": {
+      "piece_data_index": 647,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/BUILDPIECE_FishingBarrel.BUILDPIECE_FishingBarrel"
+    },
+    "BP_BaseBuilding_Food_Dinner_Omelette_Pungent_C": {
+      "piece_data_index": 331,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Dinner_Omelette_Pungent.DA_BaseBuilding_Decoration_Food_Dinner_Omelette_Pungent"
+    },
+    "BP_BaseBuilding_Food_Dinner_Roast_C": {
+      "piece_data_index": 332,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Dinner_Roast.DA_BaseBuilding_Decoration_Food_Dinner_Roast"
+    },
+    "BP_BaseBuilding_Food_Dinner_Steak_Eggs_C": {
+      "piece_data_index": 333,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Dinner_Steak_Eggs.DA_BaseBuilding_Decoration_Food_Dinner_Steak_Eggs"
+    },
+    "BP_BaseBuilding_Food_Dinner_Vegball_Sweet_C": {
+      "piece_data_index": 334,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Dinner_Vegball_Sweet.DA_BaseBuilding_Decoration_Food_Dinner_Vegball_Sweet"
+    },
+    "BP_BaseBuilding_Food_Fryup_Cheeky_C": {
+      "piece_data_index": 335,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Fryup_Cheeky.DA_BaseBuilding_Decoration_Food_Fryup_Cheeky"
+    },
+    "BP_BaseBuilding_Food_Fryup_Vegan_C": {
+      "piece_data_index": 336,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Fryup_Vegan.DA_BaseBuilding_Decoration_Food_Fryup_Vegan"
+    },
+    "BP_BaseBuilding_Food_Soup_Pumpkin_C": {
+      "piece_data_index": 337,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Soup_Pumpkin.DA_BaseBuilding_Decoration_Food_Soup_Pumpkin"
+    },
+    "BP_BaseBuilding_Food_Stew_BeefTomato_C": {
+      "piece_data_index": 338,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Stew_BeefTomato.DA_BaseBuilding_Decoration_Food_Stew_BeefTomato"
+    },
+    "BP_BaseBuilding_Food_Stew_Meat_C": {
+      "piece_data_index": 339,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Stew_Meat.DA_BaseBuilding_Decoration_Food_Stew_Meat"
+    },
+    "BP_BaseBuilding_Lodestone_C": {
+      "piece_data_index": 25,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Lodestone.BUILDPIECE_Lodestone"
+    },
+    "BP_BaseBuilding_LumberStorage_C": {
+      "piece_data_index": 59,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_LumberStorage.BUILDPIECE_LumberStorage"
+    },
+    "BP_BaseBuilding_PanRack_C": {
+      "piece_data_index": 10,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_PanRack.BUILDPIECE_Interior_PanRack"
+    },
+    "BP_BaseBuilding_PersonalChest_C": {
+      "piece_data_index": 60,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_PersonalChest.BUILDPIECE_PersonalChest"
+    },
+    "BP_BaseBuilding_PlantPot_C": {
+      "piece_data_index": 11,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_PlantPot.BUILDPIECE_Interior_PlantPot"
+    },
+    "BP_BaseBuilding_Rug_Rect2_C": {
+      "piece_data_index": 13,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Rug_Rect2.BUILDPIECE_Interior_Rug_Rect2"
+    },
+    "BP_BaseBuilding_Rug_Rect_C": {
+      "piece_data_index": 12,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Rug_Rect.BUILDPIECE_Interior_Rug_Rect"
+    },
+    "BP_BaseBuilding_Scarecrow_C": {
+      "piece_data_index": 594,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/BUILDPIECE_Interior_Scarecrow.BUILDPIECE_Interior_Scarecrow"
+    },
+    "BP_BaseBuilding_Shelf_C": {
+      "piece_data_index": 14,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Shelf.BUILDPIECE_Interior_Shelf"
+    },
+    "BP_BaseBuilding_Shelf_Oak_C": {
+      "piece_data_index": 15,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Shelf_Oak.BUILDPIECE_Interior_Shelf_Oak"
+    },
+    "BP_BaseBuilding_Stairs_45_C": {
+      "piece_data_index": 84,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/FlooringAndStairs/BUILDPIECE_Stairs_45.BUILDPIECE_Stairs_45"
+    },
+    "BP_BaseBuilding_TableRound_C": {
+      "piece_data_index": 20,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_TableRound.BUILDPIECE_Interior_TableRound"
+    },
+    "BP_BaseBuilding_TableRound_Oak_C": {
+      "piece_data_index": 21,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_TableRound_Oak.BUILDPIECE_Interior_TableRound_Oak"
+    },
+    "BP_BaseBuilding_Table_C": {
+      "piece_data_index": 17,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Table.BUILDPIECE_Interior_Table"
+    },
+    "BP_BaseBuilding_Table_Oak_C": {
+      "piece_data_index": 18,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Table_Oak.BUILDPIECE_Interior_Table_Oak"
+    },
+    "BP_BaseBuilding_Table_Side_C": {
+      "piece_data_index": 19,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_Table_Side.BUILDPIECE_Interior_Table_Side"
+    },
+    "BP_BaseBuilding_TackleBox_C": {
+      "piece_data_index": 646,
+      "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/BUILDPIECE_TackleBox.BUILDPIECE_TackleBox"
+    },
+    "BP_BaseBuilding_TorchStanding_Blue_C": {
+      "piece_data_index": 37,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_TorchStanding_Blue.BUILDPIECE_Prop_TorchStanding_Blue"
+    },
+    "BP_BaseBuilding_TorchStanding_C": {
+      "piece_data_index": 36,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_TorchStanding.BUILDPIECE_Prop_TorchStanding"
+    },
+    "BP_BaseBuilding_TorchStanding_Green_C": {
+      "piece_data_index": 38,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_TorchStanding_Green.BUILDPIECE_Prop_TorchStanding_Green"
+    },
+    "BP_BaseBuilding_TorchStanding_Purple_C": {
+      "piece_data_index": 39,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_TorchStanding_Purple.BUILDPIECE_Prop_TorchStanding_Purple"
+    },
+    "BP_BaseBuilding_TorchStanding_Red_C": {
+      "piece_data_index": 40,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_TorchStanding_Red.BUILDPIECE_Prop_TorchStanding_Red"
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Blue_C": {
+      "piece_data_index": 47,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_TorchStanding_Blue.BUILDPIECE_Prop_Type2_TorchStanding_Blue"
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Green_C": {
+      "piece_data_index": 48,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_TorchStanding_Green.BUILDPIECE_Prop_Type2_TorchStanding_Green"
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Natural_C": {
+      "piece_data_index": 46,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_TorchStanding.BUILDPIECE_Prop_Type2_TorchStanding"
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Purple_C": {
+      "piece_data_index": 49,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_TorchStanding_Purple.BUILDPIECE_Prop_Type2_TorchStanding_Purple"
+    },
+    "BP_BaseBuilding_TorchStanding_Type2_Red_C": {
+      "piece_data_index": 50,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_TorchStanding_Red.BUILDPIECE_Prop_Type2_TorchStanding_Red"
+    },
+    "BP_BaseBuilding_Torch_Blue_C": {
+      "piece_data_index": 32,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Torch_Blue.BUILDPIECE_Prop_Torch_Blue"
+    },
+    "BP_BaseBuilding_Torch_C": {
+      "piece_data_index": 31,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Torch.BUILDPIECE_Prop_Torch"
+    },
+    "BP_BaseBuilding_Torch_Green_C": {
+      "piece_data_index": 33,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Torch_Green.BUILDPIECE_Prop_Torch_Green"
+    },
+    "BP_BaseBuilding_Torch_Purple_C": {
+      "piece_data_index": 34,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Torch_Purple.BUILDPIECE_Prop_Torch_Purple"
+    },
+    "BP_BaseBuilding_Torch_Red_C": {
+      "piece_data_index": 35,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Torch_Red.BUILDPIECE_Prop_Torch_Red"
+    },
+    "BP_BaseBuilding_Torch_Type2_Blue_C": {
+      "piece_data_index": 42,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_Torch_Blue.BUILDPIECE_Prop_Type2_Torch_Blue"
+    },
+    "BP_BaseBuilding_Torch_Type2_Green_C": {
+      "piece_data_index": 43,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_Torch_Green.BUILDPIECE_Prop_Type2_Torch_Green"
+    },
+    "BP_BaseBuilding_Torch_Type2_Natural_C": {
+      "piece_data_index": 41,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_Torch.BUILDPIECE_Prop_Type2_Torch"
+    },
+    "BP_BaseBuilding_Torch_Type2_Purple_C": {
+      "piece_data_index": 44,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_Torch_Purple.BUILDPIECE_Prop_Type2_Torch_Purple"
+    },
+    "BP_BaseBuilding_Torch_Type2_Red_C": {
+      "piece_data_index": 45,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Prop_Type2_Torch_Red.BUILDPIECE_Prop_Type2_Torch_Red"
+    },
+    "BP_BaseBuilding_TrainingDummy_C": {
+      "piece_data_index": 22,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_TrainingDummy.BUILDPIECE_Interior_TrainingDummy"
+    },
+    "BP_BaseBuilding_WeaponRack_C": {
+      "piece_data_index": 61,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Storage/BUILDPIECE_WeaponRack.BUILDPIECE_WeaponRack"
+    },
+    "BP_BaseBuilding_Windowbox_C": {
+      "piece_data_index": 23,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_WindowBox.BUILDPIECE_Interior_WindowBox"
+    },
+    "BP_BaseBuilding_Windowbox_Oak_C": {
+      "piece_data_index": 24,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Interior_WindowBox_Oak.BUILDPIECE_Interior_WindowBox_Oak"
+    },
+    "BP_Crafting_Cauldron_C": {
+      "piece_data_index": 71,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Cauldron.BUILDPIECE_ProcessingStation_Cauldron"
+    },
+    "BP_Crafting_CookingBench_C": {
+      "piece_data_index": 64,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Cooking.BUILDPIECE_CraftingStation_Cooking"
+    },
+    "BP_Crafting_FletchingBench_C": {
+      "piece_data_index": 65,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Fletching.BUILDPIECE_CraftingStation_Fletching"
+    },
+    "BP_Crafting_Jewelry_C": {
+      "piece_data_index": 69,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStiation_Jewelry_Bench.BUILDPIECE_CraftingStiation_Jewelry_Bench"
+    },
+    "BP_Crafting_PotteryWheel_C": {
+      "piece_data_index": 66,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Pottery.BUILDPIECE_CraftingStation_Pottery"
+    },
+    "BP_Crafting_Rune_Altar_C": {
+      "piece_data_index": 67,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Rune_Altar.BUILDPIECE_CraftingStation_Rune_Altar"
+    },
+    "BP_Crafting_StartingBench_C": {
+      "piece_data_index": 63,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Basic.BUILDPIECE_CraftingStation_Basic"
+    },
+    "BP_Crafting_Stone_Range_C": {
+      "piece_data_index": 2,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_CraftingStation_Cooking_Stone.BUILDPIECE_CraftingStation_Cooking_Stone"
+    },
+    "BP_Crafting_WeaponBench_C": {
+      "piece_data_index": 68,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStation_Weapons.BUILDPIECE_CraftingStation_Weapons"
+    },
+    "BP_FarmPlot1x1_T1_C": {
+      "piece_data_index": 534,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Farming/DA_FarmPlot_T1_Brynmoor.DA_FarmPlot_T1_Brynmoor"
+    },
+    "BP_FarmPlot1x1_T2_C": {
+      "piece_data_index": 533,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Farming/DA_FarmPlot_T2_Ghronfell.DA_FarmPlot_T2_Ghronfell"
+    },
+    "BP_FarmPlot1x1_T3_C": {
+      "piece_data_index": 532,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Farming/DA_FarmPlot_T3_Fellhollow.DA_FarmPlot_T3_Fellhollow"
+    },
+    "BP_Farm_Barrel_Water_C": {
+      "piece_data_index": 591,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Station_Barrel.DA_BaseBuilding_Station_Barrel"
+    },
+    "BP_Farm_Barrel_Water_Large_C": {
+      "piece_data_index": 590,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Station_Barrel_Large.DA_BaseBuilding_Station_Barrel_Large"
+    },
+    "BP_Farm_RainCatcher_C": {
+      "piece_data_index": 593,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Container_Water_Barrel_RainCatcher.DA_BaseBuilding_Container_Water_Barrel_RainCatcher"
+    },
+    "BP_Farm_Well_C": {
+      "piece_data_index": 592,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Container_Water_Well.DA_BaseBuilding_Container_Water_Well"
+    },
+    "BP_PostService_PostiePeteDispenser_C": {
+      "piece_data_index": 587,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/PostService/DA_BaseBuilding_PostService_PostiePeteDispenser.DA_BaseBuilding_PostService_PostiePeteDispenser"
+    },
+    "BP_Station_AdvancedSmelter_C": {
+      "piece_data_index": 70,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_AdvancedSmelter.BUILDPIECE_ProcessingStation_AdvancedSmelter"
+    },
+    "BP_Station_Campfire_C": {
+      "piece_data_index": 1,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Furniture/Comfort/BUILDPIECE_Campfire.BUILDPIECE_Campfire"
+    },
+    "BP_Station_CharcoalKiln_C": {
+      "piece_data_index": 72,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_CharcoalKiln.BUILDPIECE_ProcessingStation_CharcoalKiln"
+    },
+    "BP_Station_Composter_New_C": {
+      "piece_data_index": 589,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Station_Composter.DA_BaseBuilding_Station_Composter"
+    },
+    "BP_Station_Composter_New_Super_C": {
+      "piece_data_index": 588,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Farming/DA_BaseBuilding_Station_ComposterSuper.DA_BaseBuilding_Station_ComposterSuper"
+    },
+    "BP_Station_Grill_C": {
+      "piece_data_index": 73,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Grill.BUILDPIECE_ProcessingStation_Grill"
+    },
+    "BP_Station_Grindstone_C": {
+      "piece_data_index": 74,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Grindstone.BUILDPIECE_ProcessingStation_Grindstone"
+    },
+    "BP_Station_Loom_C": {
+      "piece_data_index": 75,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Loom.BUILDPIECE_ProcessingStation_Loom"
+    },
+    "BP_Station_Sawmill_C": {
+      "piece_data_index": 76,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Sawmill.BUILDPIECE_ProcessingStation_Sawmill"
+    },
+    "BP_Station_Smelter_C": {
+      "piece_data_index": 77,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Smelter.BUILDPIECE_ProcessingStation_Smelter"
+    },
+    "BP_Station_Spinning_Wheel_C": {
+      "piece_data_index": 78,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Spinning_Wheel.BUILDPIECE_ProcessingStation_Spinning_Wheel"
+    },
+    "BP_Station_Stonecutter_C": {
+      "piece_data_index": 79,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Stonecutter.BUILDPIECE_ProcessingStation_Stonecutter"
+    },
+    "BP_Station_Tanner_C": {
+      "piece_data_index": 80,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_ProcessingStation_Tanner.BUILDPIECE_ProcessingStation_Tanner"
+    },
+    "BP_T1_Beam_Thick_Large_Diagonal_C": {
+      "piece_data_index": 554,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Large_Diagonal.DA_T1_Beam_Thick_Large_Diagonal"
+    },
+    "BP_T1_Beam_Thick_Large_Horizontal_C": {
+      "piece_data_index": 553,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Large_Horizontal.DA_T1_Beam_Thick_Large_Horizontal"
+    },
+    "BP_T1_Beam_Thick_Large_Shallow_C": {
+      "piece_data_index": 552,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Large_Shallow.DA_T1_Beam_Thick_Large_Shallow"
+    },
+    "BP_T1_Beam_Thick_Large_Steep_C": {
+      "piece_data_index": 551,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Large_Steep.DA_T1_Beam_Thick_Large_Steep"
+    },
+    "BP_T1_Beam_Thick_Large_Vertical_C": {
+      "piece_data_index": 550,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Large_Vertical.DA_T1_Beam_Thick_Large_Vertical"
+    },
+    "BP_T1_Beam_Thick_Medium_Diagonal_C": {
+      "piece_data_index": 549,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Medium_Diagonal.DA_T1_Beam_Thick_Medium_Diagonal"
+    },
+    "BP_T1_Beam_Thick_Medium_Horizontal_C": {
+      "piece_data_index": 548,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Medium_Horizontal.DA_T1_Beam_Thick_Medium_Horizontal"
+    },
+    "BP_T1_Beam_Thick_Medium_Shallow_C": {
+      "piece_data_index": 547,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Medium_Shallow.DA_T1_Beam_Thick_Medium_Shallow"
+    },
+    "BP_T1_Beam_Thick_Medium_Steep_C": {
+      "piece_data_index": 546,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Medium_Steep.DA_T1_Beam_Thick_Medium_Steep"
+    },
+    "BP_T1_Beam_Thick_Medium_Vertical_C": {
+      "piece_data_index": 545,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thick_Medium_Vertical.DA_T1_Beam_Thick_Medium_Vertical"
+    },
+    "BP_T1_Beam_Thin_Large_Diagonal_C": {
+      "piece_data_index": 544,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Large_Diagonal.DA_T1_Beam_Thin_Large_Diagonal"
+    },
+    "BP_T1_Beam_Thin_Large_Horizontal_C": {
+      "piece_data_index": 543,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Large_Horizontal.DA_T1_Beam_Thin_Large_Horizontal"
+    },
+    "BP_T1_Beam_Thin_Large_Shallow_C": {
+      "piece_data_index": 542,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Large_Shallow.DA_T1_Beam_Thin_Large_Shallow"
+    },
+    "BP_T1_Beam_Thin_Large_Steep_C": {
+      "piece_data_index": 541,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Large_Steep.DA_T1_Beam_Thin_Large_Steep"
+    },
+    "BP_T1_Beam_Thin_Large_Vertical_C": {
+      "piece_data_index": 540,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Large_Vertical.DA_T1_Beam_Thin_Large_Vertical"
+    },
+    "BP_T1_Beam_Thin_Medium_Diagonal_C": {
+      "piece_data_index": 539,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Medium_Diagonal.DA_T1_Beam_Thin_Medium_Diagonal"
+    },
+    "BP_T1_Beam_Thin_Medium_Horizontal_C": {
+      "piece_data_index": 538,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Medium_Horizontal.DA_T1_Beam_Thin_Medium_Horizontal"
+    },
+    "BP_T1_Beam_Thin_Medium_Shallow_C": {
+      "piece_data_index": 537,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Medium_Shallow.DA_T1_Beam_Thin_Medium_Shallow"
+    },
+    "BP_T1_Beam_Thin_Medium_Steep_C": {
+      "piece_data_index": 536,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Medium_Steep.DA_T1_Beam_Thin_Medium_Steep"
+    },
+    "BP_T1_Beam_Thin_Medium_Vertical_C": {
+      "piece_data_index": 535,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Beams/DA_T1_Beam_Thin_Medium_Vertical.DA_T1_Beam_Thin_Medium_Vertical"
+    },
+    "BP_T1_Door_C": {
+      "piece_data_index": 522,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Misc/DA_T1_Door.DA_T1_Door"
+    },
+    "BP_T1_Floor_Large_C": {
+      "piece_data_index": 531,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Floor/DA_T1_Floor_Large.DA_T1_Floor_Large"
+    },
+    "BP_T1_Floor_Large_Triangle_C": {
+      "piece_data_index": 530,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Floor/DA_T1_Floor_Large_Triangle.DA_T1_Floor_Large_Triangle"
+    },
+    "BP_T1_Floor_Medium_C": {
+      "piece_data_index": 529,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Floor/DA_T1_Floor_Medium.DA_T1_Floor_Medium"
+    },
+    "BP_T1_Floor_Medium_Triangle_C": {
+      "piece_data_index": 528,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Floor/DA_T1_Floor_Medium_Triangle.DA_T1_Floor_Medium_Triangle"
+    },
+    "BP_T1_Floor_Small_C": {
+      "piece_data_index": 527,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Floor/DA_T1_Floor_Small.DA_T1_Floor_Small"
+    },
+    "BP_T1_Foundation_Large_C": {
+      "piece_data_index": 526,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Foundations/DA_T1_Foundation_Large.DA_T1_Foundation_Large"
+    },
+    "BP_T1_Foundation_Large_Triangle_C": {
+      "piece_data_index": 525,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Foundations/DA_T1_Foundation_Large_Triangle.DA_T1_Foundation_Large_Triangle"
+    },
+    "BP_T1_Foundation_Medium_C": {
+      "piece_data_index": 524,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Foundations/DA_T1_Foundation_Medium.DA_T1_Foundation_Medium"
+    },
+    "BP_T1_Foundation_Medium_Triangle_C": {
+      "piece_data_index": 523,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Foundations/DA_T1_Foundation_Medium_Triangle.DA_T1_Foundation_Medium_Triangle"
+    },
+    "BP_T1_Pallisades_C": {
+      "piece_data_index": 410,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Pallisades.DA_T1_Wall_Pallisades"
+    },
+    "BP_T1_Pallisades_Gate_C": {
+      "piece_data_index": 442,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Pallisades_Gate.DA_T1_Pallisades_Gate"
+    },
+    "BP_T1_Roof_Large_Diagonal_C": {
+      "piece_data_index": 520,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Diagonal.DA_T1_Roof_Large_Diagonal"
+    },
+    "BP_T1_Roof_Large_Hip_Diagonal_C": {
+      "piece_data_index": 519,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Hip_Diagonal.DA_T1_Roof_Large_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Large_Hip_Shallow_C": {
+      "piece_data_index": 518,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Hip_Shallow.DA_T1_Roof_Large_Hip_Shallow"
+    },
+    "BP_T1_Roof_Large_Shallow_C": {
+      "piece_data_index": 517,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Shallow.DA_T1_Roof_Large_Shallow"
+    },
+    "BP_T1_Roof_Large_Triangle_Diagonal_C": {
+      "piece_data_index": 516,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Triangle_Diagonal.DA_T1_Roof_Large_Triangle_Diagonal"
+    },
+    "BP_T1_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 515,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Triangle_Diagonal_Inverted.DA_T1_Roof_Large_Triangle_Diagonal_Inverted"
+    },
+    "BP_T1_Roof_Large_Triangle_Shallow_C": {
+      "piece_data_index": 514,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Triangle_Shallow.DA_T1_Roof_Large_Triangle_Shallow"
+    },
+    "BP_T1_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 513,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Triangle_Shallow_Inverted.DA_T1_Roof_Large_Triangle_Shallow_Inverted"
+    },
+    "BP_T1_Roof_Large_Valley_Diagonal_C": {
+      "piece_data_index": 512,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Valley_Diagonal.DA_T1_Roof_Large_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Large_Valley_Shallow_C": {
+      "piece_data_index": 511,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Large_Valley_Shallow.DA_T1_Roof_Large_Valley_Shallow"
+    },
+    "BP_T1_Roof_Medium_Diagonal_C": {
+      "piece_data_index": 510,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Diagonal.DA_T1_Roof_Medium_Diagonal"
+    },
+    "BP_T1_Roof_Medium_Hip_Diagonal_C": {
+      "piece_data_index": 509,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Hip_Diagonal.DA_T1_Roof_Medium_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Medium_Hip_Shallow_C": {
+      "piece_data_index": 508,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Hip_Shallow.DA_T1_Roof_Medium_Hip_Shallow"
+    },
+    "BP_T1_Roof_Medium_Shallow_C": {
+      "piece_data_index": 507,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Shallow.DA_T1_Roof_Medium_Shallow"
+    },
+    "BP_T1_Roof_Medium_Triangle_Diagonal_C": {
+      "piece_data_index": 506,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Triangle_Diagonal.DA_T1_Roof_Medium_Triangle_Diagonal"
+    },
+    "BP_T1_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 505,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Triangle_Diagonal_Inverted.DA_T1_Roof_Medium_Triangle_Diagonal_Inverted"
+    },
+    "BP_T1_Roof_Medium_Triangle_Shallow_C": {
+      "piece_data_index": 504,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Triangle_Shallow.DA_T1_Roof_Medium_Triangle_Shallow"
+    },
+    "BP_T1_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 503,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Triangle_Shallow_Inverted.DA_T1_Roof_Medium_Triangle_Shallow_Inverted"
+    },
+    "BP_T1_Roof_Medium_Valley_C": {
+      "piece_data_index": 502,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Valley_Diagonal.DA_T1_Roof_Medium_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Medium_Valley_Shallow_C": {
+      "piece_data_index": 501,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Medium_Valley_Shallow.DA_T1_Roof_Medium_Valley_Shallow"
+    },
+    "BP_T1_Roof_Small_Diagonal_C": {
+      "piece_data_index": 500,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Diagonal.DA_T1_Roof_Small_Diagonal"
+    },
+    "BP_T1_Roof_Small_Hip_Diagonal_C": {
+      "piece_data_index": 499,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Hip_Diagonal.DA_T1_Roof_Small_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Small_Hip_Shallow_C": {
+      "piece_data_index": 498,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Hip_Shallow.DA_T1_Roof_Small_Hip_Shallow"
+    },
+    "BP_T1_Roof_Small_Shallow_C": {
+      "piece_data_index": 497,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Shallow.DA_T1_Roof_Small_Shallow"
+    },
+    "BP_T1_Roof_Small_Valley_Diagonal_C": {
+      "piece_data_index": 496,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Valley_Diagonal.DA_T1_Roof_Small_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Small_Valley_Shallow_C": {
+      "piece_data_index": 495,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Small_Valley_Shallow.DA_T1_Roof_Small_Valley_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Large_Diagonal_C": {
+      "piece_data_index": 494,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Diagonal.DA_T1_Roof_Thatch_Large_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Large_Hip_Diagonal_C": {
+      "piece_data_index": 493,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Hip_Diagonal.DA_T1_Roof_Thatch_Large_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Large_Hip_Shallow_C": {
+      "piece_data_index": 492,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Hip_Shallow.DA_T1_Roof_Thatch_Large_Hip_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Large_Shallow_C": {
+      "piece_data_index": 491,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Shallow.DA_T1_Roof_Thatch_Large_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Diagonal_C": {
+      "piece_data_index": 468,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Triangle_Diagonal.DA_T1_Roof_Thatch_Large_Triangle_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 467,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Triangle_Diagonal_Inverted.DA_T1_Roof_Thatch_Large_Triangle_Diagonal_Inverted"
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Shallow_C": {
+      "piece_data_index": 466,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Triangle_Shallow.DA_T1_Roof_Thatch_Large_Triangle_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Large_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 465,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Triangle_Shallow_Inverted.DA_T1_Roof_Thatch_Large_Triangle_Shallow_Inverted"
+    },
+    "BP_T1_Roof_Thatch_Large_Valley_Diagonal_C": {
+      "piece_data_index": 464,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Valley_Diagonal.DA_T1_Roof_Thatch_Large_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Large_Valley_Shallow_C": {
+      "piece_data_index": 463,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Large_Valley_Shallow.DA_T1_Roof_Thatch_Large_Valley_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Medium_Diagonal_C": {
+      "piece_data_index": 462,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Diagonal.DA_T1_Roof_Thatch_Medium_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Medium_Hip_Diagonal_C": {
+      "piece_data_index": 461,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Hip_Diagonal.DA_T1_Roof_Thatch_Medium_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Medium_Hip_Shallow_C": {
+      "piece_data_index": 460,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Hip_Shallow.DA_T1_Roof_Thatch_Medium_Hip_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Medium_Shallow_C": {
+      "piece_data_index": 459,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Shallow.DA_T1_Roof_Thatch_Medium_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Diagonal_C": {
+      "piece_data_index": 458,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Triangle_Diagonal.DA_T1_Roof_Thatch_Medium_Triangle_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 457,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Triangle_Diagonal_Inverted.DA_T1_Roof_Thatch_Medium_Triangle_Diagonal_Inverted"
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Shallow_C": {
+      "piece_data_index": 456,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Triangle_Shallow.DA_T1_Roof_Thatch_Medium_Triangle_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 455,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Triangle_Shallow_Inverted.DA_T1_Roof_Thatch_Medium_Triangle_Shallow_Inverted"
+    },
+    "BP_T1_Roof_Thatch_Medium_Valley_C": {
+      "piece_data_index": 454,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Valley_Diagonal.DA_T1_Roof_Thatch_Medium_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Medium_Valley_Shallow_C": {
+      "piece_data_index": 453,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Medium_Valley_Shallow.DA_T1_Roof_Thatch_Medium_Valley_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Small_Diagonal_C": {
+      "piece_data_index": 452,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Diagonal.DA_T1_Roof_Thatch_Small_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Small_Hip_Diagonal_C": {
+      "piece_data_index": 451,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Hip_Diagonal.DA_T1_Roof_Thatch_Small_Hip_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Small_Hip_Shallow_C": {
+      "piece_data_index": 450,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Hip_Shallow.DA_T1_Roof_Thatch_Small_Hip_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Small_Shallow_C": {
+      "piece_data_index": 449,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Shallow.DA_T1_Roof_Thatch_Small_Shallow"
+    },
+    "BP_T1_Roof_Thatch_Small_Valley_Diagonal_C": {
+      "piece_data_index": 448,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Valley_Diagonal.DA_T1_Roof_Thatch_Small_Valley_Diagonal"
+    },
+    "BP_T1_Roof_Thatch_Small_Valley_Shallow_C": {
+      "piece_data_index": 447,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Roofs/DA_T1_Roof_Thatch_Small_Valley_Shallow.DA_T1_Roof_Thatch_Small_Valley_Shallow"
+    },
+    "BP_T1_Stairs_InnerCorner_C": {
+      "piece_data_index": 446,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Stairs/DA_T1_Stairs_InnerCorner.DA_T1_Stairs_InnerCorner"
+    },
+    "BP_T1_Stairs_OuterCorner_C": {
+      "piece_data_index": 445,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Stairs/DA_T1_Stairs_OuterCorner.DA_T1_Stairs_OuterCorner"
+    },
+    "BP_T1_Stairs_Straight_C": {
+      "piece_data_index": 444,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Stairs/DA_T1_Stairs_Straight.DA_T1_Stairs_Straight"
+    },
+    "BP_T1_Stairs_Straight_Shallow_C": {
+      "piece_data_index": 443,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Stairs/DA_T1_Stairs_Straight_Shallow.DA_T1_Stairs_Straight_Shallow"
+    },
+    "BP_T1_Wall_Large_C": {
+      "piece_data_index": 441,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large.DA_T1_Wall_Large"
+    },
+    "BP_T1_Wall_Large_Diagonal_C": {
+      "piece_data_index": 440,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Diagonal.DA_T1_Wall_Large_Diagonal"
+    },
+    "BP_T1_Wall_Large_Diagonal_Inverted_C": {
+      "piece_data_index": 439,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Diagonal_Inverted.DA_T1_Wall_Large_Diagonal_Inverted"
+    },
+    "BP_T1_Wall_Large_Doorframe_C": {
+      "piece_data_index": 438,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Doorframe.DA_T1_Wall_Large_Doorframe"
+    },
+    "BP_T1_Wall_Large_Doorframe_Double_C": {
+      "piece_data_index": 437,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Doorframe_Double.DA_T1_Wall_Large_Doorframe_Double"
+    },
+    "BP_T1_Wall_Large_Narrow_C": {
+      "piece_data_index": 436,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Narrow.DA_T1_Wall_Large_Narrow"
+    },
+    "BP_T1_Wall_Large_Narrow_Doorframe_C": {
+      "piece_data_index": 435,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Narrow_Doorframe.DA_T1_Wall_Large_Narrow_Doorframe"
+    },
+    "BP_T1_Wall_Large_Narrow_Windowframe_C": {
+      "piece_data_index": 434,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Narrow_Windowframe.DA_T1_Wall_Large_Narrow_Windowframe"
+    },
+    "BP_T1_Wall_Large_Shallow_C": {
+      "piece_data_index": 433,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Shallow.DA_T1_Wall_Large_Shallow"
+    },
+    "BP_T1_Wall_Large_Shallow_Inverted_C": {
+      "piece_data_index": 432,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Shallow_Inverted.DA_T1_Wall_Large_Shallow_Inverted"
+    },
+    "BP_T1_Wall_Large_Windowframe_C": {
+      "piece_data_index": 431,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Windowframe.DA_T1_Wall_Large_Windowframe"
+    },
+    "BP_T1_Wall_Large_Windowframe_Double_C": {
+      "piece_data_index": 430,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Large_Windowframe_Double.DA_T1_Wall_Large_Windowframe_Double"
+    },
+    "BP_T1_Wall_Medium_C": {
+      "piece_data_index": 429,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Medium.DA_T1_Wall_Medium"
+    },
+    "BP_T1_Wall_Medium_Diagonal_C": {
+      "piece_data_index": 428,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Medium_Diagonal.DA_T1_Wall_Medium_Diagonal"
+    },
+    "BP_T1_Wall_Medium_Diagonal_Inverted_C": {
+      "piece_data_index": 427,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Medium_Diagonal_Inverted.DA_T1_Wall_Medium_Diagonal_Inverted"
+    },
+    "BP_T1_Wall_Medium_Shallow_C": {
+      "piece_data_index": 426,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Medium_Shallow.DA_T1_Wall_Medium_Shallow"
+    },
+    "BP_T1_Wall_Medium_Shallow_Inverted_C": {
+      "piece_data_index": 425,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Medium_Shallow_Inverted.DA_T1_Wall_Medium_Shallow_Inverted"
+    },
+    "BP_T1_Wall_Small_C": {
+      "piece_data_index": 409,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Walls/DA_T1_Wall_Small.DA_T1_Wall_Small"
+    },
+    "BP_T1_Window_C": {
+      "piece_data_index": 521,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier1_Brynmoor/Misc/DA_T1_Window.DA_T1_Window"
+    },
+    "BP_T2_Beam_Thick_Large_Diagonal_C": {
+      "piece_data_index": 408,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Large_Diagonal.DA_T2_Beam_Thick_Large_Diagonal"
+    },
+    "BP_T2_Beam_Thick_Large_Horizontal_C": {
+      "piece_data_index": 407,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Large_Horizontal.DA_T2_Beam_Thick_Large_Horizontal"
+    },
+    "BP_T2_Beam_Thick_Large_Shallow_C": {
+      "piece_data_index": 406,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Large_Shallow.DA_T2_Beam_Thick_Large_Shallow"
+    },
+    "BP_T2_Beam_Thick_Large_Steep_C": {
+      "piece_data_index": 405,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Large_Steep.DA_T2_Beam_Thick_Large_Steep"
+    },
+    "BP_T2_Beam_Thick_Large_Vertical_C": {
+      "piece_data_index": 404,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Large_Vertical.DA_T2_Beam_Thick_Large_Vertical"
+    },
+    "BP_T2_Beam_Thick_Medium_Diagonal_C": {
+      "piece_data_index": 403,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Medium_Diagonal.DA_T2_Beam_Thick_Medium_Diagonal"
+    },
+    "BP_T2_Beam_Thick_Medium_Horizontal_C": {
+      "piece_data_index": 402,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Medium_Horizontal.DA_T2_Beam_Thick_Medium_Horizontal"
+    },
+    "BP_T2_Beam_Thick_Medium_Shallow_C": {
+      "piece_data_index": 401,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Medium_Shallow.DA_T2_Beam_Thick_Medium_Shallow"
+    },
+    "BP_T2_Beam_Thick_Medium_Steep_C": {
+      "piece_data_index": 400,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Medium_Steep.DA_T2_Beam_Thick_Medium_Steep"
+    },
+    "BP_T2_Beam_Thick_Medium_Vertical_C": {
+      "piece_data_index": 399,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thick_Medium_Vertical.DA_T2_Beam_Thick_Medium_Vertical"
+    },
+    "BP_T2_Beam_Thin_Large_Diagonal_C": {
+      "piece_data_index": 398,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Large_Diagonal.DA_T2_Beam_Thin_Large_Diagonal"
+    },
+    "BP_T2_Beam_Thin_Large_Horizontal_C": {
+      "piece_data_index": 397,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Large_Horizontal.DA_T2_Beam_Thin_Large_Horizontal"
+    },
+    "BP_T2_Beam_Thin_Large_Shallow_C": {
+      "piece_data_index": 396,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Large_Shallow.DA_T2_Beam_Thin_Large_Shallow"
+    },
+    "BP_T2_Beam_Thin_Large_Steep_C": {
+      "piece_data_index": 395,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Large_Steep.DA_T2_Beam_Thin_Large_Steep"
+    },
+    "BP_T2_Beam_Thin_Large_Vertical_C": {
+      "piece_data_index": 394,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Large_Vertical.DA_T2_Beam_Thin_Large_Vertical"
+    },
+    "BP_T2_Beam_Thin_Medium_Diagonal_C": {
+      "piece_data_index": 393,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Medium_Diagonal.DA_T2_Beam_Thin_Medium_Diagonal"
+    },
+    "BP_T2_Beam_Thin_Medium_Horizontal_C": {
+      "piece_data_index": 392,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Medium_Horizontal.DA_T2_Beam_Thin_Medium_Horizontal"
+    },
+    "BP_T2_Beam_Thin_Medium_Shallow_C": {
+      "piece_data_index": 391,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Medium_Shallow.DA_T2_Beam_Thin_Medium_Shallow"
+    },
+    "BP_T2_Beam_Thin_Medium_Steep_C": {
+      "piece_data_index": 390,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Medium_Steep.DA_T2_Beam_Thin_Medium_Steep"
+    },
+    "BP_T2_Beam_Thin_Medium_Vertical_C": {
+      "piece_data_index": 389,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Beams/DA_T2_Beam_Thin_Medium_Vertical.DA_T2_Beam_Thin_Medium_Vertical"
+    },
+    "BP_T2_Door_C": {
+      "piece_data_index": 364,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Misc/DA_T2_Door.DA_T2_Door"
+    },
+    "BP_T2_Floor_Large_C": {
+      "piece_data_index": 388,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Floor/DA_T2_Floor_Large.DA_T2_Floor_Large"
+    },
+    "BP_T2_Floor_Large_Triangle_C": {
+      "piece_data_index": 387,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Floor/DA_T2_Floor_Large_Triangle.DA_T2_Floor_Large_Triangle"
+    },
+    "BP_T2_Floor_Medium_C": {
+      "piece_data_index": 386,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Floor/DA_T2_Floor_Medium.DA_T2_Floor_Medium"
+    },
+    "BP_T2_Floor_Medium_Triangle_C": {
+      "piece_data_index": 385,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Floor/DA_T2_Floor_Medium_Triangle.DA_T2_Floor_Medium_Triangle"
+    },
+    "BP_T2_Floor_Small_C": {
+      "piece_data_index": 369,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Floor/DA_T2_Floor_Small.DA_T2_Floor_Small"
+    },
+    "BP_T2_Foundation_Large_C": {
+      "piece_data_index": 368,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Foundations/DA_T2_Foundation_Large.DA_T2_Foundation_Large"
+    },
+    "BP_T2_Foundation_Large_Triangle_C": {
+      "piece_data_index": 367,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Foundations/DA_T2_Foundation_Large_Triangle.DA_T2_Foundation_Large_Triangle"
+    },
+    "BP_T2_Foundation_Medium_C": {
+      "piece_data_index": 366,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Foundations/DA_T2_Foundation_Medium.DA_T2_Foundation_Medium"
+    },
+    "BP_T2_Foundation_Medium_Triangle_C": {
+      "piece_data_index": 365,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Foundations/DA_T2_Foundation_Medium_Triangle.DA_T2_Foundation_Medium_Triangle"
+    },
+    "BP_T2_Pallisades_C": {
+      "piece_data_index": 266,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Pallisades.DA_T2_Wall_Pallisades"
+    },
+    "BP_T2_Pallisades_Gate_C": {
+      "piece_data_index": 297,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Pallisades_Gate.DA_T2_Pallisades_Gate"
+    },
+    "BP_T2_Roof_Large_Diagonal_C": {
+      "piece_data_index": 362,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Diagonal.DA_T2_Roof_Large_Diagonal"
+    },
+    "BP_T2_Roof_Large_Hip_Diagonal_C": {
+      "piece_data_index": 361,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Hip_Diagonal.DA_T2_Roof_Large_Hip_Diagonal"
+    },
+    "BP_T2_Roof_Large_Hip_Shallow_C": {
+      "piece_data_index": 360,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Hip_Shallow.DA_T2_Roof_Large_Hip_Shallow"
+    },
+    "BP_T2_Roof_Large_Hip_Steep_C": {
+      "piece_data_index": 359,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Hip_Steep.DA_T2_Roof_Large_Hip_Steep"
+    },
+    "BP_T2_Roof_Large_Shallow_C": {
+      "piece_data_index": 358,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Shallow.DA_T2_Roof_Large_Shallow"
+    },
+    "BP_T2_Roof_Large_Steep_C": {
+      "piece_data_index": 357,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Steep.DA_T2_Roof_Large_Steep"
+    },
+    "BP_T2_Roof_Large_Triangle_Diagonal_C": {
+      "piece_data_index": 356,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Diagonal.DA_T2_Roof_Large_Triangle_Diagonal"
+    },
+    "BP_T2_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 355,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Diagonal_Inverted.DA_T2_Roof_Large_Triangle_Diagonal_Inverted"
+    },
+    "BP_T2_Roof_Large_Triangle_Shallow_C": {
+      "piece_data_index": 354,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Shallow.DA_T2_Roof_Large_Triangle_Shallow"
+    },
+    "BP_T2_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 353,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Shallow_Inverted.DA_T2_Roof_Large_Triangle_Shallow_Inverted"
+    },
+    "BP_T2_Roof_Large_Triangle_Steep_C": {
+      "piece_data_index": 352,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Steep.DA_T2_Roof_Large_Triangle_Steep"
+    },
+    "BP_T2_Roof_Large_Triangle_Steep_Inverted_C": {
+      "piece_data_index": 351,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Triangle_Steep_Inverted.DA_T2_Roof_Large_Triangle_Steep_Inverted"
+    },
+    "BP_T2_Roof_Large_Valley_Diagonal_C": {
+      "piece_data_index": 350,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Valley_Diagonal.DA_T2_Roof_Large_Valley_Diagonal"
+    },
+    "BP_T2_Roof_Large_Valley_Shallow_C": {
+      "piece_data_index": 349,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Valley_Shallow.DA_T2_Roof_Large_Valley_Shallow"
+    },
+    "BP_T2_Roof_Large_Valley_Steep_C": {
+      "piece_data_index": 348,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Large_Valley_Steep.DA_T2_Roof_Large_Valley_Steep"
+    },
+    "BP_T2_Roof_Medium_Diagonal_C": {
+      "piece_data_index": 347,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Diagonal.DA_T2_Roof_Medium_Diagonal"
+    },
+    "BP_T2_Roof_Medium_Hip_Diagonal_C": {
+      "piece_data_index": 346,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Hip_Diagonal.DA_T2_Roof_Medium_Hip_Diagonal"
+    },
+    "BP_T2_Roof_Medium_Hip_Shallow_C": {
+      "piece_data_index": 345,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Hip_Shallow.DA_T2_Roof_Medium_Hip_Shallow"
+    },
+    "BP_T2_Roof_Medium_Hip_Steep_C": {
+      "piece_data_index": 344,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Hip_Steep.DA_T2_Roof_Medium_Hip_Steep"
+    },
+    "BP_T2_Roof_Medium_Shallow_C": {
+      "piece_data_index": 343,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Shallow.DA_T2_Roof_Medium_Shallow"
+    },
+    "BP_T2_Roof_Medium_Steep_C": {
+      "piece_data_index": 342,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Steep.DA_T2_Roof_Medium_Steep"
+    },
+    "BP_T2_Roof_Medium_Triangle_Diagonal_C": {
+      "piece_data_index": 341,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Diagonal.DA_T2_Roof_Medium_Triangle_Diagonal"
+    },
+    "BP_T2_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 340,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Diagonal_Inverted.DA_T2_Roof_Medium_Triangle_Diagonal_Inverted"
+    },
+    "BP_T2_Roof_Medium_Triangle_Shallow_C": {
+      "piece_data_index": 319,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Shallow.DA_T2_Roof_Medium_Triangle_Shallow"
+    },
+    "BP_T2_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 318,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Shallow_Inverted.DA_T2_Roof_Medium_Triangle_Shallow_Inverted"
+    },
+    "BP_T2_Roof_Medium_Triangle_Steep_C": {
+      "piece_data_index": 317,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Steep.DA_T2_Roof_Medium_Triangle_Steep"
+    },
+    "BP_T2_Roof_Medium_Triangle_Steep_Inverted_C": {
+      "piece_data_index": 316,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Triangle_Steep_Inverted.DA_T2_Roof_Medium_Triangle_Steep_Inverted"
+    },
+    "BP_T2_Roof_Medium_Valley_C": {
+      "piece_data_index": 315,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Valley_Diagonal.DA_T2_Roof_Medium_Valley_Diagonal"
+    },
+    "BP_T2_Roof_Medium_Valley_Shallow_C": {
+      "piece_data_index": 314,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Valley_Shallow.DA_T2_Roof_Medium_Valley_Shallow"
+    },
+    "BP_T2_Roof_Medium_Valley_Steep_C": {
+      "piece_data_index": 313,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Medium_Valley_Steep.DA_T2_Roof_Medium_Valley_Steep"
+    },
+    "BP_T2_Roof_Small_Diagonal_C": {
+      "piece_data_index": 312,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Diagonal.DA_T2_Roof_Small_Diagonal"
+    },
+    "BP_T2_Roof_Small_Hip_Diagonal_C": {
+      "piece_data_index": 311,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Hip_Diagonal.DA_T2_Roof_Small_Hip_Diagonal"
+    },
+    "BP_T2_Roof_Small_Hip_Shallow_C": {
+      "piece_data_index": 310,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Hip_Shallow.DA_T2_Roof_Small_Hip_Shallow"
+    },
+    "BP_T2_Roof_Small_Hip_Steep_C": {
+      "piece_data_index": 309,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Hip_Steep.DA_T2_Roof_Small_Hip_Steep"
+    },
+    "BP_T2_Roof_Small_Shallow_C": {
+      "piece_data_index": 308,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Shallow.DA_T2_Roof_Small_Shallow"
+    },
+    "BP_T2_Roof_Small_Steep_C": {
+      "piece_data_index": 307,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Steep.DA_T2_Roof_Small_Steep"
+    },
+    "BP_T2_Roof_Small_Valley_Diagonal_C": {
+      "piece_data_index": 306,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Valley_Diagonal.DA_T2_Roof_Small_Valley_Diagonal"
+    },
+    "BP_T2_Roof_Small_Valley_Shallow_C": {
+      "piece_data_index": 305,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Valley_Shallow.DA_T2_Roof_Small_Valley_Shallow"
+    },
+    "BP_T2_Roof_Small_Valley_Steep_C": {
+      "piece_data_index": 304,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Roofs/DA_T2_Roof_Small_Valley_Steep.DA_T2_Roof_Small_Valley_Steep"
+    },
+    "BP_T2_Stairs_Curved_InnerCorner_C": {
+      "piece_data_index": 303,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_Curved_InnerCorner.DA_T2_Stairs_Curved_InnerCorner"
+    },
+    "BP_T2_Stairs_Curved_OuterCorner_C": {
+      "piece_data_index": 302,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_Curved_OuterCorner.DA_T2_Stairs_Curved_OuterCorner"
+    },
+    "BP_T2_Stairs_InnerCorner_C": {
+      "piece_data_index": 301,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_InnerCorner.DA_T2_Stairs_InnerCorner"
+    },
+    "BP_T2_Stairs_OuterCorner_C": {
+      "piece_data_index": 300,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_OuterCorner.DA_T2_Stairs_OuterCorner"
+    },
+    "BP_T2_Stairs_Straight_C": {
+      "piece_data_index": 299,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_Straight.DA_T2_Stairs_Straight"
+    },
+    "BP_T2_Stairs_Straight_Shallow_C": {
+      "piece_data_index": 298,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Stairs/DA_T2_Stairs_Straight_Shallow.DA_T2_Stairs_Straight_Shallow"
+    },
+    "BP_T2_Wall_Large_C": {
+      "piece_data_index": 296,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large.DA_T2_Wall_Large"
+    },
+    "BP_T2_Wall_Large_Diagonal_C": {
+      "piece_data_index": 295,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Diagonal.DA_T2_Wall_Large_Diagonal"
+    },
+    "BP_T2_Wall_Large_Doorframe_C": {
+      "piece_data_index": 293,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Doorframe.DA_T2_Wall_Large_Doorframe"
+    },
+    "BP_T2_Wall_Large_Doorframe_Double_C": {
+      "piece_data_index": 292,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Doorframe_Double.DA_T2_Wall_Large_Doorframe_Double"
+    },
+    "BP_T2_Wall_Large_Inverted_C": {
+      "piece_data_index": 294,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Diagonal_Inverted.DA_T2_Wall_Large_Diagonal_Inverted"
+    },
+    "BP_T2_Wall_Large_Narrow_C": {
+      "piece_data_index": 291,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Narrow.DA_T2_Wall_Large_Narrow"
+    },
+    "BP_T2_Wall_Large_Narrow_Doorframe_C": {
+      "piece_data_index": 290,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Narrow_Doorframe.DA_T2_Wall_Large_Narrow_Doorframe"
+    },
+    "BP_T2_Wall_Large_Narrow_Windowframe_C": {
+      "piece_data_index": 289,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Narrow_Windowframe.DA_T2_Wall_Large_Narrow_Windowframe"
+    },
+    "BP_T2_Wall_Large_Shallow_C": {
+      "piece_data_index": 288,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Shallow.DA_T2_Wall_Large_Shallow"
+    },
+    "BP_T2_Wall_Large_Shallow_Inverted_C": {
+      "piece_data_index": 287,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Shallow_Inverted.DA_T2_Wall_Large_Shallow_Inverted"
+    },
+    "BP_T2_Wall_Large_Steep_C": {
+      "piece_data_index": 286,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Steep.DA_T2_Wall_Large_Steep"
+    },
+    "BP_T2_Wall_Large_Steep_Inverted_C": {
+      "piece_data_index": 285,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Steep_Inverted.DA_T2_Wall_Large_Steep_Inverted"
+    },
+    "BP_T2_Wall_Large_Windowframe_C": {
+      "piece_data_index": 284,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Windowframe.DA_T2_Wall_Large_Windowframe"
+    },
+    "BP_T2_Wall_Large_Windowframe_Double_C": {
+      "piece_data_index": 283,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Large_Windowframe_Double.DA_T2_Wall_Large_Windowframe_Double"
+    },
+    "BP_T2_Wall_Medium_C": {
+      "piece_data_index": 282,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium.DA_T2_Wall_Medium"
+    },
+    "BP_T2_Wall_Medium_Diagonal_C": {
+      "piece_data_index": 272,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Diagonal.DA_T2_Wall_Medium_Diagonal"
+    },
+    "BP_T2_Wall_Medium_Diagonal_Inverted_C": {
+      "piece_data_index": 271,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Diagonal_Inverted.DA_T2_Wall_Medium_Diagonal_Inverted"
+    },
+    "BP_T2_Wall_Medium_Shallow_C": {
+      "piece_data_index": 270,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Shallow.DA_T2_Wall_Medium_Shallow"
+    },
+    "BP_T2_Wall_Medium_Shallow_Inverted_C": {
+      "piece_data_index": 269,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Shallow_Inverted.DA_T2_Wall_Medium_Shallow_Inverted"
+    },
+    "BP_T2_Wall_Medium_Steep_C": {
+      "piece_data_index": 268,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Steep.DA_T2_Wall_Medium_Steep"
+    },
+    "BP_T2_Wall_Medium_Steep_Inverted_C": {
+      "piece_data_index": 267,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Medium_Steep_Inverted.DA_T2_Wall_Medium_Steep_Inverted"
+    },
+    "BP_T2_Wall_Small_C": {
+      "piece_data_index": 265,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Walls/DA_T2_Wall_Small.DA_T2_Wall_Small"
+    },
+    "BP_T2_Window_C": {
+      "piece_data_index": 363,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier2_Ghornfell/Misc/DA_T2_Window.DA_T2_Window"
+    },
+    "BP_T3_Beam_Thick_Large_Diagonal_C": {
+      "piece_data_index": 264,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Large_Diagonal.DA_T3_Beam_Thick_Large_Diagonal"
+    },
+    "BP_T3_Beam_Thick_Large_Horizontal_C": {
+      "piece_data_index": 263,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Large_Horizontal.DA_T3_Beam_Thick_Large_Horizontal"
+    },
+    "BP_T3_Beam_Thick_Large_Shallow_C": {
+      "piece_data_index": 262,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Large_Shallow.DA_T3_Beam_Thick_Large_Shallow"
+    },
+    "BP_T3_Beam_Thick_Large_Steep_C": {
+      "piece_data_index": 261,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Large_Steep.DA_T3_Beam_Thick_Large_Steep"
+    },
+    "BP_T3_Beam_Thick_Large_Vertical_C": {
+      "piece_data_index": 260,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Large_Vertical.DA_T3_Beam_Thick_Large_Vertical"
+    },
+    "BP_T3_Beam_Thick_Medium_Diagonal_C": {
+      "piece_data_index": 259,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Medium_Diagonal.DA_T3_Beam_Thick_Medium_Diagonal"
+    },
+    "BP_T3_Beam_Thick_Medium_Horizontal_C": {
+      "piece_data_index": 258,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Medium_Horizontal.DA_T3_Beam_Thick_Medium_Horizontal"
+    },
+    "BP_T3_Beam_Thick_Medium_Shallow_C": {
+      "piece_data_index": 257,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Medium_Shallow.DA_T3_Beam_Thick_Medium_Shallow"
+    },
+    "BP_T3_Beam_Thick_Medium_Steep_C": {
+      "piece_data_index": 256,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Medium_Steep.DA_T3_Beam_Thick_Medium_Steep"
+    },
+    "BP_T3_Beam_Thick_Medium_Vertical_C": {
+      "piece_data_index": 255,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Medium_Vertical.DA_T3_Beam_Thick_Medium_Vertical"
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Diagonal_C": {
+      "piece_data_index": 245,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Large_Diagonal.DA_T3_Beam_Thick_Type2_Large_Diagonal"
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Horizontal_C": {
+      "piece_data_index": 244,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Large_Horizontal.DA_T3_Beam_Thick_Type2_Large_Horizontal"
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Shallow_C": {
+      "piece_data_index": 243,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Large_Shallow.DA_T3_Beam_Thick_Type2_Large_Shallow"
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Steep_C": {
+      "piece_data_index": 242,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Large_Steep.DA_T3_Beam_Thick_Type2_Large_Steep"
+    },
+    "BP_T3_Beam_Thick_Type2_Large_Vertical_C": {
+      "piece_data_index": 241,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Large_Vertical.DA_T3_Beam_Thick_Type2_Large_Vertical"
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Diagonal_C": {
+      "piece_data_index": 240,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Medium_Diagonal.DA_T3_Beam_Thick_Type2_Medium_Diagonal"
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Horizontal_C": {
+      "piece_data_index": 239,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Medium_Horizontal.DA_T3_Beam_Thick_Type2_Medium_Horizontal"
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Shallow_C": {
+      "piece_data_index": 238,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Medium_Shallow.DA_T3_Beam_Thick_Type2_Medium_Shallow"
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Steep_C": {
+      "piece_data_index": 237,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Medium_Steep.DA_T3_Beam_Thick_Type2_Medium_Steep"
+    },
+    "BP_T3_Beam_Thick_Type2_Medium_Vertical_C": {
+      "piece_data_index": 236,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type2_Medium_Vertical.DA_T3_Beam_Thick_Type2_Medium_Vertical"
+    },
+    "BP_T3_Beam_Thick_Type3_Vertical_C": {
+      "piece_data_index": 235,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thick_Type3_Vertical.DA_T3_Beam_Thick_Type3_Vertical"
+    },
+    "BP_T3_Beam_Thin_Large_Diagonal_C": {
+      "piece_data_index": 234,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Large_Diagonal.DA_T3_Beam_Thin_Large_Diagonal"
+    },
+    "BP_T3_Beam_Thin_Large_Horizontal_C": {
+      "piece_data_index": 233,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Large_Horizontal.DA_T3_Beam_Thin_Large_Horizontal"
+    },
+    "BP_T3_Beam_Thin_Large_Shallow_C": {
+      "piece_data_index": 232,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Large_Shallow.DA_T3_Beam_Thin_Large_Shallow"
+    },
+    "BP_T3_Beam_Thin_Large_Steep_C": {
+      "piece_data_index": 231,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Large_Steep.DA_T3_Beam_Thin_Large_Steep"
+    },
+    "BP_T3_Beam_Thin_Large_Vertical_C": {
+      "piece_data_index": 230,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Large_Vertical.DA_T3_Beam_Thin_Large_Vertical"
+    },
+    "BP_T3_Beam_Thin_Medium_Diagonal_C": {
+      "piece_data_index": 229,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Medium_Diagonal.DA_T3_Beam_Thin_Medium_Diagonal"
+    },
+    "BP_T3_Beam_Thin_Medium_Horizontal_C": {
+      "piece_data_index": 228,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Medium_Horizontal.DA_T3_Beam_Thin_Medium_Horizontal"
+    },
+    "BP_T3_Beam_Thin_Medium_Shallow_C": {
+      "piece_data_index": 218,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Medium_Shallow.DA_T3_Beam_Thin_Medium_Shallow"
+    },
+    "BP_T3_Beam_Thin_Medium_Steep_C": {
+      "piece_data_index": 217,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Medium_Steep.DA_T3_Beam_Thin_Medium_Steep"
+    },
+    "BP_T3_Beam_Thin_Medium_Vertical_C": {
+      "piece_data_index": 216,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Medium_Vertical.DA_T3_Beam_Thin_Medium_Vertical"
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Diagonal_C": {
+      "piece_data_index": 215,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Large_Diagonal.DA_T3_Beam_Thin_Type2_Large_Diagonal"
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Horizontal_C": {
+      "piece_data_index": 214,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Large_Horizontal.DA_T3_Beam_Thin_Type2_Large_Horizontal"
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Shallow_C": {
+      "piece_data_index": 213,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Large_Shallow.DA_T3_Beam_Thin_Type2_Large_Shallow"
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Steep_C": {
+      "piece_data_index": 212,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Large_Steep.DA_T3_Beam_Thin_Type2_Large_Steep"
+    },
+    "BP_T3_Beam_Thin_Type2_Large_Vertical_C": {
+      "piece_data_index": 211,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Large_Vertical.DA_T3_Beam_Thin_Type2_Large_Vertical"
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Diagonal_C": {
+      "piece_data_index": 210,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Medium_Diagonal.DA_T3_Beam_Thin_Type2_Medium_Diagonal"
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Horizontal_C": {
+      "piece_data_index": 209,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Medium_Horizontal.DA_T3_Beam_Thin_Type2_Medium_Horizontal"
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Shallow_C": {
+      "piece_data_index": 208,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Medium_Shallow.DA_T3_Beam_Thin_Type2_Medium_Shallow"
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Steep_C": {
+      "piece_data_index": 207,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Medium_Steep.DA_T3_Beam_Thin_Type2_Medium_Steep"
+    },
+    "BP_T3_Beam_Thin_Type2_Medium_Vertical_C": {
+      "piece_data_index": 206,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type2_Medium_Vertical.DA_T3_Beam_Thin_Type2_Medium_Vertical"
+    },
+    "BP_T3_Beam_Thin_Type3_Medium_Vertical_C": {
+      "piece_data_index": 205,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type3_Medium_Vertical.DA_T3_Beam_Thin_Type3_Medium_Vertical"
+    },
+    "BP_T3_Beam_Thin_Type3_Vertical_C": {
+      "piece_data_index": 204,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Beams/DA_T3_Beam_Thin_Type3_Vertical.DA_T3_Beam_Thin_Type3_Vertical"
+    },
+    "BP_T3_CastleDoor_C": {
+      "piece_data_index": 183,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Misc/DA_T3_CastleDoor.DA_T3_CastleDoor"
+    },
+    "BP_T3_Door_C": {
+      "piece_data_index": 182,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Misc/DA_T3_Door.DA_T3_Door"
+    },
+    "BP_T3_FenceEnd_Medium_C": {
+      "piece_data_index": 124,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_FenceEnd_Medium.DA_T3_FenceEnd_Medium"
+    },
+    "BP_T3_Fence_Medium_C": {
+      "piece_data_index": 125,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Fence_Medium.DA_T3_Fence_Medium"
+    },
+    "BP_T3_Floor_Large_C": {
+      "piece_data_index": 203,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Floor_Large.DA_T3_Floor_Large"
+    },
+    "BP_T3_Floor_Large_Triangle_C": {
+      "piece_data_index": 202,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Floor_Large_Triangle.DA_T3_Floor_Large_Triangle"
+    },
+    "BP_T3_Floor_Medium_C": {
+      "piece_data_index": 201,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Floor_Medium.DA_T3_Floor_Medium"
+    },
+    "BP_T3_Floor_Medium_Triangle_C": {
+      "piece_data_index": 191,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Floor_Medium_Triangle.DA_T3_Floor_Medium_Triangle"
+    },
+    "BP_T3_Floor_Small_C": {
+      "piece_data_index": 190,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Floor_Small.DA_T3_Floor_Small"
+    },
+    "BP_T3_Foundation_Large_C": {
+      "piece_data_index": 187,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Foundations/DA_T3_Foundation_Large.DA_T3_Foundation_Large"
+    },
+    "BP_T3_Foundation_Large_Triangle_C": {
+      "piece_data_index": 186,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Foundations/DA_T3_Foundation_Large_Triangle.DA_T3_Foundation_Large_Triangle"
+    },
+    "BP_T3_Foundation_Medium_C": {
+      "piece_data_index": 185,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Foundations/DA_T3_Foundation_Medium.DA_T3_Foundation_Medium"
+    },
+    "BP_T3_Foundation_Medium_Triangle_C": {
+      "piece_data_index": 184,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Foundations/DA_T3_Foundation_Medium_Triangle.DA_T3_Foundation_Medium_Triangle"
+    },
+    "BP_T3_Roof_Large_Diagonal_C": {
+      "piece_data_index": 181,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Diagonal.DA_T3_Roof_Large_Diagonal"
+    },
+    "BP_T3_Roof_Large_Hip_Diagonal_C": {
+      "piece_data_index": 180,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Hip_Diagonal.DA_T3_Roof_Large_Hip_Diagonal"
+    },
+    "BP_T3_Roof_Large_Hip_Shallow_C": {
+      "piece_data_index": 179,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Hip_Shallow.DA_T3_Roof_Large_Hip_Shallow"
+    },
+    "BP_T3_Roof_Large_Shallow_C": {
+      "piece_data_index": 178,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Shallow.DA_T3_Roof_Large_Shallow"
+    },
+    "BP_T3_Roof_Large_Triangle_Diagonal_C": {
+      "piece_data_index": 177,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Triangle_Diagonal.DA_T3_Roof_Large_Triangle_Diagonal"
+    },
+    "BP_T3_Roof_Large_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 176,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Triangle_Diagonal_Inverted.DA_T3_Roof_Large_Triangle_Diagonal_Inverted"
+    },
+    "BP_T3_Roof_Large_Triangle_Shallow_C": {
+      "piece_data_index": 175,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Triangle_Shallow.DA_T3_Roof_Large_Triangle_Shallow"
+    },
+    "BP_T3_Roof_Large_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 174,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Triangle_Shallow_Inverted.DA_T3_Roof_Large_Triangle_Shallow_Inverted"
+    },
+    "BP_T3_Roof_Large_Valley_Diagonal_C": {
+      "piece_data_index": 164,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Valley_Diagonal.DA_T3_Roof_Large_Valley_Diagonal"
+    },
+    "BP_T3_Roof_Large_Valley_Shallow_C": {
+      "piece_data_index": 163,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Large_Valley_Shallow.DA_T3_Roof_Large_Valley_Shallow"
+    },
+    "BP_T3_Roof_Medium_Diagonal_C": {
+      "piece_data_index": 162,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Diagonal.DA_T3_Roof_Medium_Diagonal"
+    },
+    "BP_T3_Roof_Medium_Hip_Diagonal_C": {
+      "piece_data_index": 161,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Hip_Diagonal.DA_T3_Roof_Medium_Hip_Diagonal"
+    },
+    "BP_T3_Roof_Medium_Hip_Shallow_C": {
+      "piece_data_index": 160,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Hip_Shallow.DA_T3_Roof_Medium_Hip_Shallow"
+    },
+    "BP_T3_Roof_Medium_Shallow_C": {
+      "piece_data_index": 159,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Shallow.DA_T3_Roof_Medium_Shallow"
+    },
+    "BP_T3_Roof_Medium_Triangle_Diagonal_C": {
+      "piece_data_index": 158,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Triangle_Diagonal.DA_T3_Roof_Medium_Triangle_Diagonal"
+    },
+    "BP_T3_Roof_Medium_Triangle_Diagonal_Inverted_C": {
+      "piece_data_index": 157,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Triangle_Diagonal_Inverted.DA_T3_Roof_Medium_Triangle_Diagonal_Inverted"
+    },
+    "BP_T3_Roof_Medium_Triangle_Shallow_C": {
+      "piece_data_index": 156,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Triangle_Shallow.DA_T3_Roof_Medium_Triangle_Shallow"
+    },
+    "BP_T3_Roof_Medium_Triangle_Shallow_Inverted_C": {
+      "piece_data_index": 155,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Triangle_Shallow_Inverted.DA_T3_Roof_Medium_Triangle_Shallow_Inverted"
+    },
+    "BP_T3_Roof_Medium_Valley_C": {
+      "piece_data_index": 154,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Valley_Diagonal.DA_T3_Roof_Medium_Valley_Diagonal"
+    },
+    "BP_T3_Roof_Medium_Valley_Shallow_C": {
+      "piece_data_index": 153,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Medium_Valley_Shallow.DA_T3_Roof_Medium_Valley_Shallow"
+    },
+    "BP_T3_Roof_Small_Diagonal_C": {
+      "piece_data_index": 152,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Diagonal.DA_T3_Roof_Small_Diagonal"
+    },
+    "BP_T3_Roof_Small_Hip_Diagonal_C": {
+      "piece_data_index": 151,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Hip_Diagonal.DA_T3_Roof_Small_Hip_Diagonal"
+    },
+    "BP_T3_Roof_Small_Hip_Shallow_C": {
+      "piece_data_index": 150,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Hip_Shallow.DA_T3_Roof_Small_Hip_Shallow"
+    },
+    "BP_T3_Roof_Small_Shallow_C": {
+      "piece_data_index": 149,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Shallow.DA_T3_Roof_Small_Shallow"
+    },
+    "BP_T3_Roof_Small_Valley_Diagonal_C": {
+      "piece_data_index": 148,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Valley_Diagonal.DA_T3_Roof_Small_Valley_Diagonal"
+    },
+    "BP_T3_Roof_Small_Valley_Shallow_C": {
+      "piece_data_index": 147,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Roofs/DA_T3_Roof_Small_Valley_Shallow.DA_T3_Roof_Small_Valley_Shallow"
+    },
+    "BP_T3_Stairs_InnerCorner_C": {
+      "piece_data_index": 145,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_InnerCorner.DA_T3_Stairs_InnerCorner"
+    },
+    "BP_T3_Stairs_Narrow_Straight_C": {
+      "piece_data_index": 144,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_Narrow_Straight.DA_T3_Stairs_Narrow_Straight"
+    },
+    "BP_T3_Stairs_Narrow_Straight_Shallow_C": {
+      "piece_data_index": 129,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_Narrow_Straight_Shallow.DA_T3_Stairs_Narrow_Straight_Shallow"
+    },
+    "BP_T3_Stairs_OuterCorner_C": {
+      "piece_data_index": 128,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_OuterCorner.DA_T3_Stairs_OuterCorner"
+    },
+    "BP_T3_Stairs_Straight_C": {
+      "piece_data_index": 127,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_Straight.DA_T3_Stairs_Straight"
+    },
+    "BP_T3_Stairs_Straight_Shallow_C": {
+      "piece_data_index": 126,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Stairs/DA_T3_Stairs_Straight_Shallow.DA_T3_Stairs_Straight_Shallow"
+    },
+    "BP_T3_Type2_Floor_Large_C": {
+      "piece_data_index": 189,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Type2_Floor_Large.DA_T3_Type2_Floor_Large"
+    },
+    "BP_T3_Type2_Floor_Medium_C": {
+      "piece_data_index": 188,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Floor/DA_T3_Type2_Floor_Medium.DA_T3_Type2_Floor_Medium"
+    },
+    "BP_T3_Wall_CurvedWindow_Medium_C": {
+      "piece_data_index": 123,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_CurvedWindow_Medium.DA_T3_Wall_CurvedWindow_Medium"
+    },
+    "BP_T3_Wall_Large_C": {
+      "piece_data_index": 122,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large.DA_T3_Wall_Large"
+    },
+    "BP_T3_Wall_Large_Castle_Doorframe_C": {
+      "piece_data_index": 121,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Castle_Doorframe.DA_T3_Wall_Large_Castle_Doorframe"
+    },
+    "BP_T3_Wall_Large_Diagonal_C": {
+      "piece_data_index": 120,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Diagonal.DA_T3_Wall_Large_Diagonal"
+    },
+    "BP_T3_Wall_Large_Doorframe_C": {
+      "piece_data_index": 118,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Doorframe.DA_T3_Wall_Large_Doorframe"
+    },
+    "BP_T3_Wall_Large_Doorframe_Double_C": {
+      "piece_data_index": 117,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Doorframe_Double.DA_T3_Wall_Large_Doorframe_Double"
+    },
+    "BP_T3_Wall_Large_Inverted_C": {
+      "piece_data_index": 119,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Diagonal_Inverted.DA_T3_Wall_Large_Diagonal_Inverted"
+    },
+    "BP_T3_Wall_Large_Narrow_C": {
+      "piece_data_index": 116,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow.DA_T3_Wall_Large_Narrow"
+    },
+    "BP_T3_Wall_Large_Narrow_Doorframe_C": {
+      "piece_data_index": 115,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Doorframe.DA_T3_Wall_Large_Narrow_Doorframe"
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_1_C": {
+      "piece_data_index": 114,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Special_Windowed_1.DA_T3_Wall_Large_Narrow_Special_Windowed_1"
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_2_C": {
+      "piece_data_index": 113,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Special_Windowed_2.DA_T3_Wall_Large_Narrow_Special_Windowed_2"
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_3_C": {
+      "piece_data_index": 112,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Special_Windowed_3.DA_T3_Wall_Large_Narrow_Special_Windowed_3"
+    },
+    "BP_T3_Wall_Large_Narrow_Special_Windowed_4_C": {
+      "piece_data_index": 111,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Special_Windowed_4.DA_T3_Wall_Large_Narrow_Special_Windowed_4"
+    },
+    "BP_T3_Wall_Large_Narrow_StainedGlass_6_C": {
+      "piece_data_index": 110,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_StainedGlass_6.DA_T3_Wall_Large_Narrow_StainedGlass_6"
+    },
+    "BP_T3_Wall_Large_Narrow_Windowframe_C": {
+      "piece_data_index": 109,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Narrow_Windowframe.DA_T3_Wall_Large_Narrow_Windowframe"
+    },
+    "BP_T3_Wall_Large_Shallow_C": {
+      "piece_data_index": 108,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Shallow.DA_T3_Wall_Large_Shallow"
+    },
+    "BP_T3_Wall_Large_Shallow_Inverted_C": {
+      "piece_data_index": 107,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Shallow_Inverted.DA_T3_Wall_Large_Shallow_Inverted"
+    },
+    "BP_T3_Wall_Large_Special_Windowed_1_C": {
+      "piece_data_index": 106,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Special_Windowed_1.DA_T3_Wall_Large_Special_Windowed_1"
+    },
+    "BP_T3_Wall_Large_Special_Windowed_2_C": {
+      "piece_data_index": 105,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Special_Windowed_2.DA_T3_Wall_Large_Special_Windowed_2"
+    },
+    "BP_T3_Wall_Large_Special_Windowed_3_C": {
+      "piece_data_index": 104,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Special_Windowed_3.DA_T3_Wall_Large_Special_Windowed_3"
+    },
+    "BP_T3_Wall_Large_Special_Windowed_4_C": {
+      "piece_data_index": 103,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Special_Windowed_4.DA_T3_Wall_Large_Special_Windowed_4"
+    },
+    "BP_T3_Wall_Large_Special_Windowed_5_C": {
+      "piece_data_index": 102,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Special_Windowed_5.DA_T3_Wall_Large_Special_Windowed_5"
+    },
+    "BP_T3_Wall_Large_Windowframe_C": {
+      "piece_data_index": 101,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Large_Windowframe.DA_T3_Wall_Large_Windowframe"
+    },
+    "BP_T3_Wall_Medium_Curved_Shallow_C": {
+      "piece_data_index": 100,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Curved_Shallow.DA_T3_Wall_Medium_Curved_Shallow"
+    },
+    "BP_T3_Wall_Medium_Curved_Shallow_Inverted_C": {
+      "piece_data_index": 99,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Curved_Shallow_Inverted.DA_T3_Wall_Medium_Curved_Shallow_Inverted"
+    },
+    "BP_T3_Wall_Medium_Diagonal_C": {
+      "piece_data_index": 98,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Diagonal.DA_T3_Wall_Medium_Diagonal"
+    },
+    "BP_T3_Wall_Medium_Diagonal_Inverted_C": {
+      "piece_data_index": 96,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Diagonal_Inverted.DA_T3_Wall_Medium_Diagonal_Inverted"
+    },
+    "BP_T3_Wall_Medium_Shallow_C": {
+      "piece_data_index": 95,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Shallow.DA_T3_Wall_Medium_Shallow"
+    },
+    "BP_T3_Wall_Medium_Shallow_Inverted_C": {
+      "piece_data_index": 94,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Medium_Shallow_Inverted.DA_T3_Wall_Medium_Shallow_Inverted"
+    },
+    "BP_T3_Wall_Plain_Medium_C": {
+      "piece_data_index": 93,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Plain_Medium.DA_T3_Wall_Plain_Medium"
+    },
+    "BP_T3_Wall_Slit_Medium_C": {
+      "piece_data_index": 92,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_SlitNew_Medium.DA_T3_Wall_SlitNew_Medium"
+    },
+    "BP_T3_Wall_Small_C": {
+      "piece_data_index": 91,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_Small.DA_T3_Wall_Small"
+    },
+    "BP_T3_Wall_StainedGlass_6_C": {
+      "piece_data_index": 90,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Tier3_Fellhollow/Walls/DA_T3_Wall_StainedGlass_6.DA_T3_Wall_StainedGlass_6"
+    },
+    "BP_UpgradeProp_Crucible_C": {
+      "piece_data_index": 81,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_StationUpgrade_Crucible.BUILDPIECE_StationUpgrade_Crucible"
+    },
+    "BP_UpgradeProp_Jewelers_Tools_C": {
+      "piece_data_index": 69,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_CraftingStiation_Jewelry_Bench.BUILDPIECE_CraftingStiation_Jewelry_Bench"
+    },
+    "BP_UpgradeProp_Loom_Harness_C": {
+      "piece_data_index": 82,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_StationUpgrade_Loom_Harness.BUILDPIECE_StationUpgrade_Loom_Harness"
+    },
+    "BP_UpgradeProp_Tanners_Kit_C": {
+      "piece_data_index": 83,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/Crafting/BUILDPIECE_StationUpgrade_Tanners_Kit.BUILDPIECE_StationUpgrade_Tanners_Kit"
+    },
+    "PROXY_BP_BaseBuilding_Floor_C": {
+      "piece_data_index": 85,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Floor_PROXY.BUILDPIECE_Floor_PROXY"
+    },
+    "PROXY_BP_BaseBuilding_Foundation_C": {
+      "piece_data_index": 86,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Foundation_PROXY.BUILDPIECE_Foundation_PROXY"
+    },
+    "PROXY_BP_BaseBuilding_Roof_26_C": {
+      "piece_data_index": 87,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Roof_26_PROXY.BUILDPIECE_Roof_26_PROXY"
+    },
+    "PROXY_BP_BaseBuilding_Roof_45_C": {
+      "piece_data_index": 88,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Roof_45_PROXY.BUILDPIECE_Roof_45_PROXY"
+    },
+    "PROXY_BP_BaseBuilding_Wall_C": {
+      "piece_data_index": 89,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Wall_PROXY.BUILDPIECE_Wall_PROXY"
+    },
+    "PROXY_BP_BaseBuilding_Wall_Small_C": {
+      "piece_data_index": 0,
+      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding/Data/BuildingPieces/Structures/PROXY/BUILDPIECE_Wall_Small_PROXY.BUILDPIECE_Wall_Small_PROXY"
+    }
+  }
+}
