@@ -71,6 +71,19 @@ required beyond moving things around.
 
 ---
 
+## Hotkeys
+
+The add-on registers an editable 3D View shortcut for the diagnose helper:
+
+| Action | Default shortcut | Operator ID |
+|---|---|
+| **Auto-Snap Selected to Nearest** | `Ctrl` + `Alt` + `D` | `rsdw.diagnose_auto_snap` |
+
+To change it, open **Edit → Preferences → Keymap** and search for the
+operator ID or the action name.
+
+---
+
 ## Tips
 
 - **Designs auto-snap** to neighbouring pieces. To place something freely,

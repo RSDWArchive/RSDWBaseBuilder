@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "rsdw_base_builder"
-version = "0.6.0"
+version = "0.6.5"
 name = "RSDW Base Builder"
 tagline = "Dragonwilds base-building parts + base layout import/export"
 maintainer = "RSDW Tools"

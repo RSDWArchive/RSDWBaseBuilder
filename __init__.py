@@ -60,6 +60,10 @@ COLLECTION_NAME_PREFIX = "RSDW_Building_"
 # to the per-piece-data max on load, so over-shooting is harmless.
 DEFAULT_STABILITY = 3000
 
+# Blender does not expose Assign Shortcut on every add-on panel button, so we
+# register an editable keymap entry for the diagnose helper.
+_addon_keymaps: list = []
+
 
 # ---------- helpers ----------
 
@@ -471,6 +475,17 @@ class RSDWSettings(PropertyGroup):
             "If off, only translate so the plug pair coincides"
         ),
         default=False,
+    )  # type: ignore[valid-type]
+    surface_snap_inset: FloatProperty(
+        name="Surface fallback overlap (m)",
+        description=(
+            "For pieces without game snap-points, overlap bounding-box "
+            "surfaces by this amount when snapping so tiny gaps do not "
+            "break in-game support"
+        ),
+        default=0.005,
+        min=0.0,
+        soft_max=0.05,
     )  # type: ignore[valid-type]
     lint_tolerance: FloatProperty(
         name="Snap tolerance (m)",
@@ -1180,12 +1195,139 @@ def _plugs_compatible(a: dict, b: dict) -> bool:
     return True
 
 
+def _world_bound_corners(obj) -> list:
+    """Return world-space bound-box corners for meshes or collection instances."""
+    corners = []
+    if obj is None:
+        return corners
+    if obj.type == "EMPTY" and obj.instance_collection is not None:
+        for child in _collection_objects_recursive(obj.instance_collection):
+            try:
+                child_corners = list(child.bound_box)
+            except Exception:
+                continue
+            if not child_corners:
+                continue
+            child_world = obj.matrix_world @ child.matrix_world
+            for corner in child_corners:
+                corners.append(child_world @ Vector(corner))
+        return corners
+    try:
+        for corner in obj.bound_box:
+            corners.append(obj.matrix_world @ Vector(corner))
+    except Exception:
+        pass
+    return corners
+
+
+def _orientation_frame(obj) -> Matrix:
+    """Object world transform without scale, used as an oriented bounds frame."""
+    try:
+        loc, rot, _scale = obj.matrix_world.decompose()
+        return Matrix.LocRotScale(loc, rot, None)
+    except Exception:
+        return Matrix.Translation(obj.matrix_world.translation)
+
+
+def _bounds_in_frame(obj, frame: Matrix):
+    corners = _world_bound_corners(obj)
+    if not corners:
+        return None
+    inv = frame.inverted()
+    local = [inv @ corner for corner in corners]
+    mins = Vector((
+        min(v.x for v in local),
+        min(v.y for v in local),
+        min(v.z for v in local),
+    ))
+    maxs = Vector((
+        max(v.x for v in local),
+        max(v.y for v in local),
+        max(v.z for v in local),
+    ))
+    return mins, maxs
+
+
+def _interval_overlap(a_min: float, a_max: float, b_min: float, b_max: float) -> float:
+    return min(a_max, b_max) - max(a_min, b_min)
+
+
+def _is_rsdw_snap_target(obj) -> bool:
+    if obj is None:
+        return False
+    if _resolve_class_for_obj(obj):
+        return True
+    if obj.type == "EMPTY" and obj.instance_collection is not None:
+        _stem, cls = _resolve_drop_target(obj)
+        return bool(cls)
+    return False
+
+
+def _surface_snap_one(obj, candidates: list, max_distance: float, inset: float) -> str:
+    """Bounds-based fallback for pieces that have no game plug data.
+
+    This is intentionally narrower than plug snapping: it only closes the
+    nearest pair of overlapping oriented bound-box faces and applies a tiny
+    configurable overlap. That avoids visible/support gaps for no-plug props
+    without changing the game-authored plug behaviour for normal pieces.
+    """
+    if not _world_bound_corners(obj):
+        return "surface-no-bounds"
+
+    max_distance = float("inf") if float(max_distance) <= 0.0 else float(max_distance)
+    inset = max(0.0, float(inset))
+    best = None  # (score, candidate, frame, axis, delta_axis)
+    for cand in candidates:
+        if cand is obj or not _is_rsdw_snap_target(cand):
+            continue
+        frame = _orientation_frame(cand)
+        cand_bounds = _bounds_in_frame(cand, frame)
+        obj_bounds = _bounds_in_frame(obj, frame)
+        if cand_bounds is None or obj_bounds is None:
+            continue
+        cmin, cmax = cand_bounds
+        omin, omax = obj_bounds
+        for axis in range(3):
+            other_axes = [i for i in range(3) if i != axis]
+            overlaps = [
+                _interval_overlap(cmin[i], cmax[i], omin[i], omax[i])
+                for i in other_axes
+            ]
+            if any(v <= 0.0 for v in overlaps):
+                continue
+            # Mover sits on the positive side of candidate along this axis.
+            sep = omin[axis] - cmax[axis]
+            if -inset <= sep <= max_distance:
+                delta = -sep - inset
+                score = abs(sep) - (sum(overlaps) * 0.001)
+                if best is None or score < best[0]:
+                    best = (score, cand, frame, axis, delta)
+            # Mover sits on the negative side of candidate along this axis.
+            sep = cmin[axis] - omax[axis]
+            if -inset <= sep <= max_distance:
+                delta = sep + inset
+                score = abs(sep) - (sum(overlaps) * 0.001)
+                if best is None or score < best[0]:
+                    best = (score, cand, frame, axis, delta)
+
+    if best is None:
+        return "surface-out-of-range"
+
+    _score, _cand, frame, axis, delta_axis = best
+    local_delta = Vector((0.0, 0.0, 0.0))
+    local_delta[axis] = delta_axis
+    world_delta = frame.to_3x3() @ local_delta
+    obj.matrix_world = Matrix.Translation(world_delta) @ obj.matrix_world
+    return "surface-snapped"
+
+
 class RSDW_OT_SnapToActive(Operator):
     bl_idname = "rsdw.snap_to_active"
     bl_label = "Snap Selected to Active"
     bl_description = (
         "Snap each selected base-building piece to the active piece using "
-        "the closest pair of compatible game snap-points (plugs)"
+        "the closest pair of compatible game snap-points (plugs). Pieces "
+        "without plug data fall back to tight bounding-box surface contact"
     )
     bl_options = {"REGISTER", "UNDO"}
 
@@ -1223,16 +1365,19 @@ class RSDW_OT_SnapToActive(Operator):
 
         anchor_cls = _resolve_class_for_obj(anchor)
         anchor_data = snaps.get(anchor_cls)
-        if not anchor_data:
+        if not anchor_data and not _is_rsdw_snap_target(anchor):
             self.report({"ERROR"},
                         f"No snap data for active object class '{anchor_cls or anchor.name}'.")
             return {"CANCELLED"}
 
         scale = float(context.scene.rsdw_settings.scale)
-        anchor_world_plugs = [
-            (p, anchor.matrix_world @ _plug_local_matrix(p, scale))
-            for p in anchor_data["plugs"]
-        ]
+        surface_inset = float(context.scene.rsdw_settings.surface_snap_inset)
+        anchor_world_plugs = []
+        if anchor_data:
+            anchor_world_plugs = [
+                (p, anchor.matrix_world @ _plug_local_matrix(p, scale))
+                for p in anchor_data["plugs"]
+            ]
 
         snapped = 0
         skipped: list = []
@@ -1240,8 +1385,15 @@ class RSDW_OT_SnapToActive(Operator):
         for mv in movers:
             cls = _resolve_class_for_obj(mv)
             data = snaps.get(cls)
-            if not data:
-                skipped.append(f"{mv.name}(no plugs)")
+            if not data or not anchor_data:
+                status = _surface_snap_one(
+                    mv, [anchor], float(self.max_distance), surface_inset,
+                )
+                if status == "surface-snapped":
+                    snapped += 1
+                else:
+                    reason = "no plugs" if not data else "active has no plugs"
+                    skipped.append(f"{mv.name}({reason}; {status})")
                 continue
 
             best = None  # (dist2, plug_a, mat_a_local, plug_b, mat_b_world)
@@ -1344,7 +1496,13 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
         return "no-class"
     data = snaps.get(cls)
     if not data:
-        return "no-plugs-mover"
+        candidates = list(scene.objects) if scene is not None else list(bpy.context.scene.objects)
+        return _surface_snap_one(
+            obj,
+            candidates,
+            float(settings.auto_snap_max_distance),
+            float(settings.surface_snap_inset),
+        )
 
     scale = float(settings.scale)
     max_d2 = float(settings.auto_snap_max_distance) ** 2
@@ -1359,7 +1517,6 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
     best = None  # (d2, mat_a_local, mat_b_world)
     sibling_count = 0
     in_range = 0
-    rev = _reverse_bpmap()
     for sib in candidates:
         if sib is obj:
             continue
@@ -1388,7 +1545,13 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
 
     if best is None:
         if sibling_count == 0:
-            return "no-siblings"
+            surface_status = _surface_snap_one(
+                obj,
+                candidates,
+                float(settings.auto_snap_max_distance),
+                float(settings.surface_snap_inset),
+            )
+            return "no-siblings" if surface_status == "surface-out-of-range" else surface_status
         return "out-of-range"
     _d2, mat_a_local, mat_b_world = best
     if settings.auto_snap_align_rotation:
@@ -2502,6 +2665,7 @@ class RSDW_PT_advanced(Panel):
         snap_box = layout.box()
         snap_box.label(text="Snap Diagnostics", icon="SNAP_GRID")
         snap_box.prop(s, "auto_snap_align_rotation")
+        snap_box.prop(s, "surface_snap_inset")
         snap_box.operator(RSDW_OT_DiagnoseAutoSnap.bl_idname,
                           text="Diagnose Selected", icon="INFO")
 
@@ -2573,6 +2737,34 @@ class RSDW_PT_plug_status(Panel):
 
 # ---------- registration ----------
 
+def _register_keymaps() -> None:
+    _unregister_keymaps()
+    try:
+        keyconfig = bpy.context.window_manager.keyconfigs.addon
+    except Exception:
+        keyconfig = None
+    if keyconfig is None:
+        return
+
+    keymap = keyconfig.keymaps.new(name="3D View", space_type="VIEW_3D")
+    diagnose_item = keymap.keymap_items.new(
+        RSDW_OT_DiagnoseAutoSnap.bl_idname,
+        type="D",
+        value="PRESS",
+        ctrl=True,
+        alt=True,
+    )
+    _addon_keymaps.append((keymap, diagnose_item))
+
+
+def _unregister_keymaps() -> None:
+    for keymap, item in list(_addon_keymaps):
+        try:
+            keymap.keymap_items.remove(item)
+        except Exception:
+            pass
+    _addon_keymaps.clear()
+
 _classes = (
     RSDWSettings,
     RSDW_OT_NewBuildCollection,
@@ -2600,6 +2792,7 @@ def register() -> None:
     for c in _classes:
         bpy.utils.register_class(c)
     bpy.types.Scene.rsdw_settings = bpy.props.PointerProperty(type=RSDWSettings)
+    _register_keymaps()
 
     # Auto-snap-on-drop handler.
     if _rsdw_auto_snap_handler not in bpy.app.handlers.depsgraph_update_post:
@@ -2630,6 +2823,8 @@ def register() -> None:
 
 
 def unregister() -> None:
+    _unregister_keymaps()
+
     try:
         _unregister_asset_library()
     except Exception as e:
