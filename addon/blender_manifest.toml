@@ -1,0 +1,24 @@
+schema_version = "1.0.0"
+
+id = "rsdw_base_builder"
+version = "0.6.5"
+name = "RSDW Base Builder"
+tagline = "Dragonwilds base-building parts + base layout import/export"
+maintainer = "RSDW Tools"
+type = "add-on"
+
+tags = ["Game Engine", "Pipeline"]
+
+blender_version_min = "5.0.0"
+
+license = [
+  "SPDX:MIT",
+]
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "/.git/",
+  "/*.zip",
+  "/*.blend1",
+]

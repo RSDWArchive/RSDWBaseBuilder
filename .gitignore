@@ -1,0 +1,12 @@
+_local/
+_build/
+dist/
+PipelineLogs/
+PipelineRun.json
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+*.blend1
+*.blend2

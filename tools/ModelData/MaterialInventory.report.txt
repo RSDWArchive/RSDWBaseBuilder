@@ -1,0 +1,49 @@
+Total meshes:               1573
+  with >=1 material:        1573
+  with no material JSON:    0
+  with >1 material slots:   1014
+Unique material JSONs:      1262
+
+Top 30 most-referenced materials:
+    133  MI_Modular_Set_Tier_Trim                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim.json
+    132  MI_Modular_Set_Tier1_Wall_v2                        RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Wall_v2.json
+    123  MI_Tier3_Castle_Doors_01                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Castle_Doors_01.json
+    123  MI_Tier3_Castle_Floor_02                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Castle_Floor_02.json
+    123  MI_Tier3_Corner_Brick_01                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Corner_Brick_01.json
+    123  MI_Tier3_Roof_03                                    RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Roof_03.json
+    123  MI_Tier3_WallDark_01                                RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_WallDark_01.json
+    123  MI_Tier3_Wall_01                                    RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Wall_01.json
+    123  MI_Tier3_Wood_Trim_01                               RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/Materials/MI_Tier3_Wood_Trim_01.json
+    109  lambert1                                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/lambert1.json
+    108  MI_Modular_Set_Tier1_Roof                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Roof.json
+    108  MI_Modular_Set_Tier1_Wall                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Wall.json
+    107  MI_Modular_Set_Tier1_Extended_Roof                  RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Extended_Roof.json
+    107  MI_Modular_Set_Tier1_Floor                          RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Floor.json
+    107  MI_Modular_Set_Tier_Trim_DMG                        RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim_DMG.json
+    107  MI_T1_Pallisade_Wall_01                             RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_T1_Pallisade_Wall_01.json
+    100  MI_Modular_Set_Tier2_Floor                          RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Floor.json
+    100  MI_Modular_Set_Tier2_Foundation                     RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Foundation.json
+    100  MI_Modular_Set_Tier2_Roof                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Roof.json
+    100  MI_Modular_Set_Tier2_Trim9990                       RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Trim9990.json
+    100  MI_Modular_Set_Tier2_Wall                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Wall.json
+    100  MI_T2_Pallisade_Wall_01                             RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_T2_Pallisade_Wall_01.json
+    100  lambert1                                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/lambert1.json
+     60  MI_Ash_Branches                                     RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_Ash_Branches.json
+     57  MI_BM_AshTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Leaves.json
+     57  MI_BM_AshTree_Segments                              RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Segments.json
+     57  MI_BM_AshTree_Trunk                                 RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Trunk.json
+     57  MI_BM_Fallen_Log                                    RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_Fallen_Log.json
+     57  MI_BM_OakTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves.json
+     57  MI_BM_OakTree_Leaves_Saplings                       RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves_Saplings.json
+
+Bottom 10 least-referenced:
+      1  MI_VFX_FishParticles_Herring                        RSDragonwilds/Plugins/GameFeatures/Fishing/Content/Art/VFX/Fishing/MI_VFX_FishParticles_Herring.json
+      1  MI_VFX_FishParticles_Salmon                         RSDragonwilds/Plugins/GameFeatures/Fishing/Content/Art/VFX/Fishing/MI_VFX_FishParticles_Salmon.json
+      1  MI_VFX_FishParticles_Sardine                        RSDragonwilds/Plugins/GameFeatures/Fishing/Content/Art/VFX/Fishing/MI_VFX_FishParticles_Sardine.json
+      1  MI_VFX_FishParticles_Trout                          RSDragonwilds/Plugins/GameFeatures/Fishing/Content/Art/VFX/Fishing/MI_VFX_FishParticles_Trout.json
+      1  MI_VFX_FishParticles_UndeadBass                     RSDragonwilds/Plugins/GameFeatures/Fishing/Content/Art/VFX/Fishing/MI_VFX_FishParticles_UndeadBass.json
+      1  MI_M_MED_Zombie_01                                  RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Skeleton/NPC/Humanoid/M_MED_Zombie_01/Materials/MI_M_MED_Zombie_01.json
+      1  MI_M_MED_Zombie_Hair_01                             RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Skeleton/NPC/Humanoid/M_MED_Zombie_01/Materials/MI_M_MED_Zombie_Hair_01.json
+      1  MI_M_MED_Zombie_Outfit_01                           RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Skeleton/NPC/Humanoid/M_MED_Zombie_01/Materials/MI_M_MED_Zombie_Outfit_01.json
+      1  MI_U_MED_Skeleton_Human_Melee_Heavy_Shield          RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Skeleton/Weapons/Faction/U_MED_Skeleton_Human_Melee_Heavy_Shield_01/Materials/MI_U_MED_Skeleton_Human_Melee_Heavy_Shield.json
+      1  MI_U_MED_Skeleton_Human_Melee_Heavy_Spear           RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Skeleton/Weapons/Faction/U_MED_Skeleton_Human_Melee_Heavy_Spear_01/Materials/MI_U_MED_Skeleton_Human_Melee_Heavy_Spear.json
