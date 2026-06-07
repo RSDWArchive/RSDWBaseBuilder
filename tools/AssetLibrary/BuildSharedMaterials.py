@@ -82,6 +82,11 @@ def _default_out_blend() -> Path:
     return _repo_root() / "_build" / "extension" / "_Materials.blend"
 
 
+def _default_web_assets_manifest(source_root: Path) -> Path | None:
+    candidate = source_root / "WebAssets" / "WebAssetManifest.json"
+    return candidate if candidate.is_file() else None
+
+
 def _default_worker() -> Path:
     return Path(__file__).resolve().parent / "BuildSharedMaterialsWorker.py"
 
@@ -202,6 +207,7 @@ def _run_worker(
     pack_images: bool = True,
     external_texture_root: Path | None = None,
     texture_limit_mb: float | None = None,
+    texture_transcode_min_mb: float | None = None,
 ) -> tuple[dict | None, float, int]:
     task = {
         "source_root": str(args.source_root.resolve()),
@@ -211,6 +217,8 @@ def _run_worker(
         "pack_images": pack_images,
         "external_texture_root": str(external_texture_root.resolve()) if external_texture_root else None,
         "texture_limit_mb": texture_limit_mb,
+        "texture_transcode_min_mb": texture_transcode_min_mb,
+        "web_assets_manifest": str(args.web_assets_manifest.resolve()) if args.web_assets_manifest else None,
     }
 
     with tempfile.NamedTemporaryFile(
@@ -266,7 +274,7 @@ def _save_jpeg_under_limit(source: Path, dest: Path, limit_bytes: int) -> dict:
     with Image.open(source) as image:
         rgb = image.convert("RGB")
         last_quality = None
-        for quality in (98, 95, 92, 90, 85, 80, 75, 70):
+        for quality in (80, 75, 70, 65, 60, 55, 50):
             rgb.save(dest, format="JPEG", quality=quality, optimize=True, progressive=True)
             last_quality = quality
             if dest.stat().st_size <= limit_bytes:
@@ -312,6 +320,7 @@ def _write_manifest(
     inventory_path: Path,
     source_root: Path,
     material_data_roots: list[Path],
+    web_assets_manifest: Path | None,
     limit_mb: float | None,
     materials: list[dict],
     shards: list[dict],
@@ -340,11 +349,18 @@ def _write_manifest(
             "inventory": str(inventory_path.resolve()),
             "source_root": str(source_root.resolve()),
             "material_data_roots": [str(root.resolve()) for root in material_data_roots],
+            "web_assets_manifest": str(web_assets_manifest.resolve()) if web_assets_manifest else None,
         },
         "summary": {
             "requested_materials": len(materials),
             "linked_materials": sum(len(shard["materials"]) for shard in shards),
             "shards": len(shards),
+            "built_materials": sum(int(shard.get("built") or 0) for shard in shards),
+            "empty_materials": sum(int(shard.get("empty") or 0) for shard in shards),
+            "errored_materials": sum(int(shard.get("errored") or 0) for shard in shards),
+            "external_texture_count": sum(int(shard.get("external_texture_count") or 0) for shard in shards),
+            "web_texture_hit_count": sum(int((shard.get("web_texture_stats") or {}).get("hit_count") or 0) for shard in shards),
+            "web_texture_miss_count": sum(int((shard.get("web_texture_stats") or {}).get("miss_count") or 0) for shard in shards),
             "over_limit_shards": len(over_limit),
             "externalized_shards": sum(1 for shard in shards if not shard.get("pack_images", True)),
             "stem_collisions": len(_stem_collisions(materials)),
@@ -357,10 +373,12 @@ def _write_manifest(
                 "mb": shard["mb"],
                 "requested": shard["requested"],
                 "saved_material_count": shard["saved_material_count"],
+                "built": shard.get("built", 0),
                 "errored": shard["errored"],
                 "empty": shard["empty"],
                 "pack_images": shard.get("pack_images", True),
                 "external_texture_count": shard.get("external_texture_count", 0),
+                "web_texture_stats": shard.get("web_texture_stats"),
                 "external_textures": shard.get("external_textures", []),
                 "materials": shard["materials"],
             }
@@ -379,17 +397,29 @@ def _build_single(args: argparse.Namespace, materials: list[dict], material_data
     print(f"Building {len(materials)} shared materials -> {args.out_blend}")
     if material_data_roots:
         print("Material data roots: " + ", ".join(str(root) for root in material_data_roots))
+    external_texture_root = args.external_texture_root or (args.out_blend.parent / "_MaterialTextures")
+    pack_images = not args.externalize_textures
 
     result, elapsed, returncode = _run_worker(
         args=args,
         materials=materials,
         material_data_roots=material_data_roots,
         out_blend=args.out_blend,
+        pack_images=pack_images,
+        external_texture_root=external_texture_root if not pack_images else None,
+        texture_limit_mb=args.external_texture_limit_mb if not pack_images else None,
+        texture_transcode_min_mb=args.external_texture_transcode_min_mb if not pack_images else None,
     )
     if result is None or result.get("status") != "success":
         print(f"FAIL ({elapsed:.1f}s): {(result or {}).get('error', 'unknown error')}", file=sys.stderr)
         print(json.dumps(result, indent=2), file=sys.stderr)
         return returncode or 1
+    if not pack_images and args.external_texture_limit_mb:
+        try:
+            _materialize_transcoded_textures(result, limit_mb=args.external_texture_limit_mb)
+        except RuntimeError as exc:
+            print(f"FAIL external texture transcode: {exc}", file=sys.stderr)
+            return 1
 
     print(f"OK ({elapsed:.1f}s)")
     print(json.dumps(result, indent=2))
@@ -404,10 +434,12 @@ def _build_single(args: argparse.Namespace, materials: list[dict], material_data
             "mb": round(size / (1024 * 1024), 3),
             "requested": len(materials),
             "saved_material_count": len(saved),
+            "built": int(result.get("built") or 0),
             "errored": int(result.get("errored") or 0),
             "empty": int(result.get("empty") or 0),
             "pack_images": bool(result.get("pack_images", True)),
             "external_texture_count": int(result.get("externalized_texture_count") or 0),
+            "web_texture_stats": result.get("web_texture_stats") or {},
             "external_textures": result.get("externalized_textures") or [],
             "materials": [_manifest_material(m) for m in materials if m["stem"] in saved],
         }
@@ -416,6 +448,7 @@ def _build_single(args: argparse.Namespace, materials: list[dict], material_data
             inventory_path=args.inventory,
             source_root=args.source_root,
             material_data_roots=material_data_roots,
+            web_assets_manifest=args.web_assets_manifest,
             limit_mb=None,
             materials=materials,
             shards=[shard],
@@ -455,16 +488,27 @@ def _build_sharded(args: argparse.Namespace, materials: list[dict], material_dat
         attempts += 1
         print(f"[{shard_index:04d}] building {len(batch)} materials -> {out_blend.name}")
 
+        pack_images = not args.externalize_textures
         result, elapsed, returncode = _run_worker(
             args=args,
             materials=batch,
             material_data_roots=material_data_roots,
             out_blend=out_blend,
+            pack_images=pack_images,
+            external_texture_root=external_texture_root if not pack_images else None,
+            texture_limit_mb=args.external_texture_limit_mb if not pack_images else None,
+            texture_transcode_min_mb=args.external_texture_transcode_min_mb if not pack_images else None,
         )
         if result is None or result.get("status") != "success":
             print(f"FAIL shard {shard_index:04d} ({elapsed:.1f}s): {(result or {}).get('error', 'unknown error')}", file=sys.stderr)
             print(json.dumps(result, indent=2), file=sys.stderr)
             return returncode or 1
+        if not pack_images and args.external_texture_limit_mb:
+            try:
+                _materialize_transcoded_textures(result, limit_mb=args.external_texture_limit_mb)
+            except RuntimeError as exc:
+                print(f"FAIL shard {shard_index:04d} external texture transcode: {exc}", file=sys.stderr)
+                return 1
 
         size = out_blend.stat().st_size if out_blend.exists() else 0
         size_mb = size / (1024 * 1024)
@@ -479,7 +523,7 @@ def _build_sharded(args: argparse.Namespace, materials: list[dict], material_dat
             pending.insert(0, right)
             pending.insert(0, left)
             continue
-        if size > limit_bytes and len(batch) == 1:
+        if size > limit_bytes and len(batch) == 1 and pack_images:
             attempts += 1
             print(
                 f"[{shard_index:04d}] {size_mb:.1f} MiB for one material; "
@@ -493,6 +537,7 @@ def _build_sharded(args: argparse.Namespace, materials: list[dict], material_dat
                 pack_images=False,
                 external_texture_root=external_texture_root,
                 texture_limit_mb=args.shard_size_mb,
+                texture_transcode_min_mb=args.external_texture_transcode_min_mb,
             )
             if result is None or result.get("status") != "success":
                 print(f"FAIL shard {shard_index:04d} externalized ({elapsed:.1f}s): {(result or {}).get('error', 'unknown error')}", file=sys.stderr)
@@ -515,10 +560,12 @@ def _build_sharded(args: argparse.Namespace, materials: list[dict], material_dat
             "mb": round(size_mb, 3),
             "requested": len(batch),
             "saved_material_count": len(saved),
+            "built": int(result.get("built") or 0),
             "errored": int(result.get("errored") or 0),
             "empty": int(result.get("empty") or 0),
             "pack_images": bool(result.get("pack_images", True)),
             "external_texture_count": int(result.get("externalized_texture_count") or 0),
+            "web_texture_stats": result.get("web_texture_stats") or {},
             "external_textures": result.get("externalized_textures") or [],
             "materials": shard_materials,
         }
@@ -545,6 +592,7 @@ def _build_sharded(args: argparse.Namespace, materials: list[dict], material_dat
         inventory_path=args.inventory,
         source_root=args.source_root,
         material_data_roots=material_data_roots,
+        web_assets_manifest=args.web_assets_manifest,
         limit_mb=args.shard_size_mb,
         materials=materials,
         shards=shards,
@@ -576,18 +624,30 @@ def main(argv: list[str] | None = None) -> int:
                    help="Initial material count per shard before size-based splitting.")
     p.add_argument("--external-texture-root", type=Path, default=None,
                    help="Texture copy root for oversized single-material shards. Defaults to asset_library/_MaterialTextures.")
+    p.add_argument("--externalize-textures", action="store_true",
+                   help="Store shared material images under _MaterialTextures instead of packing them into .blend shards.")
+    p.add_argument("--external-texture-limit-mb", type=float, default=None,
+                   help="When externalizing textures, transcode supported images larger than this many MiB to JPEG under the limit.")
+    p.add_argument("--external-texture-transcode-min-mb", type=float, default=None,
+                   help="When externalizing textures, transcode supported images larger than this many MiB to JPEG even if they are under the hard limit.")
+    p.add_argument("--web-assets-manifest", type=Path, default=None,
+                   help="Optional RSDWModel WebAssets/WebAssetManifest.json used to load optimized WebP textures.")
     p.add_argument("--limit", type=int, default=None,
                    help="Build at most N materials (smoke testing)")
     p.add_argument("--timeout-s", type=int, default=900)
     args = p.parse_args(argv)
+
+    if args.web_assets_manifest is None:
+        args.web_assets_manifest = _default_web_assets_manifest(args.source_root)
 
     for path, label in [
         (args.blender, "blender.exe"),
         (args.worker, "worker script"),
         (args.source_root, "source root"),
         (args.inventory, "material inventory"),
+        (args.web_assets_manifest, "web assets manifest"),
     ]:
-        if not path.exists():
+        if path is not None and not path.exists():
             print(f"{label} not found: {path}", file=sys.stderr)
             return 2
 

@@ -27,12 +27,15 @@ import bpy
 # include the repo by default.
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_REPO_ROOT / "tools" / "ModelData"))
+sys.path.insert(0, str(_REPO_ROOT / "tools" / "AssetLibrary"))
 
+import BuildGLBWorker as base  # noqa: E402
 from BuildGLBWorker import (  # noqa: E402  (sys.path manipulated above)
     _build_material_from_mi,
     _clear_scene,
     _enable_required_addons,
 )
+from OptimizedTextures import compact_web_texture_stats, install_web_texture_loader  # noqa: E402
 
 
 def _parse_args() -> argparse.Namespace:
@@ -78,6 +81,7 @@ def _copy_external_images(
     blend_path: Path,
     *,
     texture_limit_bytes: int | None,
+    texture_transcode_min_bytes: int | None,
 ) -> list[dict]:
     texture_root.mkdir(parents=True, exist_ok=True)
     copied: list[dict] = []
@@ -99,9 +103,17 @@ def _copy_external_images(
             digest = hashlib.sha1(str(src).encode("utf-8", errors="ignore")).hexdigest()[:12]
             source_bytes = src.stat().st_size
             transcode = (
-                texture_limit_bytes is not None
-                and source_bytes > texture_limit_bytes
-                and src.suffix.lower() in {".png", ".tga", ".tif", ".tiff", ".bmp"}
+                src.suffix.lower() in {".png", ".tga", ".tif", ".tiff", ".bmp"}
+                and (
+                    (
+                        texture_transcode_min_bytes is not None
+                        and source_bytes > texture_transcode_min_bytes
+                    )
+                    or (
+                        texture_limit_bytes is not None
+                        and source_bytes > texture_limit_bytes
+                    )
+                )
             )
             suffix = ".jpg" if transcode else (src.suffix or ".img")
             dest = texture_root / digest[:2] / f"{src.stem}_{digest}{suffix}"
@@ -149,10 +161,20 @@ def main() -> int:
             int(float(texture_limit_mb) * 1024 * 1024)
             if texture_limit_mb is not None else None
         )
+        texture_transcode_min_mb = task.get("texture_transcode_min_mb")
+        texture_transcode_min_bytes = (
+            int(float(texture_transcode_min_mb) * 1024 * 1024)
+            if texture_transcode_min_mb is not None else None
+        )
         external_texture_root_raw = task.get("external_texture_root")
         external_texture_root = (
             Path(external_texture_root_raw).resolve()
             if external_texture_root_raw else None
+        )
+        web_assets_manifest_raw = task.get("web_assets_manifest")
+        web_assets_manifest = (
+            Path(web_assets_manifest_raw).resolve()
+            if web_assets_manifest_raw else None
         )
 
         if not source_root.is_dir():
@@ -160,6 +182,12 @@ def main() -> int:
 
         _enable_required_addons()
         _clear_scene()
+        web_texture_stats = install_web_texture_loader(
+            base,
+            source_root=source_root,
+            data_roots=data_roots,
+            manifest_path=web_assets_manifest,
+        )
 
         built: list[dict] = []
         empty: list[dict] = []
@@ -207,10 +235,11 @@ def main() -> int:
         externalized_textures: list[dict] = []
         if not pack_images and external_texture_root is not None:
             externalized_textures = _copy_external_images(
-                external_texture_root,
-                out_blend,
-                texture_limit_bytes=texture_limit_bytes,
-            )
+            external_texture_root,
+            out_blend,
+            texture_limit_bytes=texture_limit_bytes,
+            texture_transcode_min_bytes=texture_transcode_min_bytes,
+        )
 
         _save_blend(out_blend, pack_images=pack_images)
 
@@ -230,6 +259,7 @@ def main() -> int:
             "external_texture_root": str(external_texture_root) if external_texture_root else None,
             "externalized_texture_count": len(externalized_textures),
             "externalized_textures": externalized_textures,
+            "web_texture_stats": compact_web_texture_stats(web_texture_stats),
             "packed_images": packed_images,
             "total_images": total_images,
             "empty_list": empty[:20],

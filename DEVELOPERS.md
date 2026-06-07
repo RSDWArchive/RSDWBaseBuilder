@@ -88,6 +88,19 @@ Useful options:
 - `--workers` controls concurrent Blender worker count.
 - `--force` rebuilds already successful assets.
 - `--limit` and `--only` restrict the target set for focused testing.
+- `--material-mode fallback` is the default for smoke/full quality builds. It
+  builds shared MI-derived material shards and links/falls back to them.
+- Shared materials externalize texture files into `_MaterialTextures/` by
+  default so the same texture data is not packed repeatedly into material
+  shard `.blend` files.
+- `--material-texture-limit-mb` defaults to `8.0` and transcodes larger
+  externalized shared-material textures to JPEG for release-size control.
+- `--material-texture-transcode-min-mb` defaults to `0.5`; supported
+  externalized textures above that size are stored as release-friendly JPEGs.
+- `--material-mode light` is only for fast debugging and is expected to produce
+  weaker/untextured asset-library output.
+- `--skip-shared-materials` skips shared material shard generation; workers can
+  still build local fallback materials when `--material-mode fallback` is used.
 - `--sync-portable-extension` installs the staged extension into the selected
   portable Blender after a full/package-current run.
 - `--portable-extension-dir` overrides the installed extension directory. The
@@ -125,6 +138,33 @@ The full pipeline also refreshes source-side manifests under `tools/`, such as:
 Review these generated manifests before committing because they describe the
 current upstream Archive/Model inputs.
 
+## Asset Quality Rules
+
+The asset-library pipeline has explicit preview and material expectations:
+
+- Item previews come from `properties.Icon` in `ItemData.json`, resolved against
+  the selected Archive texture root.
+- Building-piece previews come from the referenced building-piece JSON
+  `Properties.DisplayIcon`.
+- BP assets normally do not have authoritative UI icons. They should ship
+  without a custom placeholder preview so Blender's asset browser can generate
+  its normal 3D object thumbnail on load.
+- Pipeline-generated targets must not use category fallback icons. The old
+  category fallback remains only for legacy direct script runs without a target
+  manifest.
+- Smoke/full builds should use MI-derived materials. A material can be valid
+  with texture images or with scalar/vector color parameters only, depending on
+  what the source MI actually contains.
+
+Quality reports are written under each run's `PipelineLogs\<timestamp>\` folder:
+
+- `asset_target_quality_report.json` verifies icon coverage and preview intent
+  immediately after target generation.
+- `asset_quality_report.json` verifies built preview sources and materialized
+  slot counts after the Blender workers finish.
+- `_build\extension\_Materials.manifest.json` summarizes shared material shards,
+  built/empty material counts, and externalized texture counts.
+
 ## Expected Validation
 
 For game version `0.11.2.2`, the current full run should produce:
@@ -139,6 +179,11 @@ The validation stages should report:
 
 - asset build: `2928 ok, 0 failed`
 - metadata verification: `2928 ok, 0 failed`
+- asset target quality: all `647` building pieces and `891` item targets have
+  resolved authoritative icons; BP targets use generated preview mode
+- asset quality: item/building-piece assets use custom icons, BP assets use
+  Blender default/generated previews, and fallback material mode reports
+  materialized slots
 - Git file-size audit: no generated file over the configured limit
 - package: one `dist\rsdw_base_builder-<addon-version>.zip`
 - optional portable sync: installed extension has the same file count/layout as

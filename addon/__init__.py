@@ -311,12 +311,17 @@ def _collection_objects_recursive(collection) -> list:
 
 def _has_rsdw_metadata(obj) -> bool:
     return any(key in obj for key in (
+        "rsdw_asset_kind",
         "rsdw_class_name",
         "rsdw_bp_class",
         "rsdw_piece_data_index",
         "rsdw_piece_data_name",
         "rsdw_catalog_asset_stem",
         "rsdw_source_sm_stem",
+        "rsdw_item_name",
+        "rsdw_item_asset_name",
+        "rsdw_item_asset_path",
+        "rsdw_actor_class",
     ))
 
 
@@ -333,7 +338,10 @@ def _metadata_object_for(obj):
 
 
 def _collection_has_rsdw_pieces(collection) -> bool:
-    return any(_resolve_class_for_obj(obj) for obj in _collection_objects_recursive(collection))
+    return any(
+        _asset_kind_for_obj(obj) or _resolve_class_for_obj(obj)
+        for obj in _collection_objects_recursive(collection)
+    )
 
 
 def _build_collections_in_scene(scene) -> list:
@@ -375,6 +383,205 @@ def _is_object_hidden_for_export(obj) -> bool:
         return bool(obj.hide_get() or obj.hide_render)
     except Exception:
         return False
+
+
+def _asset_kind_for_obj(obj) -> str:
+    meta = _metadata_object_for(obj) or obj
+    kind = str(meta.get("rsdw_asset_kind", "") or "").strip().lower()
+    if kind:
+        return kind
+    if meta.get("rsdw_item_name") or meta.get("rsdw_item_asset_name") or meta.get("rsdw_item_asset_path"):
+        return "item"
+    if meta.get("rsdw_piece_data_name") or meta.get("rsdw_piece_data_index") is not None:
+        return "building_piece"
+    if meta.get("rsdw_actor_class") or meta.get("rsdw_runtime_path") or meta.get("rsdw_bp_json_relative"):
+        return "bp"
+    return ""
+
+
+def _is_building_piece_obj(obj) -> bool:
+    kind = _asset_kind_for_obj(obj)
+    if kind:
+        return kind == "building_piece"
+    return bool(_resolve_class_for_obj(obj))
+
+
+def _is_item_obj(obj) -> bool:
+    return _asset_kind_for_obj(obj) == "item"
+
+
+def _is_actor_obj(obj) -> bool:
+    return _asset_kind_for_obj(obj) == "bp"
+
+
+def _copy_custom_props(src, dst) -> None:
+    for key in src.keys():
+        try:
+            dst[key] = src[key]
+        except Exception:
+            pass
+
+
+def _load_asset_source(stem: str, blend_path: str, linked_assets: dict):
+    cached = linked_assets.get(stem)
+    if cached is not None:
+        return cached
+    with bpy.data.libraries.load(blend_path, link=True) as (df, dt):
+        if stem in df.objects:
+            dt.objects = [stem]
+        else:
+            dt.objects = list(df.objects)[:1]
+    if not dt.objects or dt.objects[0] is None:
+        return None
+    src = dt.objects[0]
+    linked_assets[stem] = src
+    return src
+
+
+def _instantiate_asset(
+    *,
+    stem: str,
+    name: str,
+    blend_index: dict,
+    linked_assets: dict,
+    collection,
+):
+    blend_path = blend_index.get(stem.lower())
+    if not blend_path:
+        return None, "missing_blend"
+    src = _load_asset_source(stem, blend_path, linked_assets)
+    if src is None:
+        return None, "missing_object"
+
+    inst = bpy.data.objects.new(name=name or stem, object_data=getattr(src, "data", None))
+    if src.type == "EMPTY" and getattr(src, "instance_collection", None) is not None:
+        inst.empty_display_type = src.empty_display_type
+        inst.empty_display_size = src.empty_display_size
+        inst.instance_type = "COLLECTION"
+        inst.instance_collection = src.instance_collection
+    _copy_custom_props(src, inst)
+    collection.objects.link(inst)
+    return inst, ""
+
+
+def _ue_row_to_blender_matrix(
+    row: dict,
+    scale: float,
+    ox: float,
+    oy: float,
+    oz: float,
+    *,
+    flip_roll: bool = True,
+    flip_pitch: bool = False,
+) -> Matrix:
+    loc = Vector((
+        (float(row.get("x", 0.0)) - ox) * scale,
+        -(float(row.get("y", 0.0)) - oy) * scale,
+        (float(row.get("z", 0.0)) - oz) * scale,
+    ))
+    # UE Rotator axes map through the same Y mirror used for position.
+    # Building pieces/items use the legacy mirrored roll convention. BP actors
+    # use corrected actor signs for X/Y tilt while keeping Z/yaw mirrored.
+    roll_sign = -1.0 if flip_roll else 1.0
+    pitch_sign = -1.0 if flip_pitch else 1.0
+    rot = Euler((
+        math.radians(roll_sign * float(row.get("roll", 0.0))),
+        math.radians(pitch_sign * float(row.get("pitch", 0.0))),
+        math.radians(-float(row.get("yaw", 0.0))),
+    ), "XYZ")
+    scl = Vector((
+        float(row.get("scale_x", 1.0) or 1.0),
+        float(row.get("scale_y", 1.0) or 1.0),
+        float(row.get("scale_z", 1.0) or 1.0),
+    ))
+    return Matrix.LocRotScale(loc, rot.to_quaternion(), scl)
+
+
+def _apply_ue_transform(
+    obj,
+    row: dict,
+    scale: float,
+    ox: float,
+    oy: float,
+    oz: float,
+    *,
+    flip_roll: bool = True,
+    flip_pitch: bool = False,
+) -> None:
+    obj.matrix_world = _ue_row_to_blender_matrix(
+        row,
+        scale,
+        ox,
+        oy,
+        oz,
+        flip_roll=flip_roll,
+        flip_pitch=flip_pitch,
+    )
+
+
+def _round_transform_value(value: float, digits: int = 3) -> float:
+    return round(float(value), digits)
+
+
+def _ue_transform_from_matrix(
+    mw: Matrix,
+    scale: float,
+    ox: float,
+    oy: float,
+    oz: float,
+    *,
+    flip_roll: bool = True,
+    flip_pitch: bool = False,
+) -> dict:
+    loc, rot, scl = mw.decompose()
+    try:
+        eul = rot.to_euler("XYZ")
+    except Exception:
+        eul = Euler((0.0, 0.0, 0.0), "XYZ")
+    roll = math.degrees(eul.x)
+    if flip_roll:
+        roll = -roll
+    pitch = math.degrees(eul.y)
+    if flip_pitch:
+        pitch = -pitch
+    return {
+        "x": _round_transform_value((loc.x / scale) + ox),
+        "y": _round_transform_value((-loc.y / scale) + oy),
+        "z": _round_transform_value((loc.z / scale) + oz),
+        "pitch": _round_transform_value(pitch),
+        "yaw": _round_transform_value(-math.degrees(eul.z)),
+        "roll": _round_transform_value(roll),
+        "scale_x": _round_transform_value(scl.x, 6),
+        "scale_y": _round_transform_value(scl.y, 6),
+        "scale_z": _round_transform_value(scl.z, 6),
+    }
+
+
+def _unreal_asset_path_from_json_relative(json_relative: str, asset_name: str = "") -> str:
+    rel = str(json_relative or "").replace("\\", "/")
+    if rel.endswith(".json"):
+        rel = rel[:-5]
+    if not rel:
+        return ""
+    stem = asset_name or rel.rsplit("/", 1)[-1]
+    if rel.startswith("RSDragonwilds/Content/"):
+        body = rel[len("RSDragonwilds/Content/"):]
+        return f"/Game/{body}.{stem}"
+    marker = "RSDragonwilds/Plugins/GameFeatures/"
+    if rel.startswith(marker):
+        rest = rel[len(marker):]
+        parts = rest.split("/", 2)
+        if len(parts) == 3 and parts[1] == "Content":
+            return f"/{parts[0]}/{parts[2]}.{stem}"
+    return f"/Game/{stem}.{stem}"
+
+
+def _class_path_from_class_name(class_name: str) -> str:
+    text = str(class_name or "").strip()
+    prefix = "BlueprintGeneratedClass "
+    if text.startswith(prefix):
+        return text[len(prefix):].strip()
+    return text
 
 
 def _select_objects(context, objects: list) -> None:
@@ -560,21 +767,23 @@ class RSDW_OT_ImportBuildingJson(Operator):
             return {"CANCELLED"}
 
         try:
-            with open(path, "r", encoding="utf-8") as fh:
+            with open(path, "r", encoding="utf-8-sig") as fh:
                 data = json.load(fh)
         except Exception as e:
             self.report({"ERROR"}, f"Failed to read JSON: {e}")
             return {"CANCELLED"}
 
-        pieces = data.get("pieces") or []
-        if not pieces:
-            self.report({"WARNING"}, "No pieces found in JSON")
+        pieces = list(data.get("pieces") or [])
+        items = list(data.get("items") or [])
+        actors = list(data.get("actors") or [])
+        if not pieces and not items and not actors:
+            self.report({"WARNING"}, "No pieces, items, or actors found in JSON")
             return {"CANCELLED"}
 
         settings: RSDWSettings = context.scene.rsdw_settings
         bpmap = _load_bpmap()
         blend_index = _build_blend_index()
-        if not bpmap:
+        if pieces and not bpmap:
             self.report({"ERROR"},
                         "BPMap.json missing from addon. Reinstall the extension.")
             return {"CANCELLED"}
@@ -591,10 +800,11 @@ class RSDW_OT_ImportBuildingJson(Operator):
             pieces = [p for p in pieces if not p.get("is_ghosted")]
 
         ox = oy = oz = 0.0
-        if settings.recenter and pieces:
-            xs = sorted(float(p.get("x", 0.0)) for p in pieces)
-            ys = sorted(float(p.get("y", 0.0)) for p in pieces)
-            zs = sorted(float(p.get("z", 0.0)) for p in pieces)
+        recenter_rows = [*pieces, *items, *actors]
+        if settings.recenter and recenter_rows:
+            xs = sorted(float(p.get("x", 0.0)) for p in recenter_rows)
+            ys = sorted(float(p.get("y", 0.0)) for p in recenter_rows)
+            zs = sorted(float(p.get("z", 0.0)) for p in recenter_rows)
             mid = len(xs) // 2
             ox, oy, oz = xs[mid], ys[mid], zs[mid]
 
@@ -618,10 +828,12 @@ class RSDW_OT_ImportBuildingJson(Operator):
         unmapped: dict = {}
         no_blend: dict = {}
         placed = 0
+        placed_items = 0
+        placed_actors = 0
 
-        # Cache loaded source mesh data per stem so re-using the same blend
+        # Cache loaded source asset objects per stem so re-using the same blend
         # within one import doesn't trigger a fresh library load each time.
-        linked_data: dict = {}
+        linked_assets: dict = {}
 
         for pc in pieces:
             class_name = pc.get("class_name", "")
@@ -632,43 +844,30 @@ class RSDW_OT_ImportBuildingJson(Operator):
             if not stem:
                 unmapped[short] = unmapped.get(short, 0) + 1
                 continue
-            blend_path = blend_index.get(stem.lower())
-            if not blend_path:
+
+            inst, reason = _instantiate_asset(
+                stem=stem,
+                name=stem,
+                blend_index=blend_index,
+                linked_assets=linked_assets,
+                collection=coll,
+            )
+            if inst is None:
                 no_blend[stem] = no_blend.get(stem, 0) + 1
                 continue
 
-            data_block = linked_data.get(stem)
-            if data_block is None:
-                with bpy.data.libraries.load(blend_path, link=True) as (df, dt):
-                    if stem in df.objects:
-                        dt.objects = [stem]
-                    else:
-                        dt.objects = list(df.objects)[:1]
-                if not dt.objects or dt.objects[0] is None:
-                    no_blend[stem] = no_blend.get(stem, 0) + 1
-                    continue
-                src = dt.objects[0]
-                data_block = src.data
-                linked_data[stem] = data_block
-
-            # Create a fresh local instance object that re-uses the linked mesh.
-            inst = bpy.data.objects.new(name=stem, object_data=data_block)
-            coll.objects.link(inst)
-
-            x = (float(pc.get("x", 0.0)) - ox) * scale
-            y = -(float(pc.get("y", 0.0)) - oy) * scale
-            z = (float(pc.get("z", 0.0)) - oz) * scale
-            yaw_rad = math.radians(-float(pc.get("yaw", 0.0)))
-            inst.location = Vector((x, y, z))
-            inst.rotation_euler = Euler((0.0, 0.0, yaw_rad), "XYZ")
+            _apply_ue_transform(inst, pc, scale, ox, oy, oz)
 
             # Stash original game data on the object so export is lossless
             # even if the user renames it or duplicates it.
+            inst["rsdw_asset_kind"] = "building_piece"
             inst["rsdw_class_name"] = class_name
             inst["rsdw_bp_class"] = short
             inst["rsdw_piece_id"] = int(pc.get("piece_id", 0) or 0)
             inst["rsdw_piece_data_index"] = int(pc.get("piece_data_index", 0) or 0)
             inst["rsdw_piece_data_name"] = str(pc.get("piece_data_name", "") or "")
+            if pc.get("spud_guid"):
+                inst["rsdw_spud_guid"] = str(pc.get("spud_guid") or "")
             if asset_stem:
                 inst["rsdw_catalog_asset_stem"] = asset_stem
             if mesh_stem:
@@ -685,7 +884,67 @@ class RSDW_OT_ImportBuildingJson(Operator):
             inst["rsdw_is_ghosted"] = bool(pc.get("is_ghosted", False))
             placed += 1
 
-        msg = f"Placed {placed}/{len(pieces)} pieces in '{coll.name}'."
+        for item in items:
+            stem = str(item.get("item_asset_name") or "").strip()
+            if not stem:
+                asset_path = str(item.get("item_asset_path") or "")
+                stem = asset_path.rsplit("/", 1)[-1].split(".", 1)[0]
+            if not stem:
+                unmapped["item"] = unmapped.get("item", 0) + 1
+                continue
+            inst, reason = _instantiate_asset(
+                stem=stem,
+                name=str(item.get("actor_name") or stem),
+                blend_index=blend_index,
+                linked_assets=linked_assets,
+                collection=coll,
+            )
+            if inst is None:
+                no_blend[stem] = no_blend.get(stem, 0) + 1
+                continue
+            _apply_ue_transform(inst, item, scale, ox, oy, oz, flip_roll=False, flip_pitch=True)
+            inst["rsdw_asset_kind"] = "item"
+            inst["rsdw_actor_name"] = str(item.get("actor_name") or inst.name)
+            inst["rsdw_actor_class"] = str(item.get("actor_class") or "")
+            inst["rsdw_item_asset_name"] = stem
+            inst["rsdw_item_name"] = stem
+            inst["rsdw_item_asset_path"] = str(item.get("item_asset_path") or "")
+            inst["rsdw_item_source"] = str(item.get("item_source") or "ItemData")
+            try:
+                inst["rsdw_item_count"] = int(item.get("count", 1) or 1)
+            except (TypeError, ValueError):
+                inst["rsdw_item_count"] = 1
+            placed_items += 1
+
+        for actor in actors:
+            actor_class = str(actor.get("actor_class") or actor.get("class_path") or "")
+            stem = _shorten_class(actor_class)
+            if not stem:
+                unmapped["actor"] = unmapped.get("actor", 0) + 1
+                continue
+            inst, reason = _instantiate_asset(
+                stem=stem,
+                name=str(actor.get("actor_name") or stem),
+                blend_index=blend_index,
+                linked_assets=linked_assets,
+                collection=coll,
+            )
+            if inst is None:
+                no_blend[stem] = no_blend.get(stem, 0) + 1
+                continue
+            _apply_ue_transform(inst, actor, scale, ox, oy, oz, flip_roll=False, flip_pitch=True)
+            inst["rsdw_asset_kind"] = "bp"
+            inst["rsdw_actor_name"] = str(actor.get("actor_name") or inst.name)
+            inst["rsdw_actor_class"] = actor_class
+            inst["rsdw_actor_class_path"] = str(actor.get("class_path") or _class_path_from_class_name(actor_class))
+            inst["rsdw_bp_class"] = stem
+            placed_actors += 1
+
+        msg = (
+            f"Placed {placed}/{len(pieces)} pieces, "
+            f"{placed_items}/{len(items)} items, "
+            f"{placed_actors}/{len(actors)} actors in '{coll.name}'."
+        )
         if unmapped:
             top = sorted(unmapped.items(), key=lambda kv: -kv[1])[:5]
             msg += f"  {sum(unmapped.values())} unmapped class(es): " + \
@@ -732,8 +991,12 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 f"Cannot export: {preflight['unknown_runtime_index']} piece(s) are missing runtime piece data.",
             )
             return {"CANCELLED"}
-        if not preflight.get("exportable_pieces", 0):
-            self.report({"ERROR"}, "No export-ready RSDW pieces in this build.")
+        if not (
+            preflight.get("exportable_pieces", 0)
+            or preflight.get("exportable_items", 0)
+            or preflight.get("exportable_actors", 0)
+        ):
+            self.report({"ERROR"}, "No export-ready RSDW objects in this build.")
             return {"CANCELLED"}
         _set_active_collection(context, coll)
 
@@ -798,6 +1061,8 @@ class RSDW_OT_ExportBuildingJson(Operator):
         allocated_ids: set = set()
 
         pieces = []
+        items = []
+        actors = []
         skipped = 0
         hidden = 0
         # Pieces whose runtime index we don't know -- the game's spawn
@@ -813,6 +1078,12 @@ class RSDW_OT_ExportBuildingJson(Operator):
                     continue
             except Exception:
                 pass
+
+            if _is_item_obj(obj) or _is_actor_obj(obj):
+                continue
+            if not _is_building_piece_obj(obj):
+                skipped += 1
+                continue
 
             # Prefer the original class_name stashed at import time -- this is
             # the only lossless path when several BPs share the same SM mesh.
@@ -836,22 +1107,8 @@ class RSDW_OT_ExportBuildingJson(Operator):
                         f"{cls_short[:-2]}.{cls_short}"
                     )
 
-            # Use matrix_world so parented/duplicated/instanced objects export
-            # with their effective world transform, not their local one.
             mw = obj.matrix_world
-            loc = mw.translation
-            # Re-apply the import-time recenter offset to land back in the
-            # game's absolute world frame.
-            x = (loc.x / scale) + ox
-            y = (-loc.y / scale) + oy
-            z = (loc.z / scale) + oz
-            # Yaw via matrix_world's euler so it includes parent rotation.
-            try:
-                eul = mw.to_euler("XYZ")
-                yaw_blender = float(eul.z)
-            except Exception:
-                yaw_blender = float(obj.rotation_euler.z)
-            yaw_ue = math.degrees(-yaw_blender)
+            transform = _ue_transform_from_matrix(mw, scale, ox, oy, oz)
 
             # Preserve the original piece_id when present so the game can
             # round-trip stable references; mint a fresh one beyond the max
@@ -900,26 +1157,76 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 skipped += 1
                 continue
 
-            pieces.append({
+            row = {
                 "piece_id": pid,
                 "piece_data_index": pdi,
                 "piece_data_name": pdn,
                 "class_name": class_name,
-                "x": round(x, 3),
-                "y": round(y, 3),
-                "z": round(z, 3),
-                "yaw": round(yaw_ue, 3),
+                **transform,
                 "stability": _resolve_stability_for_export(
                     obj if obj.get("rsdw_stability") is not None else meta,
                     short_cn,
                 ),
                 "is_ghosted": bool(meta.get("rsdw_is_ghosted", obj.get("rsdw_is_ghosted", False))),
+            }
+            if meta.get("rsdw_spud_guid"):
+                row["spud_guid"] = str(meta.get("rsdw_spud_guid") or "")
+            pieces.append(row)
+
+        for obj in all_objs:
+            if _is_object_hidden_for_export(obj) or not _is_item_obj(obj):
+                continue
+            meta = _metadata_object_for(obj) or obj
+            item_name = str(
+                meta.get("rsdw_item_asset_name")
+                or meta.get("rsdw_item_name")
+                or obj.name.split(".")[0]
+            )
+            item_path = str(meta.get("rsdw_item_asset_path") or "")
+            if not item_path:
+                item_path = _unreal_asset_path_from_json_relative(
+                    str(meta.get("rsdw_item_json_relative") or ""),
+                    item_name,
+                )
+            try:
+                item_count = int(meta.get("rsdw_item_count", 1) or 1)
+            except (TypeError, ValueError):
+                item_count = 1
+            items.append({
+                "actor_name": str(meta.get("rsdw_actor_name") or obj.name),
+                "actor_class": str(
+                    meta.get("rsdw_actor_class")
+                    or "BlueprintGeneratedClass /Game/Gameplay/WorldItems/BP_RuntimeSpawnedWorldItem.BP_RuntimeSpawnedWorldItem_C"
+                ),
+                "item_asset_name": item_name,
+                "item_asset_path": item_path,
+                "item_source": str(meta.get("rsdw_item_source") or "ItemData"),
+                "count": item_count,
+                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz, flip_roll=False, flip_pitch=True),
             })
 
-        if not pieces:
+        for obj in all_objs:
+            if _is_object_hidden_for_export(obj) or not _is_actor_obj(obj):
+                continue
+            meta = _metadata_object_for(obj) or obj
+            actor_class = str(meta.get("rsdw_actor_class") or meta.get("rsdw_class_name") or "")
+            class_path = str(
+                meta.get("rsdw_actor_class_path")
+                or meta.get("rsdw_runtime_path")
+                or _class_path_from_class_name(actor_class)
+            )
+            if not actor_class and class_path:
+                actor_class = f"BlueprintGeneratedClass {class_path}"
+            actors.append({
+                "actor_name": str(meta.get("rsdw_actor_name") or obj.name),
+                "actor_class": actor_class,
+                "class_path": class_path,
+                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz, flip_roll=False, flip_pitch=True),
+            })
+
+        if not pieces and not items and not actors:
             self.report({"ERROR"},
-                        "No objects in this collection map to a known class. "
-                        "Object names must match an SM_* stem from the library.")
+                        "No objects in this collection map to exportable RSDW data.")
             return {"CANCELLED"}
 
         # Prefer the captured source name (the in-game base name as recorded
@@ -935,10 +1242,15 @@ class RSDW_OT_ExportBuildingJson(Operator):
         out = {
             "schema": str(schema),
             "name": str(name),
+            "generated_unix": int(time.time()),
             "count": len(pieces),
             "skipped": skipped,
+            "item_count": len(items),
+            "item_skipped": 0,
             "hidden": hidden,
             "pieces": pieces,
+            "items": items,
+            "actors": actors,
         }
 
         # Anchor (single piece per build). Optional; only emitted when the
@@ -963,7 +1275,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
         except Exception as e:
             self.report({"ERROR"}, f"Write failed: {e}")
             return {"CANCELLED"}
-        msg = f"Wrote {len(pieces)} pieces -> {path}"
+        msg = f"Wrote {len(pieces)} pieces, {len(items)} items, {len(actors)} actors -> {path}"
         if skipped:
             msg += f"  ({skipped} unmapped)"
         if hidden:
@@ -1054,13 +1366,16 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
 
     objects = _collection_objects_recursive(coll)
     visible_objects = [obj for obj in objects if not _is_object_hidden_for_export(obj)]
+    piece_objects = [obj for obj in visible_objects if _is_building_piece_obj(obj)]
+    item_objects = [obj for obj in visible_objects if _is_item_obj(obj)]
+    actor_objects = [obj for obj in visible_objects if _is_actor_obj(obj)]
     hidden_count = len(objects) - len(visible_objects)
 
     piece_data_map = _load_piece_data_map()
     snaps = _load_snaps()
     class_to_piece_data: dict = {}
     piece_ids: dict[int, list] = {}
-    for obj in visible_objects:
+    for obj in piece_objects:
         meta = _metadata_object_for(obj) or obj
         class_name = str(meta.get("rsdw_class_name", "") or "")
         if class_name:
@@ -1078,7 +1393,7 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
     unknown_runtime = []
     no_class = []
     no_snap = []
-    for obj in visible_objects:
+    for obj in piece_objects:
         cls_short = _resolve_class_for_obj(obj)
         if not cls_short:
             no_class.append(obj)
@@ -1103,9 +1418,9 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
     if select_problems:
         _select_objects(context, unknown_runtime)
 
-    ready = bool(exportable) and not unknown_runtime
+    ready = (bool(exportable) or bool(item_objects) or bool(actor_objects)) and not unknown_runtime
     status = "ready" if ready else "needs-attention"
-    if not exportable:
+    if not exportable and not item_objects and not actor_objects:
         status = "no-exportable-pieces"
 
     _preflight_cache = {
@@ -1115,8 +1430,10 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
         "total_objects": len(objects),
         "visible_objects": len(visible_objects),
         "exportable_pieces": len(exportable),
+        "exportable_items": len(item_objects),
+        "exportable_actors": len(actor_objects),
         "hidden_objects": hidden_count,
-        "non_rsdw_objects": len(no_class),
+        "non_rsdw_objects": len(visible_objects) - len(piece_objects) - len(item_objects) - len(actor_objects),
         "unknown_runtime_index": len(unknown_runtime),
         "no_snap_data": len(no_snap),
         "duplicate_piece_ids": len(duplicate_piece_id_objects),
@@ -1126,6 +1443,7 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
         "_duplicate_piece_id_objects": duplicate_piece_id_objects,
         "message": (
             f"{coll.name}: {len(exportable)} export-ready piece(s), "
+            f"{len(item_objects)} item(s), {len(actor_objects)} actor(s), "
             f"{len(unknown_runtime)} missing runtime index, "
             f"{hidden_count} hidden."
         ),
@@ -1254,6 +1572,8 @@ def _interval_overlap(a_min: float, a_max: float, b_min: float, b_max: float) ->
 
 def _is_rsdw_snap_target(obj) -> bool:
     if obj is None:
+        return False
+    if not _is_building_piece_obj(obj):
         return False
     if _resolve_class_for_obj(obj):
         return True
@@ -1491,6 +1811,8 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
     snaps = _load_snaps()
     if not snaps:
         return "no-snaps-data"
+    if not _is_building_piece_obj(obj):
+        return "not-building-piece"
     cls = forced_class or _resolve_class_for_obj(obj)
     if not cls:
         return "no-class"
@@ -1519,6 +1841,8 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
     in_range = 0
     for sib in candidates:
         if sib is obj:
+            continue
+        if not _is_building_piece_obj(sib):
             continue
         if sib.type == "MESH":
             sib_cls = _resolve_class_for_obj(sib)
@@ -1566,6 +1890,8 @@ def _auto_snap_one(obj, settings, scene=None, forced_class: str = "") -> str:
 def _resolve_drop_target(obj):
     """Given a freshly-added scene object, figure out (stem, class_name) for
     auto-snap purposes. Returns (stem, cls) or (None, None) if not ours."""
+    if not _is_building_piece_obj(obj):
+        return None, None
     rev = _reverse_bpmap()
     stem = obj.name.split(".")[0]
     cls = _resolve_class_for_obj(obj)
@@ -1784,6 +2110,8 @@ def _scene_world_plugs(scene, scale: float):
     if not snaps:
         return out
     for obj in scene.objects:
+        if not _is_building_piece_obj(obj):
+            continue
         cls = _resolve_class_for_obj(obj)
         if not cls:
             continue

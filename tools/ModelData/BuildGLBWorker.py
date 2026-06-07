@@ -46,19 +46,33 @@ TEXTURE_EXTENSIONS = (".png", ".tga", ".dds", ".jpg", ".jpeg", ".exr", ".bmp", "
 MI_SLOT_ROLES = {
     "basecolor": "BaseColor",
     "basecolor map": "BaseColor",
+    "basecolor array": "BaseColor",
+    "basecolor_vt": "BaseColor",
+    "basecolor vt": "BaseColor",
     "base color": "BaseColor",
     "base color map": "BaseColor",
     "base colour": "BaseColor",
     "base colour map": "BaseColor",
+    "iriscolor": "BaseColor",
+    "scleracolor": "BaseColor",
     "pm_diffuse": "BaseColor",
     "diffuse": "BaseColor",
     "albedo": "BaseColor",
     "normal": "Normal",
     "normal map": "Normal",
+    "normal array": "Normal",
+    "normal map array": "Normal",
+    "normal_vt": "Normal",
+    "normal vt": "Normal",
     "pm_normals": "Normal",
     "normalmap": "Normal",
     "orm": "ORM",
     "orm map": "ORM",
+    "orm_vt": "ORM",
+    "orm vt": "ORM",
+    "pm_specularmasks": "ORM",
+    "specularmasks": "ORM",
+    "specular masks": "ORM",
     "occlusionroughnessmetal": "ORM",
     "occlusionroughnessmetallic": "ORM",
     "ambientocclusionroughnessmetallic": "ORM",
@@ -69,6 +83,8 @@ MI_SLOT_ROLES = {
     "emissive": "Emission",
     "emission": "Emission",
     "pm_emissive": "Emission",
+    "emissive_vt": "Emission",
+    "emissive vt": "Emission",
     "ao": "AO",
     "ambientocclusion": "AO",
 }
@@ -98,6 +114,8 @@ HYBRID_SUFFIX_ROLES: list[tuple[str, str]] = [
 ]
 
 NON_COLOR_ROLES = {"Normal", "Metallic", "Roughness", "AO", "ORM"}
+MATERIAL_TEXTURE_PROVIDER = None
+MATTE_PLACEHOLDER_ROUGHNESS = 0.72
 
 
 # ---------------------------------------------------------------------------
@@ -488,11 +506,280 @@ def _get_bsdf(mat: bpy.types.Material) -> bpy.types.Node | None:
     return None
 
 
+def _norm_key(value: object) -> str:
+    return str(value or "").replace(" ", "").replace("_", "").lower()
+
+
+def _first_param(parameters: dict, group: str, *names: str):
+    values = parameters.get(group) or {}
+    if not isinstance(values, dict):
+        return None
+    normalized = {_norm_key(key): value for key, value in values.items()}
+    for name in names:
+        key = _norm_key(name)
+        if key in normalized:
+            return normalized[key]
+    return None
+
+
+def _first_scalar_value(parameters: dict, *names: str) -> float | None:
+    value = _first_param(parameters, "Scalars", *names)
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _emission_strength(parameters: dict) -> float | None:
+    candidates = [
+        _first_scalar_value(parameters, "BaseEmissiveMultiply", "Base Emissive Multiply"),
+        _first_scalar_value(parameters, "BasicEmissive", "Basic Emissive"),
+        _first_scalar_value(parameters, "EmissiveIntensity", "Emissive Intensity"),
+        _first_scalar_value(parameters, "Emissive Amount", "EmissiveAmount"),
+        _first_scalar_value(parameters, "Emissive Add", "EmissiveAdd"),
+        _first_scalar_value(parameters, "Emissive Scale", "EmissiveScale"),
+        _first_scalar_value(parameters, "Glow Intensity", "GlowIntensity"),
+        _first_scalar_value(parameters, "HasEmissive?", "HasEmissive", "Has Emissive"),
+    ]
+    values = [value for value in candidates if value is not None]
+    if not values:
+        return None
+    return max(0.0, max(values))
+
+
+def _is_default_base_texture(package_path: str) -> bool:
+    low = package_path.replace("\\", "/").lower()
+    defaults = (
+        "/defaulttextures/t_default_white_d",
+        "/enginematerials/defaultdiffuse",
+        "/enginematerials/t_default_basecolor",
+        "/engineresources/defaulttexture",
+        "/character/defaultvt/t_defaultvt_d",
+    )
+    return any(marker in low for marker in defaults)
+
+
+def _is_default_texture_for_role(package_path: str, role: str) -> bool:
+    low = package_path.replace("\\", "/").lower()
+    common = (
+        "/engineresources/defaulttexture",
+        "/enginematerials/defaultdiffuse",
+    )
+    if any(marker in low for marker in common):
+        return True
+    if role == "BaseColor":
+        return _is_default_base_texture(package_path)
+    if role == "Normal":
+        return any(
+            marker in low
+            for marker in (
+                "/defaulttextures/t_default_n",
+                "/defaulttextures/t_default_na",
+                "/character/defaultvt/t_defaultvt_n",
+            )
+        )
+    if role == "ORM":
+        return any(
+            marker in low
+            for marker in (
+                "/defaulttextures/t_default_orm",
+                "/character/defaultvt/t_defaultvt_orm",
+            )
+        )
+    if role == "Emission":
+        return any(
+            marker in low
+            for marker in (
+                "/defaulttextures/t_default_white_d",
+                "/defaulttextures/t_default_gray_d",
+                "/defaulttextures/t_default_linear_gray",
+                "/character/defaultvt/t_defaultvt_e",
+                "/character/defaultvt/t_defaultvt_d",
+            )
+        )
+    return False
+
+
+def _role_for_texture_slot(slot_name: str) -> str | None:
+    low = slot_name.lower()
+    role = MI_SLOT_ROLES.get(low)
+    if role is not None:
+        return role
+    normalized = low.replace("_", " ")
+    role = MI_SLOT_ROLES.get(normalized)
+    if role is not None:
+        return role
+    compact = _norm_key(low)
+    for key, value in MI_SLOT_ROLES.items():
+        if _norm_key(key) == compact:
+            return value
+    return None
+
+
+def _first_switch_value(parameters: dict, *names: str) -> bool | None:
+    value = _first_param(parameters, "Switches", *names)
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    low = str(value).strip().lower()
+    if low in {"true", "1", "yes", "on"}:
+        return True
+    if low in {"false", "0", "no", "off"}:
+        return False
+    return None
+
+
+def _texture_candidate_score(slot_name: str, role: str, package_path: str, parameters: dict) -> int:
+    slot = _norm_key(slot_name)
+    score = 0
+    if not _is_default_texture_for_role(package_path, role):
+        score += 100
+
+    use_vt = _first_switch_value(parameters, "UseVT", "Use VT")
+    if "vt" in slot:
+        score += 8 if use_vt else -8
+
+    if role == "BaseColor":
+        if slot in {"basecolormap", "basecolor", "basecolorvt"}:
+            score += 20
+        elif slot in {"pmdiffuse", "diffuse", "albedo"}:
+            score += 18
+        elif slot == "scleracolor":
+            score += 14
+        elif slot == "iriscolor":
+            score += 10
+    elif role == "Normal":
+        if slot in {"normal", "normalmap", "normalvt"}:
+            score += 10
+        elif slot == "pmnormals":
+            score += 8
+    elif role == "ORM":
+        if slot in {"orm", "ormmap", "ormvt"}:
+            score += 10
+        elif slot in {"pmspecularmasks", "specularmasks"}:
+            score += 8
+    elif role == "Emission":
+        if slot in {"emissive", "emission", "emissivevt"}:
+            score += 10
+        elif slot == "pmemissive":
+            score += 8
+    return score
+
+
+def _clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def _material_texture_provider_result(
+    *,
+    mi_json_abs: Path,
+    textures: dict,
+    parameters: dict,
+    source_root: Path,
+) -> dict:
+    provider = MATERIAL_TEXTURE_PROVIDER
+    if not callable(provider):
+        return {}
+    try:
+        result = provider(
+            mi_json_abs=mi_json_abs,
+            textures=textures,
+            parameters=parameters,
+            source_root=source_root,
+        )
+    except Exception as e:
+        return {
+            "diagnostics": [
+                {
+                    "code": "MaterialTextureProviderError",
+                    "message": f"{type(e).__name__}: {e}",
+                }
+            ]
+        }
+    return result if isinstance(result, dict) else {}
+
+
+def _has_base_color_parameter(parameters: dict) -> bool:
+    return _first_param(
+        parameters,
+        "Colors",
+        "BaseColor",
+        "Base Color",
+        "Base Colour",
+        "BaseTint",
+        "Base Tint",
+        "Color",
+        "Colour",
+        "Color A",
+        "ColourA",
+        "Tint Color",
+        "Tint Colour",
+    ) is not None
+
+
+def _is_hidden_viewer_vfx_material(mi_json_abs: Path) -> bool:
+    stem = mi_json_abs.stem.lower()
+    return "eye_glow" in stem and ("aggresive" in stem or "aggressive" in stem)
+
+
+def _hide_material_for_viewer(mat: bpy.types.Material) -> None:
+    _ensure_use_nodes(mat)
+    mat.blend_method = "BLEND"
+    bsdf = _get_bsdf(mat)
+    if bsdf is None:
+        return
+    if "Alpha" in bsdf.inputs:
+        bsdf.inputs["Alpha"].default_value = 0.0
+    if "Base Color" in bsdf.inputs:
+        value = list(bsdf.inputs["Base Color"].default_value)
+        if len(value) >= 4:
+            value[3] = 0.0
+            bsdf.inputs["Base Color"].default_value = value
+    if "Emission Strength" in bsdf.inputs:
+        bsdf.inputs["Emission Strength"].default_value = 0.0
+
+
+def _apply_mi_surface_properties(mat: bpy.types.Material, parameters: dict) -> list[str]:
+    if not isinstance(parameters, dict):
+        return []
+    props = parameters.get("Properties") or {}
+    if not isinstance(props, dict):
+        props = {}
+    overrides = props.get("BasePropertyOverrides") or {}
+    if not isinstance(overrides, dict):
+        overrides = {}
+
+    applied: list[str] = []
+    blend_mode = str(overrides.get("BlendMode") or props.get("BlendMode") or "")
+    clip_value = overrides.get("OpacityMaskClipValue")
+
+    blend_mode_low = blend_mode.lower()
+    if "additive" in blend_mode_low or "translucent" in blend_mode_low or parameters.get("IsTranslucent"):
+        mat.blend_method = "BLEND"
+        applied.append("AlphaBlend")
+    elif clip_value is not None:
+        try:
+            mat.alpha_threshold = float(clip_value)
+        except (TypeError, ValueError):
+            mat.alpha_threshold = 0.3333
+        mat.blend_method = "CLIP"
+        applied.append("AlphaMask")
+
+    return applied
+
+
 def _connect_role(
     mat: bpy.types.Material,
     role: str,
     image: bpy.types.Image,
     y_offset: int,
+    *,
+    emission_strength: float | None = None,
 ) -> None:
     """Attach a loaded Image to the Principled BSDF input matching `role`."""
     nt = mat.node_tree
@@ -511,6 +798,8 @@ def _connect_role(
 
     if role == "BaseColor":
         nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        if mat.blend_method in {"BLEND", "CLIP", "HASHED"} and "Alpha" in tex.outputs and "Alpha" in bsdf.inputs:
+            nt.links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
     elif role == "Normal":
         nm = nt.nodes.new("ShaderNodeNormalMap")
         nm.location = (-300, y_offset)
@@ -527,7 +816,7 @@ def _connect_role(
         elif "Emission" in bsdf.inputs:
             nt.links.new(tex.outputs["Color"], bsdf.inputs["Emission"])
         if "Emission Strength" in bsdf.inputs:
-            bsdf.inputs["Emission Strength"].default_value = 1.0
+            bsdf.inputs["Emission Strength"].default_value = 1.0 if emission_strength is None else emission_strength
     elif role == "ORM":
         # Red=AO, Green=Roughness, Blue=Metallic (UE convention in packed textures).
         sep = nt.nodes.new("ShaderNodeSeparateColor")
@@ -589,16 +878,53 @@ def _apply_mi_parameters(
             return False
         return True
 
+    def _first_color(*names: str) -> object | None:
+        normalized = {_norm_key(k): v for k, v in colors.items()}
+        for name in names:
+            key = _norm_key(name)
+            if key in normalized:
+                return normalized[key]
+        return None
+
+    def _first_scalar(*names: str) -> object | None:
+        normalized = {_norm_key(k): v for k, v in scalars.items()}
+        for name in names:
+            key = _norm_key(name)
+            if key in normalized:
+                return normalized[key]
+        return None
+
     # --- Colors ---
-    # Accept either "BaseColor" or generic "Color" as the albedo tint.
-    base_color_entry = colors.get("BaseColor") or colors.get("Color")
-    if "BaseColor" not in wired_texture_roles and "ORM" not in wired_texture_roles:
+    # Accept common Unreal project aliases for non-textured albedo tints.
+    base_color_entry = _first_color(
+        "BaseColor",
+        "Base Color",
+        "Base Colour",
+        "BaseTint",
+        "Base Tint",
+        "Color",
+        "Colour",
+        "Tint Color",
+        "Tint Colour",
+        "PlaceholderColor",
+        "Placeholder Color",
+        "MainColor",
+        "Main Color",
+        "Overall Color",
+        "ColourA",
+        "Colour_A",
+        "Color A",
+        "ColorA",
+        "Color 1",
+        "Checker Colour 1",
+    )
+    if "BaseColor" not in wired_texture_roles:
         rgba = _rgba_from(base_color_entry)
         if rgba is not None and _set_input("Base Color", rgba):
             applied.append("BaseColor(color)")
 
     # Emissive color (some MIs define just the color; others pair with intensity).
-    emissive_entry = colors.get("EmissiveColor") or colors.get("Emissive")
+    emissive_entry = _first_color("EmissiveColor", "Emissive Color", "Emissive")
     if "Emission" not in wired_texture_roles:
         rgba = _rgba_from(emissive_entry)
         if rgba is not None:
@@ -607,11 +933,7 @@ def _apply_mi_parameters(
                 applied.append("EmissiveColor(color)")
                 # Strength: prefer explicit scalar, else infer from color luma so
                 # glTF viewers don't render jet-black emissives.
-                intensity = scalars.get("EmissiveIntensity")
-                try:
-                    intensity = float(intensity) if intensity is not None else None
-                except (TypeError, ValueError):
-                    intensity = None
+                intensity = _emission_strength(parameters)
                 if intensity is None:
                     intensity = 1.0 if max(rgba[:3]) > 0 else 0.0
                 _set_input("Emission Strength", intensity)
@@ -623,26 +945,38 @@ def _apply_mi_parameters(
     orm_present = "ORM" in wired_texture_roles
 
     if "Metallic" not in wired_texture_roles and not orm_present:
-        if "Metallic" in scalars:
-            try:
-                val = float(scalars["Metallic"])
-                if _set_input("Metallic", val):
-                    applied.append("Metallic(scalar)")
-            except (TypeError, ValueError):
-                pass
+        metallic = _first_scalar("Metallic")
+        try:
+            val = float(metallic) if metallic is not None else 0.0
+            if _set_input("Metallic", _clamp(val, 0.0, 1.0)):
+                applied.append("Metallic(scalar)" if metallic is not None else "Metallic(default0)")
+        except (TypeError, ValueError):
+            pass
 
     if "Roughness" not in wired_texture_roles and not orm_present:
-        if "Roughness" in scalars:
-            try:
-                val = float(scalars["Roughness"])
-                if _set_input("Roughness", val):
-                    applied.append("Roughness(scalar)")
-            except (TypeError, ValueError):
-                pass
-
-    if "Specular" in scalars:
+        roughness = _first_scalar("Roughness", "Roughness Value")
+        roughness_source = "scalar"
         try:
-            val = float(scalars["Specular"])
+            if roughness is not None:
+                val = float(roughness)
+            else:
+                rough_min = _first_scalar("Roughness Min", "RoughnessMin")
+                rough_max = _first_scalar("Roughness Max", "RoughnessMax")
+                low = float(rough_min) if rough_min is not None else 0.0
+                high = float(rough_max) if rough_max is not None else 1.0
+                if high < low:
+                    low, high = high, low
+                val = _clamp(max(low, MATTE_PLACEHOLDER_ROUGHNESS), low, high)
+                roughness_source = "matte-fallback"
+            if _set_input("Roughness", _clamp(val, 0.0, 1.0)):
+                applied.append(f"Roughness({roughness_source})")
+        except (TypeError, ValueError):
+            pass
+
+    specular = _first_scalar("Specular")
+    if specular is not None:
+        try:
+            val = float(specular)
             # Blender 4+ renamed "Specular" -> "Specular IOR Level" (default 0.5).
             target_input = (
                 "Specular IOR Level" if "Specular IOR Level" in bsdf.inputs
@@ -653,9 +987,10 @@ def _apply_mi_parameters(
         except (TypeError, ValueError):
             pass
 
-    if "Opacity" in scalars:
+    opacity = _first_scalar("Opacity", "Alpha")
+    if opacity is not None:
         try:
-            val = float(scalars["Opacity"])
+            val = float(opacity)
             if _set_input("Alpha", val):
                 applied.append("Opacity(scalar)")
                 mat.blend_method = "BLEND" if val < 1.0 else mat.blend_method
@@ -679,40 +1014,106 @@ def _build_material_from_mi(
     textures = data.get("Textures") or {}
     parameters = data.get("Parameters") or {}
     _ensure_use_nodes(mat)
+    if _is_hidden_viewer_vfx_material(mi_json_abs):
+        _hide_material_for_viewer(mat)
+        return {
+            "source": "mi",
+            "mi": mi_json_abs.name,
+            "roles": [],
+            "params": ["HiddenViewerVFX"],
+            "surface": ["AlphaBlend"],
+            "diagnostics": [],
+        }
+    surface_props = _apply_mi_surface_properties(mat, parameters)
+    emission_strength = _emission_strength(parameters)
 
-    wired_roles: set[str] = set()
-    y = 400
-    for slot_name, pkg_value in textures.items():
+    selected_textures: dict[str, dict] = {}
+    for index, (slot_name, pkg_value) in enumerate(textures.items()):
         if not isinstance(pkg_value, str) or not pkg_value.strip():
             continue
-        role = MI_SLOT_ROLES.get(slot_name.lower())
+        role = _role_for_texture_slot(str(slot_name))
         if role is None:
             continue
-        if role in wired_roles:
+        score = _texture_candidate_score(str(slot_name), role, pkg_value, parameters)
+        current = selected_textures.get(role)
+        if current is None or (score, -index) > (current["score"], -current["index"]):
+            selected_textures[role] = {
+                "score": score,
+                "index": index,
+                "slot_name": slot_name,
+                "pkg_value": pkg_value,
+            }
+
+    provider_result = _material_texture_provider_result(
+        mi_json_abs=mi_json_abs,
+        textures=textures,
+        parameters=parameters,
+        source_root=source_root,
+    )
+    generated_params: list[str] = []
+    diagnostics: list[dict] = list(provider_result.get("diagnostics") or [])
+    for role, replacement in (provider_result.get("textures") or {}).items():
+        if role not in {"BaseColor", "Normal", "Metallic", "Roughness", "AO", "ORM", "Emission"}:
             continue
-        tex_path = _resolve_texture_on_disk(source_root, pkg_value, data_roots)
+        if not isinstance(replacement, dict) or not replacement.get("path"):
+            continue
+        selected_textures[role] = {
+            "score": 10000,
+            "index": -1,
+            "slot_name": str(replacement.get("slot_name") or f"Generated {role}"),
+            "pkg_value": str(replacement.get("source") or replacement.get("path")),
+            "path": Path(replacement["path"]),
+            "generated": True,
+            "suppress_scalar_roles": list(replacement.get("suppress_scalar_roles") or []),
+        }
+        generated_params.extend(str(item) for item in replacement.get("params") or [])
+
+    wired_roles: set[str] = set()
+    skipped_default_textures: list[str] = []
+    y = 400
+    for role, selected in selected_textures.items():
+        pkg_value = str(selected.get("pkg_value") or "")
+        if role == "BaseColor" and _is_default_base_texture(pkg_value) and _has_base_color_parameter(parameters):
+            continue
+        if role == "ORM" and _is_default_texture_for_role(pkg_value, role):
+            skipped_default_textures.append("ORM")
+            continue
+        if role == "Emission" and _is_default_texture_for_role(pkg_value, role):
+            continue
+        if role == "Emission" and emission_strength is not None and emission_strength <= 0.0:
+            continue
+        tex_path = selected.get("path") or _resolve_texture_on_disk(source_root, pkg_value, data_roots)
         if tex_path is None:
             continue
+        tex_path = Path(tex_path)
         img = _load_image(tex_path, non_color=(role in NON_COLOR_ROLES))
         if img is None:
             continue
-        _connect_role(mat, role, img, y)
+        _connect_role(mat, role, img, y, emission_strength=emission_strength)
         wired_roles.add(role)
+        if selected.get("generated"):
+            for suppressed in selected.get("suppress_scalar_roles") or []:
+                wired_roles.add(str(suppressed))
         y -= 300
 
     # Apply scalar/color parameters on top (textures always win per-role).
     # Catches "tint-and-scalar" materials like MI_Steel/MI_Wood/MI_Rag where
     # Textures{} is empty but Parameters define the full look.
     applied_params = _apply_mi_parameters(mat, parameters, wired_roles)
+    applied_params.extend(generated_params)
+    for role in skipped_default_textures:
+        applied_params.append(f"SkippedDefault{role}")
 
     # Report "mi" whenever either textures OR params contributed. If neither
     # did, fall back to "mi_empty" so callers can route to hybrid.
-    source = "mi" if (wired_roles or applied_params) else "mi_empty"
+    source = "mi" if (wired_roles or applied_params or surface_props) else "mi_empty"
     return {
         "source": source,
         "mi": mi_json_abs.name,
         "roles": sorted(wired_roles),
         "params": applied_params,
+        "surface": surface_props,
+        "diagnostics": diagnostics,
     }
 
 
@@ -765,6 +1166,18 @@ def _build_material_from_hybrid(
         else:
             score = 2
         classified.append((role, base, rel, score))
+
+    if not classified and not strict_slot_match:
+        for rel in hybrid_paths_rel:
+            suffix = Path(rel).suffix.lower()
+            if suffix not in {".png", ".tga", ".tif", ".tiff", ".jpg", ".jpeg", ".webp", ".bmp"}:
+                continue
+            base = Path(rel).stem
+            b = base.lower()
+            if b.startswith("t_"):
+                b = b[2:]
+            if not slot_clean or b == slot_clean or slot_clean in b or b in slot_clean:
+                classified.append(("BaseColor", base, rel, 1))
 
     if strict_slot_match:
         related = [c for c in classified if c[3] <= 1]
@@ -890,7 +1303,7 @@ def _build_materials(
             # MI counts as a real assignment when it produced either a texture
             # role OR a scalar/color parameter binding. Pure "mi_empty" (JSON
             # found but nothing applicable) falls through to hybrid.
-            mi_wired = rep.get("source") == "mi" and (rep.get("roles") or rep.get("params"))
+            mi_wired = rep.get("source") == "mi" and (rep.get("roles") or rep.get("params") or rep.get("surface"))
             if mi_wired:
                 mi_count += 1
             else:

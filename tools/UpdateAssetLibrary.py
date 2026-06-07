@@ -138,6 +138,9 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
     model_version_root = (args.model_root / version).resolve()
     archive_json_root = archive_version_root / "json"
     archive_texture_root = archive_version_root / "textures"
+    web_assets_manifest = model_version_root / "WebAssets" / "WebAssetManifest.json"
+    if args.web_assets_manifest is not None:
+        web_assets_manifest = args.web_assets_manifest.resolve()
     item_data = args.item_data or (args.archive_root / "website" / "tools" / "ItemData" / "ItemData.json")
     bp_data = args.bp_data or (args.archive_root / "website" / "tools" / "BPData" / "BPData.json")
     sm_data = model_version_root / "ModelData" / "SM_Data.json"
@@ -150,6 +153,7 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
         "model_version_root": model_version_root,
         "archive_json_root": archive_json_root,
         "archive_texture_root": archive_texture_root,
+        "web_assets_manifest": web_assets_manifest,
         "item_data": item_data,
         "bp_data": bp_data,
         "sm_data": sm_data,
@@ -159,11 +163,14 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
         "build_root": args.build_root,
         "extension_source_root": args.extension_source_root,
     }
-    missing = [
-        f"{name}: {path}"
-        for name, path in paths.items()
-        if name not in {"blender", "library_root", "build_root"} and isinstance(path, Path) and not path.exists()
-    ]
+    missing = []
+    for name, path in paths.items():
+        if name in {"blender", "library_root", "build_root"}:
+            continue
+        if name == "web_assets_manifest" and args.material_mode != "optimized-pbr":
+            continue
+        if isinstance(path, Path) and not path.exists():
+            missing.append(f"{name}: {path}")
     if missing:
         raise SystemExit("Missing required input(s):\n  " + "\n  ".join(missing))
     if blender is None and args.mode != "targets" and not args.dry_run:
@@ -349,6 +356,49 @@ def stage_command(args: argparse.Namespace, *, include_current_assets: bool, log
     if include_current_assets:
         cmd.append("--include-current-assets")
     return cmd
+
+
+def prune_shared_material_outputs(library_root: Path) -> dict[str, Any]:
+    library_root = library_root.resolve()
+    removed: list[dict[str, Any]] = []
+
+    def remove_path(path: Path) -> None:
+        resolved = path.resolve()
+        try:
+            resolved.relative_to(library_root)
+        except ValueError:
+            raise SystemExit(f"refusing to prune outside library root: {resolved}")
+        if resolved.is_dir():
+            files = [child for child in resolved.rglob("*") if child.is_file()]
+            bytes_removed = sum(child.stat().st_size for child in files)
+            shutil.rmtree(resolved)
+            removed.append({"path": str(resolved), "kind": "dir", "files": len(files), "bytes": bytes_removed})
+        elif resolved.is_file():
+            bytes_removed = resolved.stat().st_size
+            resolved.unlink()
+            removed.append({"path": str(resolved), "kind": "file", "files": 1, "bytes": bytes_removed})
+
+    for candidate in [
+        library_root / "_MaterialTextures",
+        library_root / "_Materials.blend",
+        library_root / "_Materials.manifest.json",
+    ]:
+        if candidate.exists():
+            remove_path(candidate)
+
+    for candidate in sorted(library_root.glob("_Materials_*.blend")):
+        if candidate.exists():
+            remove_path(candidate)
+
+    return {
+        "title": "Prune shared material outputs",
+        "skipped": False,
+        "removed_count": len(removed),
+        "removed_files": sum(int(item.get("files") or 0) for item in removed),
+        "removed_bytes": sum(int(item.get("bytes") or 0) for item in removed),
+        "removed_mb": round(sum(int(item.get("bytes") or 0) for item in removed) / (1024 * 1024), 3),
+        "removed": removed[:25],
+    }
 
 
 def package_command(args: argparse.Namespace) -> list[str | Path]:
@@ -680,10 +730,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Installed extension directory to sync. Defaults beside the selected portable blender.exe.")
     parser.add_argument("--include-current-assets", action="store_true",
                         help="Copy the currently tracked public asset folders into the stage.")
-    parser.add_argument("--material-mode", choices=("light", "fallback", "none"), default="light",
-                        help="light keeps imported/linked materials without packing fallbacks; fallback preserves the old packed fallback behavior.")
+    parser.add_argument("--material-mode", choices=("optimized-pbr", "light", "fallback", "base-color", "none"), default="optimized-pbr",
+                        help="optimized-pbr builds real PBR materials with RSDWModel WebP textures; fallback builds textured MI-derived materials from source textures; base-color uses flat local colors; light links existing shared materials; none skips material work.")
+    parser.add_argument("--web-assets-manifest", type=Path, default=None,
+                        help="Optional RSDWModel WebAssets/WebAssetManifest.json used by optimized-pbr material builds.")
+    parser.add_argument("--material-texture-limit-mb", type=float, default=8.0,
+                        help="Maximum size for externalized shared-material textures before JPEG transcoding.")
+    parser.add_argument("--material-texture-transcode-min-mb", type=float, default=0.5,
+                        help="Transcode externalized shared-material textures larger than this many MiB to JPEG.")
     parser.add_argument("--skip-shared-materials", action="store_true",
                         help="Compatibility flag. Shared material shards are only built when --material-mode fallback is selected.")
+    parser.add_argument("--skip-generated-previews", action="store_true",
+                        help="Skip the generated-preview bake stage for BP assets.")
+    parser.add_argument("--preview-batch-size", type=int, default=64,
+                        help="Number of generated-preview .blend files to process per Blender worker run.")
     parser.add_argument("--git-file-limit-mb", type=float, default=95.0,
                         help="Generated-file size limit for Git-safe source assets and commit planning.")
     parser.add_argument("--release-max-mb", type=float, default=DEFAULT_RELEASE_MAX_MB,
@@ -732,6 +792,7 @@ def main(argv: list[str] | None = None) -> int:
     materials_blend = Path(inputs["library_root"]) / "_Materials.blend"
     materials_manifest = Path(inputs["library_root"]) / "_Materials.manifest.json"
     progress_file = args.build_root / f"AssetLibraryProgress.{version}.json"
+    generated_preview_progress_file = args.build_root / f"GeneratedPreviewProgress.{version}.json"
     run_summary_path = root / "PipelineRun.json"
 
     print_section("Inputs")
@@ -739,6 +800,7 @@ def main(argv: list[str] | None = None) -> int:
         "version",
         "archive_version_root",
         "model_version_root",
+        "web_assets_manifest",
         "item_data",
         "bp_data",
         "library_root",
@@ -819,6 +881,7 @@ def main(argv: list[str] | None = None) -> int:
             "--archive-root", args.archive_root,
             "--model-root", args.model_root,
             "--archive-json-root", Path(inputs["archive_json_root"]),
+            "--archive-texture-root", Path(inputs["archive_texture_root"]),
             "--item-data", Path(inputs["item_data"]),
             "--bp-data", Path(inputs["bp_data"]),
             "--model-data", Path(inputs["sm_data"]),
@@ -828,6 +891,18 @@ def main(argv: list[str] | None = None) -> int:
             "--out", unified_targets,
         ],
         log_path=log_dir / "04_asset_targets.log",
+        cwd=root,
+    ))
+
+    stages.append(run_command(
+        "Asset target quality",
+        [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
+            "--target-file", unified_targets,
+            "--out", log_dir / "asset_target_quality_report.json",
+        ],
+        log_path=log_dir / "04b_asset_target_quality.log",
         cwd=root,
     ))
 
@@ -852,6 +927,21 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Smoke target count: {len(build_target_ids)}")
 
     if args.mode != "targets":
+        if args.material_mode in {"base-color", "none"}:
+            if args.dry_run:
+                print_section("Prune shared material outputs")
+                print("Skipped because --dry-run was supplied.")
+                stages.append({"title": "Prune shared material outputs", "skipped": True, "reason": "--dry-run"})
+            else:
+                print_section("Prune shared material outputs")
+                prune_report = prune_shared_material_outputs(Path(inputs["library_root"]))
+                print(json.dumps({
+                    "removed_count": prune_report["removed_count"],
+                    "removed_files": prune_report["removed_files"],
+                    "removed_mb": prune_report["removed_mb"],
+                }, indent=2))
+                stages.append(prune_report)
+
         stages.append(run_command(
             "Material inventory",
             [
@@ -865,8 +955,8 @@ def main(argv: list[str] | None = None) -> int:
         ))
 
         build_shared_materials = (
-            args.mode == "full"
-            and args.material_mode == "fallback"
+            args.mode in {"smoke", "full"}
+            and args.material_mode in {"optimized-pbr", "fallback"}
             and not args.skip_shared_materials
         )
         if build_shared_materials:
@@ -875,24 +965,32 @@ def main(argv: list[str] | None = None) -> int:
                 print("Skipped because --dry-run was supplied.")
                 stages.append({"title": "Shared materials", "skipped": True, "reason": "--dry-run"})
             else:
+                shared_cmd: list[str | Path] = [
+                    sys.executable,
+                    root / "tools" / "AssetLibrary" / "BuildSharedMaterials.py",
+                    "--blender", Path(inputs["blender"]),
+                    "--source-root", Path(inputs["model_version_root"]),
+                    "--material-data-root", Path(inputs["archive_json_root"]),
+                    "--material-data-root", Path(inputs["archive_texture_root"]),
+                    "--inventory", material_inventory,
+                    "--out-blend", materials_blend,
+                    "--manifest", materials_manifest,
+                    "--shard-size-mb", str(args.git_file_limit_mb),
+                    "--externalize-textures",
+                    "--external-texture-limit-mb", str(args.material_texture_limit_mb),
+                    "--external-texture-transcode-min-mb", str(args.material_texture_transcode_min_mb),
+                ]
+                if args.material_mode == "optimized-pbr":
+                    shared_cmd.extend(["--web-assets-manifest", Path(inputs["web_assets_manifest"])])
                 stages.append(run_command(
                     "Shared materials",
-                    [
-                        sys.executable,
-                        root / "tools" / "AssetLibrary" / "BuildSharedMaterials.py",
-                        "--blender", Path(inputs["blender"]),
-                        "--source-root", Path(inputs["model_version_root"]),
-                        "--material-data-root", Path(inputs["archive_json_root"]),
-                        "--material-data-root", Path(inputs["archive_texture_root"]),
-                        "--inventory", material_inventory,
-                        "--out-blend", materials_blend,
-                        "--manifest", materials_manifest,
-                        "--shard-size-mb", str(args.git_file_limit_mb),
-                    ],
+                    shared_cmd,
                     log_path=log_dir / "07_shared_materials.log",
                     cwd=root,
                 ))
-        elif args.mode == "full":
+                if args.material_mode == "optimized-pbr":
+                    stages[-1]["web_assets_manifest"] = str(inputs["web_assets_manifest"])
+        elif args.mode in {"smoke", "full"}:
             print_section("Shared materials")
             reason = "--skip-shared-materials" if args.skip_shared_materials else f"--material-mode {args.material_mode}"
             print(f"Skipped by {reason}.")
@@ -913,8 +1011,10 @@ def main(argv: list[str] | None = None) -> int:
             "--workers", str(args.workers),
             "--material-mode", args.material_mode,
         ]
-        if materials_manifest.is_file():
+        if args.material_mode in {"optimized-pbr", "fallback", "light"} and materials_manifest.is_file():
             build_cmd.extend(["--materials-manifest", materials_manifest])
+        if args.material_mode == "optimized-pbr":
+            build_cmd.extend(["--web-assets-manifest", Path(inputs["web_assets_manifest"])])
         if only_list is not None:
             build_cmd.extend(["--only-list", only_list])
         if args.mode == "full" and args.limit is not None:
@@ -931,6 +1031,37 @@ def main(argv: list[str] | None = None) -> int:
             log_path=log_dir / "08_asset_build.log",
             cwd=root,
         ))
+
+        preview_cmd: list[str | Path] = [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "BakeGeneratedPreviews.py",
+            "--blender", Path(inputs["blender"]),
+            "--target-file", unified_targets,
+            "--library-root", Path(inputs["library_root"]),
+            "--progress-file", generated_preview_progress_file,
+            "--out", log_dir / "generated_preview_report.json",
+            "--batch-log-dir", log_dir / "generated_preview_batches",
+            "--batch-size", str(args.preview_batch_size),
+        ]
+        if only_list is not None:
+            preview_cmd.extend(["--only-list", only_list])
+        if args.force:
+            preview_cmd.append("--force")
+        if args.dry_run:
+            print_section("Generated asset previews")
+            print("Skipped because --dry-run was supplied.")
+            stages.append({"title": "Generated asset previews", "skipped": True, "reason": "--dry-run"})
+        elif args.skip_generated_previews:
+            print_section("Generated asset previews")
+            print("Skipped by --skip-generated-previews.")
+            stages.append({"title": "Generated asset previews", "skipped": True, "reason": "--skip-generated-previews"})
+        else:
+            stages.append(run_command(
+                "Generated asset previews",
+                preview_cmd,
+                log_path=log_dir / "08b_generated_previews.log",
+                cwd=root,
+            ))
 
         verify_cmd: list[str | Path] = [
             Path(inputs["blender"]),
@@ -953,6 +1084,29 @@ def main(argv: list[str] | None = None) -> int:
                 "Metadata verification",
                 verify_cmd,
                 log_path=log_dir / "09_verify_metadata.log",
+                cwd=root,
+            ))
+
+        quality_cmd: list[str | Path] = [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
+            "--target-file", unified_targets,
+            "--progress-file", progress_file,
+            "--out", log_dir / "asset_quality_report.json",
+        ]
+        if args.material_mode in {"optimized-pbr", "fallback", "light"} and materials_manifest.is_file():
+            quality_cmd.extend(["--materials-manifest", materials_manifest])
+        if only_list is not None:
+            quality_cmd.extend(["--only-list", only_list])
+        if args.dry_run:
+            print_section("Asset quality verification")
+            print("Skipped because --dry-run was supplied.")
+            stages.append({"title": "Asset quality verification", "skipped": True, "reason": "--dry-run"})
+        else:
+            stages.append(run_command(
+                "Asset quality verification",
+                quality_cmd,
+                log_path=log_dir / "09b_verify_quality.log",
                 cwd=root,
             ))
 
@@ -1029,6 +1183,8 @@ def main(argv: list[str] | None = None) -> int:
             "building_targets": str(building_targets),
             "asset_library_targets": str(unified_targets),
             "asset_catalog": str(catalog_file),
+            "asset_target_quality_report": str(log_dir / "asset_target_quality_report.json"),
+            "asset_quality_report": str(log_dir / "asset_quality_report.json"),
             "material_inventory": str(material_inventory),
             "materials_blend": str(materials_blend),
             "materials_manifest": str(materials_manifest),

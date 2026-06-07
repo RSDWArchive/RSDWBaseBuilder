@@ -71,7 +71,7 @@ SOURCE_STEM_BY_BP = {
 }
 
 SOURCE_STEM_BY_ASSET = {
-    "BUILDPIECE_Beam_Horizontal_Half_Thick": "SM_T1_Stairs_Shallow",
+    "BUILDPIECE_Beam_Horizontal_Half_Thick": "SM_BB_T1_Beam_Thick_Med_Horizontal",
     "BUILDPIECE_Stairs_45": "SM_T1_Stairs_Shallow",
 }
 

@@ -6,7 +6,7 @@ with each piece's materials linked from the shared _Materials.blend.
 Reuses the parallel/progress-manifest infrastructure pattern from
 BuildGLB.py and adds asset-library specific bits:
   - per-entry catalog UUID (via tools/AssetLibrary/catalog.py)
-  - per-entry icon path (IconMap.json + category fallback)
+  - per-entry preview policy (target icons or generated Blender previews)
   - shared _Materials.blend reference handed to each worker
 
 Example:
@@ -83,6 +83,11 @@ def _default_source_root() -> Path:
     model_root = Path(r"E:/Github/RSDWModel")
     latest = _latest_version_root(model_root)
     return latest or (_repo_root() / "0.11.1.4")
+
+
+def _default_web_assets_manifest(source_root: Path) -> Path | None:
+    candidate = source_root / "WebAssets" / "WebAssetManifest.json"
+    return candidate if candidate.is_file() else None
 
 
 def _default_material_data_roots() -> list[Path]:
@@ -313,11 +318,14 @@ def _run_one(
     catalog_path: str,
     catalog_id: str,
     icon_path: Path | None,
+    preview_mode: str,
+    icon_source: str,
     tags: list[str],
     description: str,
     asset_stem: str | None,
     asset_metadata: dict | None,
     material_mode: str,
+    web_assets_manifest: Path | None,
     timeout_s: int,
 ) -> dict:
     task = {
@@ -330,12 +338,15 @@ def _run_one(
         "catalog_id": catalog_id,
         "catalog_path": catalog_path,
         "icon_path": str(icon_path.resolve()) if icon_path else None,
+        "preview_mode": preview_mode,
+        "icon_source": icon_source,
         "tags": tags,
         "description": description,
         "asset_stem": asset_stem,
         "asset_metadata": asset_metadata or {},
         "material_mode": material_mode,
-        "pack_unmatched_textures": material_mode == "fallback",
+        "pack_unmatched_textures": material_mode in {"fallback", "optimized-pbr"},
+        "web_assets_manifest": str(web_assets_manifest.resolve()) if web_assets_manifest else None,
     }
     t0 = time.time()
     tf = None
@@ -413,11 +424,52 @@ def _plan_out_blend(library_root: Path, catalog_path: str, stem: str) -> Path:
     return library_root / _category_to_subdir(catalog_path) / f"{stem}.blend"
 
 
-def _should_skip(key: str, progress: ProgressManifest, out_blend: Path, force: bool) -> dict | None:
+def _should_skip(
+    key: str,
+    progress: ProgressManifest,
+    out_blend: Path,
+    force: bool,
+    *,
+    preview_mode: str,
+    material_mode: str,
+    asset_kind: str = "",
+) -> dict | None:
     if force:
         return None
     rec = progress.get(key)
     if not rec or rec.get("status") != "success":
+        return None
+    if rec.get("preview_mode") != preview_mode:
+        return None
+    if rec.get("material_mode") != material_mode:
+        return None
+    if asset_kind == "bp":
+        if rec.get("bp_root_normalized") is not True:
+            return None
+        bp_audit = rec.get("bp_root_audit") or {}
+        if bp_audit and bp_audit.get("root_identity_ok") is not True:
+            return None
+    if material_mode in {"fallback", "optimized-pbr", "base-color"} and not rec.get("material_quality"):
+        return None
+    if material_mode == "optimized-pbr" and not rec.get("web_texture_stats"):
+        return None
+    if material_mode in {"fallback", "optimized-pbr", "base-color"}:
+        quality = rec.get("material_quality") or {}
+        try:
+            slot_count = int(quality.get("slot_count") or 0)
+            materialized_slot_count = int(quality.get("materialized_slot_count") or 0)
+            base_color_slot_count = int(quality.get("base_color_slot_count") or 0)
+        except (TypeError, ValueError):
+            slot_count = 0
+            materialized_slot_count = 0
+            base_color_slot_count = 0
+        if slot_count > 0 and materialized_slot_count <= 0:
+            return None
+        if material_mode == "base-color" and slot_count > 0 and base_color_slot_count <= 0:
+            return None
+    if preview_mode == "custom_icon" and rec.get("preview_source") != "custom_icon":
+        return None
+    if preview_mode == "generated" and rec.get("preview_source") not in {"generated", "blender_default"}:
         return None
     out_blend_rel = rec.get("out_blend_rel")
     if out_blend_rel and out_blend.is_file():
@@ -462,8 +514,10 @@ def main(argv: list[str] | None = None) -> int:
                    help="Path to the shared _Materials.blend that pieces link to.")
     p.add_argument("--materials-manifest", type=Path, default=None,
                    help="Optional sharded shared-material manifest.")
-    p.add_argument("--material-mode", choices=("fallback", "light", "none"), default="fallback",
-                   help="fallback builds/ packs unmatched materials; light leaves unmatched importer materials; none skips material linking/fallbacks.")
+    p.add_argument("--material-mode", choices=("optimized-pbr", "fallback", "base-color", "light", "none"), default="optimized-pbr",
+                   help="optimized-pbr links real PBR materials using the RSDWModel WebP cache; fallback builds textured materials from source textures; base-color writes flat local colors; light links existing shared materials; none skips material work.")
+    p.add_argument("--web-assets-manifest", type=Path, default=None,
+                   help="Optional RSDWModel WebAssets/WebAssetManifest.json used by optimized-pbr material builds.")
     p.add_argument("--icon-map", type=Path, default=_default_icon_map())
     p.add_argument("--category-icon-root", type=Path, default=_default_category_icon_root())
     p.add_argument("--blender", type=Path, default=_default_blender())
@@ -480,6 +534,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args(argv)
 
+    if args.web_assets_manifest is None:
+        args.web_assets_manifest = _default_web_assets_manifest(args.source_root)
+
     material_data_roots = [
         root for root in (args.material_data_root or _default_material_data_roots())
         if root.exists()
@@ -490,14 +547,19 @@ def main(argv: list[str] | None = None) -> int:
         (args.worker, "worker script"),
         (args.source_root, "source root"),
         (args.data_file, "data inventory"),
+        (args.web_assets_manifest, "web assets manifest"),
     ]:
-        if not path.exists():
+        if path is not None and not path.exists():
             _log(f"{label} not found: {path}")
             return 2
-    if args.materials_manifest is None:
+    if args.material_mode in {"optimized-pbr", "fallback", "light"} and args.materials_manifest is None:
         default_manifest = args.library_root / "_Materials.manifest.json"
         args.materials_manifest = default_manifest if default_manifest.is_file() else None
-    if not args.materials_blend.exists() and not (args.materials_manifest and args.materials_manifest.exists()):
+    if (
+        args.material_mode in {"optimized-pbr", "fallback", "light"}
+        and not args.materials_blend.exists()
+        and not (args.materials_manifest and args.materials_manifest.exists())
+    ):
         _log(f"shared materials.blend not found; workers will build local fallback materials: {args.materials_blend}")
 
     # icon_map_by_path: keyed by uemodel entry path (V2 schema)
@@ -536,11 +598,11 @@ def main(argv: list[str] | None = None) -> int:
         if not args.only_list.is_file():
             _log(f"--only-list not found: {args.only_list}")
             return 2
-        only_paths = {
-            line.strip()
-            for line in args.only_list.read_text(encoding="utf-8").splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        }
+        only_paths = set()
+        for line in args.only_list.read_text(encoding="utf-8").splitlines():
+            cleaned = line.strip().lstrip("\ufeff")
+            if cleaned and not cleaned.startswith("#"):
+                only_paths.add(cleaned)
 
     entries_by_path = {entry.get("path", ""): entry for entry in entries}
     target_items: list[dict] | None = None
@@ -585,19 +647,36 @@ def main(argv: list[str] | None = None) -> int:
         stem = target.get("asset_stem") if target else Path(e["path"]).stem
         source_stem = target.get("source_sm_stem") if target else stem
         out_blend = _plan_out_blend(args.library_root, cat, stem)
-        # Icon: per-piece map first (V3 by-stem, then V2 by-path),
-        # category fallback otherwise.
         icon: Path | None = None
-        target_icon = target.get("icon_path") if target else None
-        if target_icon:
-            cand = Path(target_icon)
-            if cand.is_file():
-                icon = cand
-        m = icon_map_by_stem.get(stem) or icon_map_by_stem.get(source_stem) or icon_map_by_path.get(e["path"])
-        if icon is None and m:
-            icon = _resolve_icon_map_path(m, material_data_roots)
-        if icon is None:
-            icon = _resolve_category_icon(stem, cat, args.category_icon_root)
+        icon_source = ""
+        preview_mode = "generated"
+        if target:
+            asset_kind = str(target.get("asset_kind") or "")
+            icon_source = str(target.get("icon_source") or "")
+            if asset_kind == "bp":
+                # Blueprint assets intentionally rely on Blender's asset browser
+                # object previews. Only item/building-piece targets should carry
+                # custom icon image previews.
+                preview_mode = "generated"
+                icon = None
+            else:
+                preview_mode = str(target.get("preview_mode") or "generated")
+            if asset_kind != "bp" and preview_mode == "custom_icon":
+                target_icon = target.get("icon_path")
+                if target_icon:
+                    cand = Path(target_icon)
+                    if cand.is_file():
+                        icon = cand
+        else:
+            # Legacy direct-script mode keeps the old IconMap/category fallback.
+            m = icon_map_by_stem.get(stem) or icon_map_by_stem.get(source_stem) or icon_map_by_path.get(e["path"])
+            if m:
+                icon = _resolve_icon_map_path(m, material_data_roots)
+                icon_source = "icon_map"
+            if icon is None:
+                icon = _resolve_category_icon(stem, cat, args.category_icon_root)
+                icon_source = "category_fallback" if icon else ""
+            preview_mode = "custom_icon" if icon else "generated"
 
         plan = {
             "entry": e,
@@ -609,9 +688,19 @@ def main(argv: list[str] | None = None) -> int:
             "catalog_path": cat,
             "catalog_id": cuid,
             "icon_path": icon,
+            "preview_mode": preview_mode,
+            "icon_source": icon_source,
             "out_blend": out_blend,
         }
-        if _should_skip(plan["key"], progress, out_blend, args.force):
+        if _should_skip(
+            plan["key"],
+            progress,
+            out_blend,
+            args.force,
+            preview_mode=preview_mode,
+            material_mode=args.material_mode,
+            asset_kind=str((target or {}).get("asset_kind") or ""),
+        ):
             pre_skipped += 1
             continue
         plans.append(plan)
@@ -621,7 +710,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         for pl in plans[:50]:
             _log(f"  {pl['stem']:42s}  catalog={pl['catalog_path']}  "
-                 f"icon={'yes' if pl['icon_path'] else 'NO'}")
+                 f"preview={pl['preview_mode']}  icon={'yes' if pl['icon_path'] else 'NO'}")
         if len(plans) > 50:
             _log(f"  ... ({len(plans) - 50} more)")
         return 0
@@ -657,11 +746,14 @@ def main(argv: list[str] | None = None) -> int:
                 catalog_path=pl["catalog_path"],
                 catalog_id=pl["catalog_id"],
                 icon_path=pl["icon_path"],
+                preview_mode=pl["preview_mode"],
+                icon_source=pl["icon_source"],
                 tags=[pl["catalog_path"].split("/")[0]],
                 description=(pl.get("target") or {}).get("display_name", ""),
                 asset_stem=pl["stem"] if pl.get("target") else None,
                 asset_metadata=pl.get("target"),
                 material_mode=args.material_mode,
+                web_assets_manifest=args.web_assets_manifest,
                 timeout_s=args.timeout_s,
             )
         finally:
@@ -714,10 +806,23 @@ def main(argv: list[str] | None = None) -> int:
                 "catalog_id": pl["catalog_id"],
                 "out_blend_rel": out_blend_rel,
                 "preview_attached": res.get("preview_attached"),
+                "preview_mode": pl["preview_mode"],
+                "preview_source": res.get("preview_source"),
+                "preview_generated": res.get("preview_generated"),
+                "preview_error": res.get("preview_error"),
+                "icon_source": pl["icon_source"],
+                "icon_path": str(pl["icon_path"]) if pl["icon_path"] else None,
+                "bp_root_normalized": res.get("bp_root_normalized"),
+                "bp_root_audit": res.get("bp_root_audit"),
+                "material_mode": args.material_mode,
+                "web_assets_manifest": str(args.web_assets_manifest) if args.web_assets_manifest else None,
                 "linked_materials": res.get("linked_materials"),
                 "swapped_slots": res.get("swapped_slots"),
                 "unmatched_slots": res.get("unmatched_slots"),
                 "unmatched_built": res.get("unmatched_built"),
+                "base_color_built": res.get("base_color_built"),
+                "material_quality": res.get("material_quality"),
+                "web_texture_stats": res.get("web_texture_stats"),
                 "duration_s": res.get("duration_s"),
                 "finished_utc": _now_utc(),
                 "error": res.get("error"),
@@ -725,7 +830,7 @@ def main(argv: list[str] | None = None) -> int:
             progress.update(key, record)
             if status == "success":
                 ok += 1
-                tag = "icon" if res.get("preview_attached") else "no-icon"
+                tag = res.get("preview_source") or ("custom_icon" if res.get("preview_attached") else "no-preview")
                 _log(f"[{done}/{total}] OK   {pl['stem']}  ({tag}, {res.get('duration_s')}s)")
             else:
                 fail += 1

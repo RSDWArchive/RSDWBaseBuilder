@@ -36,6 +36,21 @@ def _obj_prop(obj: bpy.types.Object, key: str) -> Any:
     return obj.get(key)
 
 
+def _identity_transform_errors(obj: bpy.types.Object, *, eps: float = 1e-5) -> list[str]:
+    errors: list[str] = []
+    if obj.parent is not None:
+        errors.append(f"asset object has parent {obj.parent.name!r}")
+    if obj.type != "MESH":
+        errors.append(f"asset object type {obj.type!r} != 'MESH'")
+    for row in range(4):
+        for col in range(4):
+            expected = 1.0 if row == col else 0.0
+            if abs(float(obj.matrix_world[row][col]) - expected) > eps:
+                errors.append("asset object matrix_world is not identity")
+                return errors
+    return errors
+
+
 def _validate_target(library_root: Path, target: dict[str, Any]) -> dict[str, Any]:
     blend_path = _blend_path(library_root, target)
     base = {
@@ -64,6 +79,10 @@ def _validate_target(library_root: Path, target: dict[str, Any]) -> dict[str, An
     ]
     if target.get("display_name"):
         common_props.append(("rsdw_display_name", "display_name"))
+    if target.get("preview_mode"):
+        common_props.append(("rsdw_preview_mode", "preview_mode"))
+    if target.get("icon_source"):
+        common_props.append(("rsdw_icon_source", "icon_source"))
     if expected_kind in {"bp", "building_piece"}:
         common_props.append(("rsdw_bp_class", "bp_class"))
     if expected_kind == "bp":
@@ -72,6 +91,11 @@ def _validate_target(library_root: Path, target: dict[str, Any]) -> dict[str, An
             ("rsdw_bp_json_relative", "bp_json_relative"),
             ("rsdw_assembly_status", "assembly_status"),
         ])
+        if _obj_prop(obj, "rsdw_bp_root_normalized") is not True:
+            errors.append("rsdw_bp_root_normalized is not True")
+        if str(_obj_prop(obj, "rsdw_bp_root_normalization") or "") != "baked_mesh_v1":
+            errors.append("rsdw_bp_root_normalization is not 'baked_mesh_v1'")
+        errors.extend(_identity_transform_errors(obj))
     if expected_kind == "item":
         common_props.extend([
             ("rsdw_item_json_relative", "item_json_relative"),
@@ -98,6 +122,14 @@ def _validate_target(library_root: Path, target: dict[str, Any]) -> dict[str, An
         if actual != expected:
             errors.append(f"{prop_name} {actual!r} != {expected!r}")
 
+    expected_icon_path = str(target.get("icon_path") or "")
+    actual_icon_path = str(_obj_prop(obj, "rsdw_icon_path") or "")
+    if expected_icon_path:
+        if actual_icon_path != expected_icon_path:
+            errors.append(f"rsdw_icon_path {actual_icon_path!r} != {expected_icon_path!r}")
+    elif actual_icon_path:
+        errors.append(f"unexpected rsdw_icon_path {actual_icon_path!r}")
+
     return {
         **base,
         "ok": not errors,
@@ -121,11 +153,11 @@ def main(argv: list[str] | None = None) -> int:
     target_doc = json.loads(args.target_file.read_text(encoding="utf-8"))
     targets = list(target_doc.get("targets") or [])
     if args.only_list is not None:
-        wanted = {
-            line.strip()
-            for line in args.only_list.read_text(encoding="utf-8").splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        }
+        wanted = set()
+        for line in args.only_list.read_text(encoding="utf-8").splitlines():
+            cleaned = line.strip().lstrip("\ufeff")
+            if cleaned and not cleaned.startswith("#"):
+                wanted.add(cleaned)
         targets = [
             target for target in targets
             if target.get("target_id") in wanted or target.get("source_entry_path") in wanted
