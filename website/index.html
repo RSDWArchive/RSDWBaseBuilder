@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" class="rsdw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSDW Base Builder</title>
+  <meta name="description" content="Browser base builder for RuneScape: Dragonwilds layouts." />
+  <link rel="apple-touch-icon" sizes="180x180" href="./shared/assets/favicon_io/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./shared/assets/favicon_io/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./shared/assets/favicon_io/favicon-16x16.png" />
+  <link rel="icon" href="./shared/assets/favicon_io/favicon.ico" />
+  <link rel="manifest" href="./shared/assets/favicon_io/site.webmanifest" />
+  <link rel="preload" href="https://fonts.gstatic.com/s/sofiasans/v20/Yq6T-LCVXSLy9uPBwlATrORKkzApcb8.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="./basebuilder.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.184.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="rsdw-header">
+    <a class="rsdw-brand" href="./index.html" aria-label="RSDW Base Builder home">
+      <span class="rsdw-brand__logo">
+        <img src="./shared/assets/logo.png" alt="" />
+      </span>
+      <span class="rsdw-brand__title">RSDW Base Builder</span>
+    </a>
+
+    <nav class="mode-nav" aria-label="Base Builder surfaces">
+      <a class="is-active" href="./index.html" aria-current="page">Web</a>
+      <a href="https://www.nexusmods.com/runescapedragonwilds/mods/231" target="_blank" rel="noopener noreferrer">Blender</a>
+    </nav>
+
+    <div class="rsdw-actions">
+      <div class="rsdw-menu">
+        <button id="discord-toggle" class="rsdw-iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Open Discord menu" title="Discord">
+          <img src="./shared/assets/tool-icons/discord.png" alt="" />
+        </button>
+        <div id="discord-menu" class="rsdw-menu__panel" role="menu" hidden>
+          <a href="https://discord.com/invite/rsdragonwilds" target="_blank" rel="noopener noreferrer" role="menuitem">Official</a>
+          <a href="https://discord.com/invite/rsdwwiki" target="_blank" rel="noopener noreferrer" role="menuitem">Wiki</a>
+          <a href="https://discord.gg/hPJfrZxPss" target="_blank" rel="noopener noreferrer" role="menuitem">Creative &amp; Sharing</a>
+        </div>
+      </div>
+      <a class="rsdw-iconbtn" href="https://github.com/RSDWArchive/RSDWBaseBuilder" target="_blank" rel="noopener noreferrer" aria-label="Open GitHub repository" title="GitHub">
+        <img src="./shared/assets/github.svg" alt="" />
+      </a>
+      <div class="rsdw-menu">
+        <button id="links-toggle" class="rsdw-iconbtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Open Base Builder menu" title="Base Builder">
+          <img src="./shared/assets/tools-menu.png" alt="" />
+        </button>
+        <div id="links-menu" class="rsdw-menu__panel" role="menu" hidden>
+          <a href="./index.html" role="menuitem">Web</a>
+          <a href="https://www.nexusmods.com/runescapedragonwilds/mods/231" target="_blank" rel="noopener noreferrer" role="menuitem">Blender</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="builder-shell">
+    <aside class="asset-panel" aria-label="Asset catalog">
+      <header class="panel-header">
+        <div>
+          <h1>Assets</h1>
+          <p id="asset-status">Loading catalog...</p>
+        </div>
+      </header>
+
+      <div class="segmented" aria-label="Asset kind">
+        <button type="button" class="is-active" data-kind="building_piece">Pieces</button>
+        <button type="button" data-kind="item">Items</button>
+        <button type="button" data-kind="bp">BP</button>
+      </div>
+
+      <section class="favorites-panel" aria-label="Favorite assets">
+        <div id="favorite-strip" class="favorite-strip"></div>
+      </section>
+
+      <div class="folder-row">
+        <label class="rsdw-sr" for="asset-folder">Asset folder</label>
+        <select id="asset-folder" aria-label="Asset folder"></select>
+      </div>
+
+      <div class="search-row">
+        <label class="rsdw-sr" for="asset-search">Search assets</label>
+        <input id="asset-search" type="search" placeholder="Search assets" autocomplete="off" />
+      </div>
+
+      <div id="asset-list" class="asset-list" aria-label="Assets"></div>
+    </aside>
+
+    <section class="workspace" aria-label="Base editor">
+      <header class="toolbar">
+        <div class="toolbar-group">
+          <button id="import-json" type="button">Import</button>
+          <button id="export-json" type="button">Export</button>
+          <button id="clear-build" type="button">Clear</button>
+          <input id="file-input" type="file" accept=".json,application/json" hidden />
+        </div>
+        <div class="toolbar-group">
+          <button id="duplicate-object" type="button" disabled>Duplicate</button>
+          <button id="delete-object" type="button" disabled>Delete</button>
+        </div>
+        <div class="toolbar-group">
+          <button id="snap-object" type="button" disabled>Snap</button>
+          <button id="set-anchor" type="button" disabled>Set Anchor</button>
+          <button id="clear-anchor" type="button" disabled>Clear Anchor</button>
+        </div>
+        <div class="toolbar-meta">
+          <span id="build-count">0 placed</span>
+          <span id="anchor-status">No anchor</span>
+        </div>
+      </header>
+
+            <section id="builder-stage" class="builder-stage" aria-label="3D editor">
+                <div id="stage-loading" class="stage-loading">Loading...</div>
+                <button id="orientation-toggle" class="orientation-toggle" type="button" aria-pressed="false" title="Toggle transform orientation">World Orientation</button>
+                <div id="viewport-notice" class="viewport-notice" aria-live="polite" hidden></div>
+                <aside id="controls-hud" class="controls-hud" role="button" tabindex="0" aria-label="Editor controls" aria-expanded="true" hidden></aside>
+            </section>
+    </section>
+
+    <aside class="inspector" aria-label="Selection inspector">
+      <header class="panel-header">
+        <div>
+          <h2 id="selection-title">No Selection</h2>
+          <p id="selection-meta">Select an object</p>
+        </div>
+      </header>
+
+      <div class="field-grid">
+        <label>X <input data-transform="x" type="number" step="10" /></label>
+        <label>Y <input data-transform="y" type="number" step="10" /></label>
+        <label>Z <input data-transform="z" type="number" step="10" /></label>
+        <label>Pitch <input data-transform="pitch" type="number" step="5" /></label>
+        <label>Yaw <input data-transform="yaw" type="number" step="5" /></label>
+        <label>Roll <input data-transform="roll" type="number" step="5" /></label>
+        <label>Scale X <input data-transform="scale_x" type="number" step="0.1" min="0.01" /></label>
+        <label>Scale Y <input data-transform="scale_y" type="number" step="0.1" min="0.01" /></label>
+        <label>Scale Z <input data-transform="scale_z" type="number" step="0.1" min="0.01" /></label>
+      </div>
+
+      <section class="placed-section" aria-label="Placed objects">
+        <h2>Placed</h2>
+        <div id="placed-list" class="placed-list"></div>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module" src="./basebuilder.js"></script>
+</body>
+</html>

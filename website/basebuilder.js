@@ -1,0 +1,2977 @@
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
+
+import {
+  UNIT_SCALE,
+  componentTransformToThreeMatrix4,
+  distanceSquared,
+  exportTransform,
+  matrixTranslation,
+  normalizeTransform,
+  plugWorldMatrix,
+  roundValue,
+  threeVectorToUe,
+  updateObjectFromState,
+  updateStateFromObject,
+} from "./basebuilder-transforms.js";
+
+(function () {
+  "use strict";
+
+  const CONFIG_URL = "./data.config.json";
+  const INDEX_URL = "./basebuilder-index.json";
+  const RESULT_LIMIT = 180;
+  const SNAP_MAX_DISTANCE_CM = 200;
+  const DRAG_START_DISTANCE_PX = 8;
+  const DRAG_ROTATE_STEPS_DEGREES = [15, 1, 3, 5, 10];
+  const PREVIEW_Z_STEP = 10;
+  const NUDGE_ARROW_MARGIN_PX = 42;
+  const GIZMO_TRANSLATE_SNAP_CM = 10;
+  const GIZMO_ROTATE_SNAP_DEGREES = 10;
+  const GIZMO_SCALE_SNAP = 0.1;
+  const UNDO_LIMIT = 50;
+  const GLTF_PRELOAD_CONCURRENCY = 8;
+  const IMPORT_RENDER_BATCH_SIZE = 100;
+  const PLACED_LIST_LIMIT = 500;
+  const FAVORITES_STORAGE_KEY = "RSDWBaseBuilder.favoriteTargetIds.v1";
+  const SCALE_OVERRIDE_STORAGE_KEY = "RSDWBaseBuilder.scaleRestrictionOverride.v1";
+  const AUTOSAVE_STORAGE_KEY = "RSDWBaseBuilder.autosave.v1";
+  const AUTOSAVE_DEBOUNCE_MS = 350;
+  const FOLDER_ALL = "__all__";
+  const ITEM_ACTOR_CLASS = "BlueprintGeneratedClass /Game/Gameplay/WorldItems/BP_RuntimeSpawnedWorldItem.BP_RuntimeSpawnedWorldItem_C";
+  const SMART_NUDGE_DIRECTIONS = [
+    { id: "left", icon: "4", label: "Left", codes: ["Numpad4", "ArrowLeft"], right: -1, forward: 0, vertical: 0 },
+    { id: "right", icon: "6", label: "Right", codes: ["Numpad6", "ArrowRight"], right: 1, forward: 0, vertical: 0 },
+    { id: "backward", icon: "8", label: "Backward", codes: ["Numpad8"], right: 0, forward: -1, vertical: 0 },
+    { id: "forward", icon: "2", label: "Forward", codes: ["Numpad2"], right: 0, forward: 1, vertical: 0 },
+    { id: "up", icon: "5", label: "Up", codes: ["Numpad5", "ArrowUp"], right: 0, forward: 0, vertical: 1 },
+    { id: "down", icon: "0", label: "Down", codes: ["Numpad0", "ArrowDown"], right: 0, forward: 0, vertical: -1 },
+    { id: "left-backward", icon: "7", label: "Left backward", codes: ["Numpad7"], right: -1, forward: -1, vertical: 0 },
+    { id: "right-backward", icon: "9", label: "Right backward", codes: ["Numpad9"], right: 1, forward: -1, vertical: 0 },
+    { id: "left-forward", icon: "1", label: "Left forward", codes: ["Numpad1"], right: -1, forward: 1, vertical: 0 },
+    { id: "right-forward", icon: "3", label: "Right forward", codes: ["Numpad3"], right: 1, forward: 1, vertical: 0 },
+  ];
+  const SMART_NUDGE_BY_CODE = new Map(
+    SMART_NUDGE_DIRECTIONS.flatMap((direction) => direction.codes.map((code) => [code, direction]))
+  );
+  const SMART_NUDGE_BY_ID = new Map(SMART_NUDGE_DIRECTIONS.map((direction) => [direction.id, direction]));
+
+  const els = {
+    assetStatus: document.getElementById("asset-status"),
+    assetSearch: document.getElementById("asset-search"),
+    assetFolder: document.getElementById("asset-folder"),
+    assetList: document.getElementById("asset-list"),
+    favoriteStrip: document.getElementById("favorite-strip"),
+    kindButtons: Array.from(document.querySelectorAll("[data-kind]")),
+    stage: document.getElementById("builder-stage"),
+    loading: document.getElementById("stage-loading"),
+    orientationToggle: document.getElementById("orientation-toggle"),
+    viewportNotice: document.getElementById("viewport-notice"),
+    controlsHud: document.getElementById("controls-hud"),
+    importJson: document.getElementById("import-json"),
+    exportJson: document.getElementById("export-json"),
+    clearBuild: document.getElementById("clear-build"),
+    fileInput: document.getElementById("file-input"),
+    duplicateObject: document.getElementById("duplicate-object"),
+    deleteObject: document.getElementById("delete-object"),
+    snapObject: document.getElementById("snap-object"),
+    setAnchor: document.getElementById("set-anchor"),
+    clearAnchor: document.getElementById("clear-anchor"),
+    buildCount: document.getElementById("build-count"),
+    anchorStatus: document.getElementById("anchor-status"),
+    selectionTitle: document.getElementById("selection-title"),
+    selectionMeta: document.getElementById("selection-meta"),
+    placedList: document.getElementById("placed-list"),
+    transformInputs: Array.from(document.querySelectorAll("[data-transform]")),
+  };
+
+  let config = {
+    modelRepoOwner: "RSDWArchive",
+    modelRepoName: "RSDWModel",
+    modelRepoBranch: "main",
+    assetBaseUrl: "auto",
+    archiveRepoOwner: "RSDWArchive",
+    archiveRepoName: "RSDWArchive",
+    archiveRepoBranch: "main",
+    archiveAssetBaseUrl: "auto",
+  };
+  let index = null;
+  let activeKind = "building_piece";
+  let activeFolder = FOLDER_ALL;
+  let selectedTargetId = "";
+  let selectedPlacedIds = new Set();
+  let activePlacementId = "";
+  let orientationMode = "world";
+  let favoriteTargetIds = new Set();
+  let viewOffset = { x: 0, y: 0, z: 0 };
+  let buildName = "Browser Base";
+  let buildSchema = "rsdwtools.buildings.v1";
+  let anchorPieceId = 0;
+  let nextObjectId = 1;
+  let nextPieceId = 1;
+  let renderer = null;
+  let scene = null;
+  let camera = null;
+  let controls = null;
+  let transformControls = null;
+  let rootGroup = null;
+  let loader = null;
+  let raycaster = null;
+  let pointer = null;
+  let targetLookup = null;
+  let dragCandidate = null;
+  let dragSession = null;
+  let selectionGesture = null;
+  let selectionMarquee = null;
+  let orientationNudgeOverlay = null;
+  let orientationNudgeMode = null;
+  const orientationNudgeArrows = new Map();
+  let selectionPivot = null;
+  let pendingTransformUndo = null;
+  let pendingTransformChanged = false;
+  let activeGizmoMode = "";
+  let gizmoSnapModifierActive = false;
+  let duplicateNudgeModifierActive = false;
+  let smartDuplicateNudgeActive = false;
+  let scaleRestrictionOverride = false;
+  let autosaveReady = false;
+  let autosaveTimer = 0;
+  let previewPreviousEnableZoom = null;
+  let restoringSnapshot = false;
+  let bulkMutationActive = false;
+  let controlsHudCollapsed = false;
+  let viewportNoticeTimer = 0;
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const gltfCache = new Map();
+  const placements = new Map();
+  const selectionBoxes = new Map();
+  const undoStack = [];
+
+  function isLocalHost() {
+    return ["localhost", "127.0.0.1", "::1", ""].includes(window.location.hostname);
+  }
+
+  function trimSlash(value) {
+    return String(value || "").replace(/\/+$/, "");
+  }
+
+  function encodePath(path) {
+    return String(path || "").split("/").map(encodeURIComponent).join("/");
+  }
+
+  function rawModelBase() {
+    return `https://raw.githubusercontent.com/${config.modelRepoOwner}/${config.modelRepoName}/${config.modelRepoBranch}`;
+  }
+
+  function rawArchiveBase() {
+    return `https://raw.githubusercontent.com/${config.archiveRepoOwner}/${config.archiveRepoName}/${config.archiveRepoBranch}`;
+  }
+
+  function webAssetBase() {
+    if (config.assetBaseUrl && config.assetBaseUrl !== "auto") {
+      return trimSlash(config.assetBaseUrl);
+    }
+    const version = index?.version || "0.11.2.2";
+    if (isLocalHost()) {
+      const path = window.location.pathname.replace(/\\/g, "/");
+      const marker = "/RSDWBaseBuilder/";
+      const markerAt = path.indexOf(marker);
+      if (markerAt >= 0) {
+        const prefix = path.slice(0, markerAt);
+        return `${window.location.origin}${prefix}/RSDWModel/${encodePath(version)}/WebAssets`;
+      }
+    }
+    return `${rawModelBase()}/${encodePath(version)}/WebAssets`;
+  }
+
+  function assetUrl(relPath) {
+    return `${webAssetBase()}/${encodePath(relPath)}`;
+  }
+
+  function archiveAssetBase() {
+    if (config.archiveAssetBaseUrl && config.archiveAssetBaseUrl !== "auto") {
+      return trimSlash(config.archiveAssetBaseUrl);
+    }
+    const version = index?.version || "0.11.2.2";
+    if (isLocalHost()) {
+      const path = window.location.pathname.replace(/\\/g, "/");
+      const marker = "/RSDWBaseBuilder/";
+      const markerAt = path.indexOf(marker);
+      if (markerAt >= 0) {
+        const prefix = path.slice(0, markerAt);
+        return `${window.location.origin}${prefix}/RSDWArchive/${encodePath(version)}`;
+      }
+    }
+    return `${rawArchiveBase()}/${encodePath(version)}`;
+  }
+
+  function iconUrl(relPath) {
+    return `${archiveAssetBase()}/${encodePath(relPath)}`;
+  }
+
+  function siteAssetUrl(relPath) {
+    return `./${encodePath(relPath)}`;
+  }
+
+  function keyIcon(name) {
+    return siteAssetUrl(`shared/assets/Keyboard/T_Keys-Standard-${name}.png`);
+  }
+
+  function specialKeyIcon(name) {
+    return siteAssetUrl(`shared/assets/Keyboard/T_Keys-Special-${name}.png`);
+  }
+
+  function mouseIcon(name) {
+    return siteAssetUrl(`shared/assets/Mouse/T_Mouse-Buttons-${name}.png`);
+  }
+
+  function hudIcon(src, label) {
+    return { src, label };
+  }
+
+  function renderControlsHud() {
+    if (!els.controlsHud) return;
+    const isPreviewHud = Boolean(dragSession);
+    els.controlsHud.classList.toggle("is-collapsed", controlsHudCollapsed);
+    els.controlsHud.classList.toggle("is-preview", isPreviewHud);
+    els.controlsHud.setAttribute("aria-expanded", String(!controlsHudCollapsed));
+    els.controlsHud.title = controlsHudCollapsed ? "Show hotkeys" : "Hide hotkeys";
+    if (controlsHudCollapsed) {
+      els.controlsHud.replaceChildren(createHudCollapsedRow());
+      els.controlsHud.hidden = false;
+      return;
+    }
+    const rows = isPreviewHud ? previewHudRows() : defaultHudRows();
+    els.controlsHud.replaceChildren(...rows.map(createHudRow));
+    els.controlsHud.hidden = !rows.length;
+  }
+
+  function toggleControlsHud() {
+    controlsHudCollapsed = !controlsHudCollapsed;
+    renderControlsHud();
+  }
+
+  function defaultHudRows() {
+    return [
+      { icons: [hudIcon(mouseIcon("Middle"), "Middle Mouse")], label: "Orbit" },
+      { icons: [hudIcon(mouseIcon("Left"), "Left Mouse")], label: "Select / drag move" },
+      { icons: [hudIcon(specialKeyIcon("Shift"), "Shift"), hudIcon(mouseIcon("Left"), "Left Mouse")], label: "Multi-select" },
+      { icons: [hudIcon(keyIcon("G"), "G")], label: "Move gizmo" },
+      { icons: [hudIcon(keyIcon("R"), "R")], label: "Rotate gizmo" },
+      { icons: [hudIcon(keyIcon("S"), "S")], label: "Scale gizmo" },
+      { icons: [hudIcon(keyIcon("Q"), "Q")], label: "Snap selected" },
+      { icons: [hudIcon(keyIcon("O"), "O")], label: "Toggle orientation" },
+      { icons: [hudIcon(keyIcon("E"), "E")], label: "Duplicate preview" },
+      { icons: [hudIcon(specialKeyIcon("Shift"), "Shift"), hudIcon(keyIcon("D"), "D")], label: "Duplicate in place" },
+      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("Z"), "Z")], label: "Undo" },
+      { icons: [hudIcon(keyIcon("A"), "A")], label: "Select all" },
+      { icons: [hudIcon(keyIcon("X"), "X")], label: "Delete" },
+      { icons: [hudIcon(keyIcon("D"), "D"), hudIcon(keyIcon("8"), "Numpad")], label: "Numpad nudge" },
+    ];
+  }
+
+  function previewHudRows() {
+    const placeLabel = dragSession?.moveExisting ? "Release move" : "Place preview";
+    return [
+      { icons: [hudIcon(mouseIcon("Left"), "Left Mouse")], label: placeLabel },
+      { icons: [hudIcon(mouseIcon("Scroll"), "Mouse Wheel")], label: "Rotate preview" },
+      { icons: [hudIcon(keyIcon("R"), "R")], label: "Rotation step" },
+      { icons: [hudIcon(keyIcon("F"), "F")], label: "Flip 180" },
+      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(mouseIcon("Scroll"), "Mouse Wheel")], label: "Height offset" },
+      { icons: [hudIcon(specialKeyIcon("Esc"), "Esc")], label: "Cancel preview" },
+    ];
+  }
+
+  function createHudRow(row) {
+    const item = document.createElement("div");
+    item.className = "hud-row";
+    const icons = document.createElement("span");
+    icons.className = "hud-icons";
+    row.icons.forEach((icon, index) => {
+      if (index > 0) {
+        const plus = document.createElement("span");
+        plus.className = "hud-plus";
+        plus.textContent = "+";
+        icons.appendChild(plus);
+      }
+      const image = document.createElement("img");
+      image.className = "hud-icon";
+      image.src = icon.src;
+      image.alt = icon.label;
+      image.draggable = false;
+      icons.appendChild(image);
+    });
+    const label = document.createElement("span");
+    label.className = "hud-label";
+    label.textContent = row.label;
+    item.append(icons, label);
+    return item;
+  }
+
+  function createHudCollapsedRow() {
+    const item = document.createElement("div");
+    item.className = "hud-collapsed-row";
+    item.textContent = "Hotkeys";
+    return item;
+  }
+
+  function createOrientationNudgeOverlay() {
+    if (orientationNudgeOverlay) return;
+    orientationNudgeOverlay = document.createElement("div");
+    orientationNudgeOverlay.className = "nudge-overlay";
+    orientationNudgeOverlay.hidden = true;
+    orientationNudgeMode = document.createElement("div");
+    orientationNudgeMode.className = "nudge-mode";
+    orientationNudgeOverlay.appendChild(orientationNudgeMode);
+    for (const direction of SMART_NUDGE_DIRECTIONS) {
+      const image = document.createElement("img");
+      image.className = "nudge-arrow";
+      image.src = keyIcon(direction.icon);
+      image.alt = direction.label;
+      image.title = direction.label;
+      image.draggable = false;
+      orientationNudgeArrows.set(direction.id, image);
+      orientationNudgeOverlay.appendChild(image);
+    }
+    els.stage.appendChild(orientationNudgeOverlay);
+  }
+
+  function showViewportNotice(message) {
+    if (!els.viewportNotice) return;
+    els.viewportNotice.textContent = message;
+    els.viewportNotice.hidden = false;
+    els.viewportNotice.classList.remove("is-visible");
+    void els.viewportNotice.offsetWidth;
+    els.viewportNotice.classList.add("is-visible");
+    if (viewportNoticeTimer) window.clearTimeout(viewportNoticeTimer);
+    viewportNoticeTimer = window.setTimeout(() => {
+      els.viewportNotice.classList.remove("is-visible");
+      viewportNoticeTimer = window.setTimeout(() => {
+        els.viewportNotice.hidden = true;
+      }, 180);
+    }, 2000);
+  }
+
+  function syncOrientationUi() {
+    if (!els.orientationToggle) return;
+    const isLocal = orientationMode === "local";
+    els.orientationToggle.textContent = isLocal ? "Local Orientation" : "World Orientation";
+    els.orientationToggle.setAttribute("aria-pressed", String(isLocal));
+    els.orientationToggle.title = isLocal
+      ? "Using active object's local orientation"
+      : "Using world orientation";
+  }
+
+  function setOrientationMode(mode, { notify = true } = {}) {
+    orientationMode = mode === "world" ? "world" : "local";
+    syncOrientationUi();
+    updateSelectionPivot();
+    syncTransformControlMode();
+    updateOrientationNudgeOverlay();
+    if (notify) {
+      showViewportNotice(orientationMode === "local" ? "Local Orientation" : "World Orientation");
+    }
+  }
+
+  function toggleOrientationMode() {
+    setOrientationMode(orientationMode === "local" ? "world" : "local");
+  }
+
+  async function loadJson(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+    return response.json();
+  }
+
+  function kindLabel(kind) {
+    if (kind === "building_piece") return "Piece";
+    if (kind === "item") return "Item";
+    if (kind === "bp") return "BP";
+    return "Asset";
+  }
+
+  function kindPluralLabel(kind) {
+    if (kind === "building_piece") return "Pieces";
+    if (kind === "item") return "Items";
+    if (kind === "bp") return "BP";
+    return "Assets";
+  }
+
+  function assetFolderName(target) {
+    const parts = String(target.catalog_path || "").split("/").map((part) => part.trim()).filter(Boolean);
+    if (target.asset_kind === "building_piece" && parts[0] === "Building Pieces") return parts[1] || "Misc";
+    if (target.asset_kind === "item" && parts[0] === "Items") return parts[1] || "Items";
+    if (target.asset_kind === "bp" && parts[0] === "BP") return parts[1] || "BP";
+    return parts[0] || "Unsorted";
+  }
+
+  function canScaleTarget(target) {
+    if (!target) return false;
+    if (scaleRestrictionOverride) return true;
+    if (target.asset_kind !== "building_piece") return true;
+    return assetFolderName(target) === "Crafting Stations";
+  }
+
+  function canScalePlacement(placement) {
+    return canScaleTarget(placement?.target);
+  }
+
+  function loadScaleOverride() {
+    try {
+      scaleRestrictionOverride = window.sessionStorage.getItem(SCALE_OVERRIDE_STORAGE_KEY) === "1";
+    } catch {
+      scaleRestrictionOverride = false;
+    }
+  }
+
+  function enableScaleOverride() {
+    scaleRestrictionOverride = true;
+    try {
+      window.sessionStorage.setItem(SCALE_OVERRIDE_STORAGE_KEY, "1");
+    } catch {
+      // Session-only override still works for the current page lifetime.
+    }
+    renderInspector();
+    activateGizmo("scale");
+  }
+
+  function renderScaleOverrideMessage() {
+    els.selectionMeta.textContent = "";
+    els.selectionMeta.append("Only Crafting Station pieces, items, and BP actors can be scaled. ");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "inline-action";
+    button.textContent = "Click here to override.";
+    button.addEventListener("click", enableScaleOverride);
+    els.selectionMeta.appendChild(button);
+  }
+
+  function shortenClass(className) {
+    const text = String(className || "");
+    if (!text) return "";
+    return text.split("/").pop().split(".").pop();
+  }
+
+  function pieceDataStem(pieceDataName) {
+    const text = String(pieceDataName || "").replace(/^BuildingPieceData\s+/, "");
+    return text ? text.split("/").pop().split(".")[0] : "";
+  }
+
+  function targetSearchScore(target, query) {
+    if (!query) return 1;
+    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const haystack = target.search_text || "";
+    for (const token of tokens) {
+      if (!haystack.includes(token)) return 0;
+    }
+    let score = 10;
+    const name = target.display_name.toLowerCase();
+    const stem = target.asset_stem.toLowerCase();
+    if (name.startsWith(query)) score += 100;
+    if (stem.startsWith(query)) score += 80;
+    return score;
+  }
+
+  function buildLookups() {
+    const byId = new Map();
+    const byPieceClass = new Map();
+    const byPieceDataName = new Map();
+    const byItemName = new Map();
+    const byBpClass = new Map();
+    for (const target of index.targets) {
+      byId.set(target.target_id, target);
+      if (target.asset_kind === "building_piece") {
+        if (target.export.bp_class) byPieceClass.set(target.export.bp_class, target);
+        if (target.export.class_name) byPieceClass.set(shortenClass(target.export.class_name), target);
+        if (target.export.piece_data_name) byPieceDataName.set(pieceDataStem(target.export.piece_data_name), target);
+      } else if (target.asset_kind === "item") {
+        byItemName.set(target.export.item_asset_name || target.asset_stem, target);
+      } else if (target.asset_kind === "bp") {
+        byBpClass.set(target.export.bp_class, target);
+        byBpClass.set(shortenClass(target.export.actor_class), target);
+      }
+    }
+    targetLookup = { byId, byPieceClass, byPieceDataName, byItemName, byBpClass };
+  }
+
+  function initThree() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1500);
+    camera.position.set(6, 7, 8);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    els.stage.appendChild(renderer.domElement);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0.4, 0);
+    controls.maxDistance = 150;
+    controls.mouseButtons = {
+      LEFT: null,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+
+    transformControls = new TransformControls(camera, renderer.domElement);
+    transformControls.setSpace(orientationMode);
+    transformControls.addEventListener("dragging-changed", (event) => {
+      controls.enabled = !event.value;
+      if (event.value) {
+        pendingTransformUndo = selectedPlacedIds.size ? captureBuildSnapshot() : null;
+        pendingTransformChanged = false;
+        syncTransformSnaps();
+      } else {
+        if (pendingTransformUndo && pendingTransformChanged) pushUndoSnapshot(pendingTransformUndo);
+        pendingTransformUndo = null;
+        pendingTransformChanged = false;
+        syncTransformSnaps();
+      }
+    });
+    transformControls.addEventListener("objectChange", () => {
+      handleTransformObjectChange();
+    });
+    scene.add(transformControls.getHelper());
+
+    rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    selectionPivot = new THREE.Object3D();
+    selectionPivot.name = "Selection Pivot";
+    selectionPivot.userData.previousPosition = new THREE.Vector3();
+    selectionPivot.userData.previousMatrix = new THREE.Matrix4();
+    scene.add(selectionPivot);
+
+    const grid = new THREE.GridHelper(80, 80, 0x88928c, 0xd2d8d1);
+    grid.position.y = -0.001;
+    scene.add(grid);
+
+    const hemi = new THREE.HemisphereLight(0xfff4df, 0x6f7d72, 2.3);
+    scene.add(hemi);
+    const key = new THREE.DirectionalLight(0xffe3bd, 2.1);
+    key.position.set(8, 10, 6);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xb8d8ff, 0.85);
+    fill.position.set(-7, 5, -4);
+    scene.add(fill);
+
+    const draco = new DRACOLoader();
+    draco.setDecoderPath("https://unpkg.com/three@0.184.0/examples/jsm/libs/draco/");
+    loader = new GLTFLoader();
+    loader.setDRACOLoader(draco);
+
+    raycaster = new THREE.Raycaster();
+    pointer = new THREE.Vector2();
+    renderer.domElement.addEventListener("pointerdown", onPointerDown);
+    renderer.domElement.addEventListener("wheel", onStageWheel, { passive: false });
+    selectionMarquee = document.createElement("div");
+    selectionMarquee.className = "selection-marquee";
+    selectionMarquee.hidden = true;
+    els.stage.appendChild(selectionMarquee);
+    createOrientationNudgeOverlay();
+    window.addEventListener("resize", resize);
+    resize();
+    animate();
+  }
+
+  function resize() {
+    if (!renderer || !camera) return;
+    const width = Math.max(1, els.stage.clientWidth);
+    const height = Math.max(1, els.stage.clientHeight);
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    updateSelectionBoxes();
+    updateOrientationNudgeOverlay();
+    renderer.render(scene, camera);
+  }
+
+  async function loadGltf(gltfPath) {
+    if (!gltfCache.has(gltfPath)) {
+      gltfCache.set(gltfPath, loader.loadAsync(assetUrl(gltfPath)));
+    }
+    return gltfCache.get(gltfPath);
+  }
+
+  function uniqueGltfPathsForTargets(targets) {
+    const paths = new Set();
+    for (const target of targets) {
+      for (const component of target?.components || []) {
+        if (component.gltf_path) paths.add(component.gltf_path);
+      }
+    }
+    return Array.from(paths);
+  }
+
+  async function preloadGltfsForTargets(targets, { statusPrefix = "Preloading models" } = {}) {
+    const paths = uniqueGltfPathsForTargets(targets);
+    if (!paths.length) return;
+    let nextIndex = 0;
+    let completed = 0;
+    const workerCount = Math.min(GLTF_PRELOAD_CONCURRENCY, paths.length);
+    const workers = Array.from({ length: workerCount }, async () => {
+      while (nextIndex < paths.length) {
+        const path = paths[nextIndex++];
+        await loadGltf(path);
+        completed += 1;
+        if (completed === paths.length || completed % 25 === 0) {
+          els.assetStatus.textContent = `${statusPrefix} ${completed.toLocaleString()} of ${paths.length.toLocaleString()}`;
+          await nextFrame();
+        }
+      }
+    });
+    await Promise.all(workers);
+  }
+
+  function nextFrame() {
+    return new Promise((resolve) => window.requestAnimationFrame(resolve));
+  }
+
+  function cloneScene(source, { cloneMaterials = false } = {}) {
+    const cloned = SkeletonUtils.clone(source);
+    cloned.traverse((obj) => {
+      if (!obj.isMesh && !obj.isSkinnedMesh) return;
+      obj.frustumCulled = false;
+      if (!cloneMaterials) return;
+      if (Array.isArray(obj.material)) {
+        obj.material = obj.material.map((mat) => mat.clone());
+      } else if (obj.material) {
+        obj.material = obj.material.clone();
+      }
+    });
+    return cloned;
+  }
+
+  async function buildVisualGroup(target) {
+    const assetRoot = new THREE.Group();
+    assetRoot.name = target.asset_stem || target.target_id;
+    if (!target.components.length) {
+      const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+      const material = new THREE.MeshStandardMaterial({ color: 0xb45f31, roughness: 0.75 });
+      assetRoot.add(new THREE.Mesh(geometry, material));
+      return assetRoot;
+    }
+    const jobs = target.components.map(async (component) => {
+      const gltf = await loadGltf(component.gltf_path);
+      const clone = cloneScene(gltf.scene);
+      const componentRoot = new THREE.Group();
+      componentRoot.name = component.name || "component";
+      componentRoot.add(clone);
+      const matrix = componentTransformToThreeMatrix4(component.transform || {});
+      componentRoot.matrixAutoUpdate = true;
+      const position = new THREE.Vector3();
+      const quaternion = new THREE.Quaternion();
+      const scale = new THREE.Vector3();
+      matrix.decompose(position, quaternion, scale);
+      componentRoot.position.copy(position);
+      componentRoot.quaternion.copy(quaternion);
+      componentRoot.scale.copy(scale);
+      return componentRoot;
+    });
+    const children = await Promise.all(jobs);
+    for (const child of children) assetRoot.add(child);
+    return assetRoot;
+  }
+
+  function renderAssets() {
+    const query = els.assetSearch.value.trim().toLowerCase();
+    const kindTargets = index.targets.filter((target) => target.asset_kind === activeKind);
+    const scopedTargets = kindTargets.filter((target) => activeFolder === FOLDER_ALL || assetFolderName(target) === activeFolder);
+    const scored = scopedTargets
+      .map((target) => ({ target, score: targetSearchScore(target, query) }))
+      .filter((row) => row.score > 0)
+      .sort((a, b) => b.score - a.score || a.target.display_name.localeCompare(b.target.display_name));
+    const visible = scored.slice(0, RESULT_LIMIT);
+    els.assetList.textContent = "";
+    for (const row of visible) {
+      els.assetList.appendChild(createAssetRow(row.target));
+    }
+    renderFavorites();
+    const folderSuffix = activeFolder === FOLDER_ALL ? "" : ` in ${activeFolder}`;
+    els.assetStatus.textContent = `${scored.length.toLocaleString()} shown from ${kindTargets.length.toLocaleString()} ${kindPluralLabel(activeKind)}${folderSuffix}`;
+  }
+
+  function createAssetRow(target) {
+    const row = document.createElement("div");
+    row.className = `asset-row${target.target_id === selectedTargetId ? " is-active" : ""}`;
+    row.dataset.targetId = target.target_id;
+    row.draggable = false;
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    row.setAttribute("aria-label", `${target.display_name} ${target.catalog_path}`);
+    row.innerHTML = `
+      <span class="asset-thumb" aria-hidden="true"></span>
+      <span class="asset-copy">
+        <span class="asset-name"></span>
+        <span class="asset-path"></span>
+      </span>
+      <button class="asset-favorite" type="button"></button>
+      <span class="asset-kind"></span>
+    `;
+    renderAssetThumb(row.querySelector(".asset-thumb"), target);
+    row.querySelector(".asset-name").textContent = target.display_name;
+    row.querySelector(".asset-path").textContent = target.catalog_path;
+    row.querySelector(".asset-kind").textContent = kindLabel(target.asset_kind);
+    wireFavoriteButton(row.querySelector(".asset-favorite"), target);
+    row.addEventListener("pointerdown", (event) => startAssetPointer(event, target));
+    row.addEventListener("contextmenu", (event) => openAssetContextMenu(event, target));
+    row.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      toggleFavorite(target.target_id);
+    });
+    return row;
+  }
+
+  function renderFavorites() {
+    els.favoriteStrip.textContent = "";
+    const favorites = Array.from(favoriteTargetIds)
+      .map((id) => targetLookup.byId.get(id))
+      .filter((target) => target && target.asset_kind === activeKind);
+    if (!favorites.length) {
+      const empty = document.createElement("span");
+      empty.className = "favorite-empty";
+      empty.textContent = "No favorites yet";
+      els.favoriteStrip.appendChild(empty);
+      return;
+    }
+    for (const target of favorites) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `favorite-tile${target.target_id === selectedTargetId ? " is-active" : ""}`;
+      button.dataset.targetId = target.target_id;
+      button.draggable = false;
+      button.title = target.display_name;
+      button.setAttribute("aria-label", target.display_name);
+      const thumb = document.createElement("span");
+      thumb.className = "asset-thumb";
+      thumb.setAttribute("aria-hidden", "true");
+      renderAssetThumb(thumb, target);
+      button.appendChild(thumb);
+      button.addEventListener("pointerdown", (event) => startAssetPointer(event, target));
+      button.addEventListener("contextmenu", (event) => openAssetContextMenu(event, target));
+      els.favoriteStrip.appendChild(button);
+    }
+  }
+
+  function renderFolderOptions() {
+    const current = activeFolder;
+    const folders = Array.from(new Set(index.targets
+      .filter((target) => target.asset_kind === activeKind)
+      .map(assetFolderName)))
+      .sort((a, b) => a.localeCompare(b));
+    activeFolder = current !== FOLDER_ALL && folders.includes(current) ? current : FOLDER_ALL;
+    els.assetFolder.textContent = "";
+    const allOption = document.createElement("option");
+    allOption.value = FOLDER_ALL;
+    allOption.textContent = `All ${kindPluralLabel(activeKind)}`;
+    els.assetFolder.appendChild(allOption);
+    for (const folder of folders) {
+      const option = document.createElement("option");
+      option.value = folder;
+      option.textContent = folder;
+      els.assetFolder.appendChild(option);
+    }
+    els.assetFolder.value = activeFolder;
+  }
+
+  function renderAssetThumb(thumb, target) {
+    thumb.textContent = "";
+    thumb.classList.remove("is-generated");
+    if (target.icon_path) {
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.alt = "";
+      img.src = iconUrl(target.icon_path);
+      thumb.appendChild(img);
+      return;
+    }
+    if (target.web_preview_path) {
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.alt = "";
+      img.src = siteAssetUrl(target.web_preview_path);
+      thumb.appendChild(img);
+      return;
+    }
+    thumb.classList.add("is-generated");
+    thumb.textContent = kindLabel(target.asset_kind);
+  }
+
+  function wireFavoriteButton(button, target) {
+    const isFavorite = favoriteTargetIds.has(target.target_id);
+    button.classList.toggle("is-favorite", isFavorite);
+    button.innerHTML = isFavorite ? "&#9733;" : "&#9734;";
+    button.title = isFavorite ? "Unfavorite" : "Favorite";
+    button.setAttribute("aria-label", `${isFavorite ? "Unfavorite" : "Favorite"} ${target.display_name}`);
+    button.addEventListener("pointerdown", (event) => event.stopPropagation());
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFavorite(target.target_id);
+    });
+  }
+
+  function loadFavorites() {
+    try {
+      const ids = JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]");
+      favoriteTargetIds = new Set(Array.isArray(ids) ? ids.filter((id) => typeof id === "string") : []);
+    } catch {
+      favoriteTargetIds = new Set();
+    }
+  }
+
+  function saveFavorites() {
+    window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(Array.from(favoriteTargetIds)));
+  }
+
+  function pruneFavorites() {
+    favoriteTargetIds = new Set(Array.from(favoriteTargetIds).filter((id) => targetLookup.byId.has(id)));
+    saveFavorites();
+  }
+
+  function toggleFavorite(targetId) {
+    if (!targetLookup.byId.has(targetId)) return;
+    if (favoriteTargetIds.has(targetId)) favoriteTargetIds.delete(targetId);
+    else favoriteTargetIds.add(targetId);
+    saveFavorites();
+    renderAssets();
+  }
+
+  function openAssetContextMenu(event, target) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeAssetContextMenu();
+    const menu = document.createElement("div");
+    menu.className = "asset-context-menu";
+    menu.setAttribute("role", "menu");
+    const action = document.createElement("button");
+    action.type = "button";
+    action.setAttribute("role", "menuitem");
+    action.textContent = favoriteTargetIds.has(target.target_id) ? "Unfavorite" : "Favorite";
+    action.addEventListener("click", () => {
+      toggleFavorite(target.target_id);
+      closeAssetContextMenu();
+    });
+    menu.appendChild(action);
+    document.body.appendChild(menu);
+    const x = Math.min(event.clientX, window.innerWidth - menu.offsetWidth - 8);
+    const y = Math.min(event.clientY, window.innerHeight - menu.offsetHeight - 8);
+    menu.style.left = `${Math.max(8, x)}px`;
+    menu.style.top = `${Math.max(8, y)}px`;
+    window.addEventListener("click", closeAssetContextMenu, { once: true });
+  }
+
+  function closeAssetContextMenu() {
+    document.querySelectorAll(".asset-context-menu").forEach((menu) => menu.remove());
+  }
+
+  function startAssetPointer(event, target) {
+    if (event.button !== undefined && event.button !== 0) return;
+    event.preventDefault();
+    dragCandidate = {
+      target,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    window.addEventListener("pointermove", onAssetPointerMove);
+    window.addEventListener("pointerup", onAssetPointerUp);
+    window.addEventListener("pointercancel", onAssetPointerCancel);
+  }
+
+  function onAssetPointerMove(event) {
+    if (dragSession) {
+      updateDragPlacement(event);
+      return;
+    }
+    if (!dragCandidate || event.pointerId !== dragCandidate.pointerId) return;
+    const dx = event.clientX - dragCandidate.startX;
+    const dy = event.clientY - dragCandidate.startY;
+    if (Math.hypot(dx, dy) < DRAG_START_DISTANCE_PX) return;
+    beginDragPlacement(dragCandidate.target, event);
+  }
+
+  async function onAssetPointerUp(event) {
+    if (dragSession && event.pointerId === dragSession.pointerId) {
+      const session = dragSession;
+      const state = session.state ? { ...session.state } : null;
+      const canDrop = Boolean(session.canDrop && state);
+      endDragPlacement();
+      if (canDrop) {
+        pushUndoSnapshot();
+        setLoading(true);
+        try {
+          await commitDragSessionPlacement(session, state);
+        } catch (error) {
+          console.error(error);
+          els.assetStatus.textContent = `Load failed: ${error.message}`;
+        } finally {
+          setLoading(false);
+        }
+      }
+      return;
+    }
+    clearDragCandidate();
+  }
+
+  function onAssetPointerCancel() {
+    if (dragSession) {
+      endDragPlacement();
+    } else {
+      clearDragCandidate();
+    }
+  }
+
+  function beginDragPlacement(target, event) {
+    const pointerId = dragCandidate?.pointerId ?? event.pointerId;
+    dragCandidate = null;
+    clearActiveGizmo();
+    selectedTargetId = target.target_id;
+    renderAssets();
+    const token = Symbol("drag");
+    dragSession = {
+      token,
+      pointerId,
+      target,
+      ghost: null,
+      state: null,
+      baseState: null,
+      yawOffset: 0,
+      zOffset: 0,
+      rotateStepIndex: 0,
+      templateState: null,
+      metadata: {},
+      sourcePlacementId: "",
+      moveExisting: false,
+      clickToPlace: false,
+      canDrop: false,
+      snapped: false,
+    };
+    document.body.classList.add("is-dragging-asset");
+    els.stage.classList.add("is-drag-target");
+    disablePreviewZoom();
+    renderControlsHud();
+    window.addEventListener("wheel", onPreviewWheel, { passive: false });
+    updateDragPlacement(event);
+    buildDragGhost(target, token);
+  }
+
+  function beginSmartDuplicatePlacement() {
+    const placement = selectedPlacement();
+    if (!placement || dragSession) return false;
+    clearActiveGizmo();
+    const metadata = { ...placement.metadata };
+    delete metadata.piece_id;
+    const token = Symbol("smart-duplicate");
+    dragSession = {
+      token,
+      pointerId: null,
+      target: placement.target,
+      ghost: null,
+      state: { ...placement.state },
+      baseState: { ...placement.state },
+      yawOffset: normalizeYaw(placement.state.yaw || 0),
+      zOffset: 0,
+      rotateStepIndex: 0,
+      templateState: { ...placement.state },
+      metadata,
+      sourcePlacementId: "",
+      moveExisting: false,
+      clickToPlace: true,
+      canDrop: true,
+      snapped: false,
+    };
+    selectedTargetId = placement.target.target_id;
+    renderAssets();
+    document.body.classList.add("is-dragging-asset");
+    els.stage.classList.add("is-drag-target", "is-drop-ready");
+    disablePreviewZoom();
+    renderPreviewRotationStatus("Move preview, wheel rotates, R changes step, left click places");
+    renderControlsHud();
+    buildDragGhost(placement.target, token);
+    window.addEventListener("pointermove", onClickPreviewPointerMove);
+    window.addEventListener("wheel", onPreviewWheel, { passive: false });
+    return true;
+  }
+
+  function beginMovePreviewPlacement(placement, event) {
+    if (!placement || dragSession) return false;
+    clearActiveGizmo();
+    const pointerId = event.pointerId;
+    const token = Symbol("move-preview");
+    dragSession = {
+      token,
+      pointerId,
+      target: placement.target,
+      ghost: null,
+      state: { ...placement.state },
+      baseState: { ...placement.state },
+      yawOffset: normalizeYaw(placement.state.yaw || 0),
+      zOffset: 0,
+      rotateStepIndex: 0,
+      templateState: { ...placement.state },
+      metadata: { ...placement.metadata },
+      sourcePlacementId: placement.id,
+      moveExisting: true,
+      clickToPlace: false,
+      canDrop: true,
+      snapped: false,
+    };
+    placement.group.visible = false;
+    const helper = selectionBoxes.get(placement.id);
+    if (helper) helper.visible = false;
+    selectedTargetId = placement.target.target_id;
+    renderAssets();
+    document.body.classList.add("is-dragging-asset");
+    els.stage.classList.add("is-drag-target", "is-drop-ready");
+    disablePreviewZoom();
+    renderControlsHud();
+    window.addEventListener("wheel", onPreviewWheel, { passive: false });
+    window.addEventListener("pointermove", onAssetPointerMove);
+    window.addEventListener("pointerup", onAssetPointerUp);
+    window.addEventListener("pointercancel", onAssetPointerCancel);
+    updateDragPlacement(event);
+    buildDragGhost(placement.target, token);
+    renderPreviewRotationStatus("Move preview, wheel rotates, release places");
+    return true;
+  }
+
+  function onClickPreviewPointerMove(event) {
+    if (!dragSession?.clickToPlace) return;
+    updateDragPlacement(event);
+  }
+
+  async function buildDragGhost(target, token) {
+    try {
+      const ghost = await buildVisualGroup(target);
+      if (!dragSession || dragSession.token !== token) return;
+      prepareGhostObject(ghost);
+      scene.add(ghost);
+      dragSession.ghost = ghost;
+      if (dragSession.state) {
+        updateDragPreviewFromBaseState();
+      }
+    } catch (error) {
+      console.error(error);
+      if (dragSession && dragSession.token === token) {
+        els.assetStatus.textContent = `Preview failed: ${error.message}`;
+      }
+    }
+  }
+
+  function prepareGhostObject(ghost) {
+    ghost.userData.dragGhost = true;
+    ghost.traverse((obj) => {
+      obj.userData.dragGhost = true;
+      if (!obj.isMesh && !obj.isSkinnedMesh) return;
+      const isMaterialArray = Array.isArray(obj.material);
+      const materials = isMaterialArray ? obj.material : [obj.material];
+      const clones = materials.filter(Boolean).map((material) => {
+        const clone = material.clone();
+        clone.transparent = true;
+        clone.opacity = 0.48;
+        clone.depthWrite = false;
+        if (clone.emissive) clone.emissive.set(0x000000);
+        if (clone.emissiveIntensity !== undefined) clone.emissiveIntensity = 0;
+        return clone;
+      });
+      obj.material = isMaterialArray ? clones : (clones[0] || obj.material);
+    });
+  }
+
+  function updateDragPlacement(event) {
+    if (!dragSession) return;
+    const baseState = stateFromStagePointer(event);
+    dragSession.canDrop = Boolean(baseState);
+    els.stage.classList.toggle("is-drop-ready", dragSession.canDrop);
+    if (!baseState) {
+      if (dragSession.ghost) dragSession.ghost.visible = false;
+      return;
+    }
+    const resolved = resolveDragPreviewState(baseState);
+    dragSession.baseState = baseState;
+    dragSession.state = resolved.state;
+    dragSession.snapped = resolved.snapped;
+    if (dragSession.ghost) {
+      dragSession.ghost.visible = true;
+      updateObjectFromState(dragSession.ghost, dragSession.state, viewOffset);
+      setGhostSnapVisual(dragSession.ghost, dragSession.snapped);
+    }
+  }
+
+  function stateFromStagePointer(event) {
+    const point = stagePointFromEvent(event);
+    if (!point) return null;
+    const pos = threeVectorToUe(point, viewOffset);
+    const template = dragSession?.templateState || {};
+    return {
+      x: pos.x,
+      y: pos.y,
+      z: pos.z,
+      pitch: Number(template.pitch || 0),
+      yaw: normalizeYaw(dragSession?.yawOffset || 0),
+      roll: Number(template.roll || 0),
+      scale_x: Number(template.scale_x || 1),
+      scale_y: Number(template.scale_y || 1),
+      scale_z: Number(template.scale_z || 1),
+    };
+  }
+
+  function rotateDragPreviewBy(direction) {
+    if (!dragSession) return false;
+    const step = currentDragRotateStep();
+    dragSession.yawOffset = normalizeYaw((Number(dragSession.yawOffset) || 0) + step * direction);
+    updateDragPreviewFromBaseState();
+    renderPreviewRotationStatus();
+    return true;
+  }
+
+  function moveDragPreviewZBy(direction) {
+    if (!dragSession) return false;
+    dragSession.zOffset = roundValue((Number(dragSession.zOffset) || 0) + PREVIEW_Z_STEP * direction);
+    updateDragPreviewFromBaseState();
+    renderPreviewRotationStatus();
+    return true;
+  }
+
+  function flipDragPreviewYaw() {
+    if (!dragSession) return false;
+    dragSession.yawOffset = normalizeYaw((Number(dragSession.yawOffset) || 0) + 180);
+    updateDragPreviewFromBaseState();
+    renderPreviewRotationStatus("Preview flipped");
+    showViewportNotice("Flipped 180");
+    return true;
+  }
+
+  function updateDragPreviewFromBaseState() {
+    if (!dragSession?.baseState) return;
+    const resolved = resolveDragPreviewState(dragSession.baseState);
+    dragSession.state = resolved.state;
+    dragSession.snapped = resolved.snapped;
+    if (dragSession.ghost) {
+      updateObjectFromState(dragSession.ghost, dragSession.state, viewOffset);
+      setGhostSnapVisual(dragSession.ghost, dragSession.snapped);
+    }
+  }
+
+  function resolveDragPreviewState(baseState) {
+    const state = {
+      ...baseState,
+      yaw: normalizeYaw(dragSession?.yawOffset || baseState.yaw || 0),
+    };
+    const snapped = snapStateForTarget(dragSession.target, state, dragSession.sourcePlacementId || "");
+    const surfaceAligned = alignDragStateVisualBottomToSurface(snapped.state);
+    return {
+      state: {
+        ...surfaceAligned,
+        z: roundValue((Number(surfaceAligned.z) || 0) + (Number(dragSession.zOffset) || 0)),
+      },
+      snapped: snapped.snapped,
+    };
+  }
+
+  function alignDragStateVisualBottomToSurface(state) {
+    if (!shouldAlignDragVisualBottom() || !dragSession?.ghost) return state;
+    const bottomOffset = dragVisualBottomOffsetCm(state);
+    if (!Number.isFinite(bottomOffset) || Math.abs(bottomOffset) < 0.001) return state;
+    return {
+      ...state,
+      z: roundValue((Number(state.z) || 0) + bottomOffset),
+    };
+  }
+
+  function shouldAlignDragVisualBottom() {
+    return dragSession?.target?.asset_kind === "bp" || dragSession?.target?.asset_kind === "item";
+  }
+
+  function dragVisualBottomOffsetCm(state) {
+    const ghost = dragSession?.ghost;
+    if (!ghost) return 0;
+    updateObjectFromState(ghost, state, viewOffset);
+    ghost.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(ghost);
+    if (box.isEmpty()) return 0;
+    return (ghost.position.y - box.min.y) / UNIT_SCALE;
+  }
+
+  function cycleDragRotateStep() {
+    if (!dragSession) return false;
+    dragSession.rotateStepIndex = ((Number(dragSession.rotateStepIndex) || 0) + 1) % DRAG_ROTATE_STEPS_DEGREES.length;
+    renderPreviewRotationStatus("Wheel rotates preview");
+    return true;
+  }
+
+  function currentDragRotateStep() {
+    return DRAG_ROTATE_STEPS_DEGREES[dragSession?.rotateStepIndex || 0] || DRAG_ROTATE_STEPS_DEGREES[0];
+  }
+
+  function renderPreviewRotationStatus(prefix = "") {
+    if (!dragSession) return;
+    const step = currentDragRotateStep();
+    const details = `step ${step} deg, yaw ${roundValue(dragSession.yawOffset || 0)} deg, Z ${roundValue(dragSession.zOffset || 0)}`;
+    els.assetStatus.textContent = prefix ? `${prefix} (${details})` : `Preview ${details}`;
+  }
+
+  function onPreviewWheel(event) {
+    if (!dragSession) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const direction = event.deltaY < 0 ? 1 : -1;
+    if (event.ctrlKey || event.metaKey) {
+      moveDragPreviewZBy(direction);
+    } else {
+      rotateDragPreviewBy(direction);
+    }
+  }
+
+  function onStageWheel(event) {
+    if (dragSession) {
+      onPreviewWheel(event);
+    }
+  }
+
+  function normalizeYaw(value) {
+    return ((Number(value) % 360) + 360) % 360;
+  }
+
+  function stagePointFromEvent(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    ) {
+      return null;
+    }
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const surfacePoint = placementSurfacePointFromRay();
+    if (surfacePoint) return surfacePoint;
+    const point = new THREE.Vector3();
+    return raycaster.ray.intersectPlane(dragPlane, point) ? point : null;
+  }
+
+  function placementSurfacePointFromRay() {
+    const excludedIds = new Set();
+    if (dragSession?.sourcePlacementId) excludedIds.add(dragSession.sourcePlacementId);
+    const roots = Array.from(placements.values())
+      .filter((placement) => !excludedIds.has(placement.id) && placement.group.visible)
+      .map((placement) => placement.group);
+    if (!roots.length) return null;
+    const hits = raycaster.intersectObjects(roots, true);
+    const hit = hits.find((row) => {
+      const id = row.object.userData.placedId;
+      return id && !excludedIds.has(id) && !row.object.userData.dragGhost && objectTreeVisible(row.object);
+    });
+    return hit?.point?.clone() || null;
+  }
+
+  function objectTreeVisible(object) {
+    for (let node = object; node; node = node.parent) {
+      if (!node.visible) return false;
+    }
+    return true;
+  }
+
+  function setGhostSnapVisual(ghost, snapped) {
+    ghost.traverse((obj) => {
+      if (!obj.material) return;
+      const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const material of materials) {
+        if (material.emissive) material.emissive.set(snapped ? 0xe0c896 : 0x000000);
+        if (material.emissiveIntensity !== undefined) material.emissiveIntensity = snapped ? 0.55 : 0;
+      }
+    });
+  }
+
+  function endDragPlacement() {
+    if (dragSession?.moveExisting && dragSession.sourcePlacementId) {
+      const placement = placements.get(dragSession.sourcePlacementId);
+      if (placement) placement.group.visible = true;
+      const helper = selectionBoxes.get(dragSession.sourcePlacementId);
+      if (helper) helper.visible = true;
+    }
+    if (dragSession?.ghost) {
+      scene.remove(dragSession.ghost);
+    }
+    dragSession = null;
+    dragCandidate = null;
+    document.body.classList.remove("is-dragging-asset");
+    els.stage.classList.remove("is-drag-target", "is-drop-ready");
+    clearDragListeners();
+    window.removeEventListener("pointermove", onClickPreviewPointerMove);
+    window.removeEventListener("wheel", onPreviewWheel);
+    restorePreviewZoom();
+    renderControlsHud();
+    if (index) renderAssets();
+  }
+
+  function disablePreviewZoom() {
+    if (!controls || previewPreviousEnableZoom !== null) return;
+    previewPreviousEnableZoom = controls.enableZoom;
+    controls.enableZoom = false;
+  }
+
+  function restorePreviewZoom() {
+    if (!controls || previewPreviousEnableZoom === null) return;
+    controls.enableZoom = previewPreviousEnableZoom;
+    previewPreviousEnableZoom = null;
+  }
+
+  function clearDragCandidate() {
+    dragCandidate = null;
+    clearDragListeners();
+  }
+
+  function clearDragListeners() {
+    window.removeEventListener("pointermove", onAssetPointerMove);
+    window.removeEventListener("pointerup", onAssetPointerUp);
+    window.removeEventListener("pointercancel", onAssetPointerCancel);
+  }
+
+  async function commitClickPreviewPlacement(event) {
+    if (!dragSession?.clickToPlace || event.button !== 0) return false;
+    updateDragPlacement(event);
+    const session = dragSession;
+    const state = session.state ? { ...session.state } : null;
+    const canDrop = Boolean(session.canDrop && state);
+    endDragPlacement();
+    if (!canDrop) return true;
+    pushUndoSnapshot();
+    setLoading(true);
+    try {
+      await commitDragSessionPlacement(session, state);
+    } catch (error) {
+      console.error(error);
+      els.assetStatus.textContent = `Load failed: ${error.message}`;
+    } finally {
+      setLoading(false);
+    }
+    return true;
+  }
+
+  async function commitDragSessionPlacement(session, state) {
+    if (session.moveExisting && session.sourcePlacementId) {
+      const placement = placements.get(session.sourcePlacementId);
+      if (!placement) return null;
+      placement.state = normalizeTransform(state);
+      placement.group.visible = true;
+      applyPlacementTransform(placement);
+      selectPlacement(placement.id);
+      return placement;
+    }
+    return createPlacement(session.target, state, session.metadata || {});
+  }
+
+  async function createPlacement(target, transform, metadata = {}, options = {}) {
+    const id = options.id || `obj_${nextObjectId++}`;
+    const group = await buildVisualGroup(target);
+    group.userData.placedId = id;
+    group.traverse((child) => {
+      child.userData.placedId = id;
+    });
+    rootGroup.add(group);
+
+    const placement = {
+      id,
+      target,
+      state: normalizeTransform(transform),
+      metadata: { ...metadata },
+      group,
+    };
+    placements.set(id, placement);
+    if (target.asset_kind === "building_piece") {
+      const pid = Number(placement.metadata.piece_id || 0);
+      if (pid >= nextPieceId) nextPieceId = pid + 1;
+    }
+    applyPlacementTransform(placement);
+    if (!activePlacementId) activePlacementId = id;
+    const shouldRender = options.render !== false;
+    if (options.select !== false) {
+      selectPlacement(id, { render: shouldRender, activeId: id });
+    } else if (shouldRender) {
+      renderPlacedList();
+      updateCounters();
+    }
+    return placement;
+  }
+
+  function applyPlacementTransform(placement) {
+    updateObjectFromState(placement.group, placement.state, viewOffset);
+  }
+
+  function selectedPlacements() {
+    return Array.from(selectedPlacedIds)
+      .map((id) => placements.get(id))
+      .filter(Boolean);
+  }
+
+  function selectedPlacement() {
+    const selected = selectedPlacements();
+    return selected.length === 1 ? selected[0] : null;
+  }
+
+  function activeSelectedPlacement() {
+    const active = activePlacementId ? placements.get(activePlacementId) : null;
+    if (active && selectedPlacedIds.has(active.id)) return active;
+    return selectedPlacements()[0] || null;
+  }
+
+  function hasSelection(id) {
+    return selectedPlacedIds.has(id);
+  }
+
+  function selectPlacement(id, options = {}) {
+    const next = new Set(selectedPlacedIds);
+    let nextActiveId = options.activeId || id || activePlacementId;
+    if (!id) {
+      if (!options.additive) next.clear();
+    } else if (options.toggle) {
+      if (next.has(id)) {
+        next.delete(id);
+        if (nextActiveId === id) nextActiveId = "";
+      } else {
+        next.add(id);
+        nextActiveId = id;
+      }
+    } else if (options.additive) {
+      next.add(id);
+      nextActiveId = id;
+    } else {
+      next.clear();
+      next.add(id);
+      nextActiveId = id;
+    }
+    setSelection(next, { render: options.render, activeId: nextActiveId });
+  }
+
+  function setSelection(ids, options = {}) {
+    selectedPlacedIds = new Set(Array.from(ids || []).filter((id) => placements.has(id)));
+    const requestedActive = options.activeId || activePlacementId;
+    if (requestedActive && selectedPlacedIds.has(requestedActive)) {
+      activePlacementId = requestedActive;
+    } else {
+      activePlacementId = selectedPlacedIds.values().next().value || "";
+    }
+    if (!selectedPlacedIds.size) activeGizmoMode = "";
+    syncSelectionAttachment();
+    if (options.render !== false) {
+      renderInspector();
+      renderPlacedList();
+      updateCounters();
+    }
+  }
+
+  function syncSelectionAttachment() {
+    if (!transformControls) return;
+    const selected = selectedPlacements();
+    if (selected.length === 1) {
+      transformControls.attach(selected[0].group);
+    } else if (selected.length > 1) {
+      updateSelectionPivot();
+      transformControls.attach(selectionPivot);
+    } else {
+      transformControls.detach();
+    }
+    syncTransformControlMode();
+    syncSelectionBoxes();
+  }
+
+  function updateSelectionPivot() {
+    const box = new THREE.Box3();
+    for (const placement of selectedPlacements()) {
+      box.expandByObject(placement.group);
+    }
+    if (box.isEmpty()) return;
+    const center = box.getCenter(new THREE.Vector3());
+    selectionPivot.position.copy(center);
+    const active = activeSelectedPlacement();
+    const yaw = orientationMode === "local" && active ? THREE.MathUtils.degToRad(active.state.yaw || 0) : 0;
+    selectionPivot.rotation.set(0, yaw, 0);
+    selectionPivot.scale.set(1, 1, 1);
+    selectionPivot.userData.previousPosition.copy(center);
+    selectionPivot.updateMatrixWorld(true);
+    selectionPivot.userData.previousMatrix.copy(selectionPivot.matrixWorld);
+  }
+
+  function handleTransformObjectChange() {
+    const selected = selectedPlacements();
+    if (!selected.length) return;
+    pendingTransformChanged = true;
+    if (selected.length === 1) {
+      const placement = selected[0];
+      placement.state = updateStateFromObject(placement.group, placement.state, viewOffset);
+    } else {
+      selectionPivot.updateMatrixWorld(true);
+      const previousMatrix = selectionPivot.userData.previousMatrix;
+      const currentMatrix = selectionPivot.matrixWorld.clone();
+      const deltaMatrix = currentMatrix.clone().multiply(previousMatrix.clone().invert());
+      for (const placement of selected) {
+        placement.group.updateMatrixWorld(true);
+        const nextWorldMatrix = placement.group.matrixWorld.clone().premultiply(deltaMatrix);
+        applyWorldMatrixToObject(placement.group, nextWorldMatrix);
+        placement.state = updateStateFromObject(placement.group, placement.state, viewOffset);
+      }
+      previousMatrix.copy(currentMatrix);
+    }
+    syncSelectionBoxes();
+    renderInspector();
+    renderPlacedList();
+    updateCounters();
+  }
+
+  function applyWorldMatrixToObject(object, worldMatrix) {
+    const localMatrix = worldMatrix.clone();
+    if (object.parent) {
+      object.parent.updateMatrixWorld(true);
+      const parentInverse = object.parent.matrixWorld.clone().invert();
+      localMatrix.premultiply(parentInverse);
+    }
+    localMatrix.decompose(object.position, object.quaternion, object.scale);
+    object.updateMatrixWorld(true);
+  }
+
+  function syncSelectionBoxes() {
+    for (const [id, helper] of selectionBoxes) {
+      if (!selectedPlacedIds.has(id) || !placements.has(id)) {
+        scene.remove(helper);
+        helper.geometry?.dispose?.();
+        helper.material?.dispose?.();
+        selectionBoxes.delete(id);
+      }
+    }
+    for (const placement of selectedPlacements()) {
+      if (selectionBoxes.has(placement.id)) continue;
+      const helper = new THREE.BoxHelper(placement.group, 0xf3cf89);
+      helper.name = `Selection Box ${placement.id}`;
+      helper.material.depthTest = false;
+      helper.material.transparent = true;
+      helper.material.opacity = 0.96;
+      helper.renderOrder = 999;
+      selectionBoxes.set(placement.id, helper);
+      scene.add(helper);
+    }
+    updateSelectionBoxes();
+  }
+
+  function updateSelectionBoxes() {
+    for (const [id, helper] of selectionBoxes) {
+      const placement = placements.get(id);
+      if (placement) helper.update();
+    }
+  }
+
+  function setDuplicateNudgeModifier(active) {
+    if (duplicateNudgeModifierActive === active) return;
+    duplicateNudgeModifierActive = active;
+    updateOrientationNudgeOverlay();
+  }
+
+  function updateOrientationNudgeOverlay() {
+    if (!orientationNudgeOverlay || !renderer || !camera) return;
+    if (!duplicateNudgeModifierActive || dragSession || !selectedPlacedIds.size) {
+      orientationNudgeOverlay.hidden = true;
+      return;
+    }
+    const orientedBounds = selectedOrientationBounds();
+    const localBounds = orientedBoundsStageBounds(orientedBounds);
+    if (!orientedBounds || !localBounds) {
+      orientationNudgeOverlay.hidden = true;
+      return;
+    }
+
+    const stageRect = renderer.domElement.getBoundingClientRect();
+    const center = {
+      x: (localBounds.left + localBounds.right) / 2,
+      y: (localBounds.top + localBounds.bottom) / 2,
+    };
+    const width = Math.max(24, localBounds.right - localBounds.left);
+    const height = Math.max(24, localBounds.bottom - localBounds.top);
+    const directions = nudgeScreenDirections(orientedBounds);
+    for (const direction of SMART_NUDGE_DIRECTIONS) {
+      const image = orientationNudgeArrows.get(direction.id);
+      if (!image) continue;
+      const vector = directions[direction.id] || fallbackScreenDirection(direction);
+      const length = Math.hypot(vector.x, vector.y) || 1;
+      const unit = { x: vector.x / length, y: vector.y / length };
+      const edgeDistance = Math.abs(unit.x) * width / 2 + Math.abs(unit.y) * height / 2;
+      const distance = edgeDistance + NUDGE_ARROW_MARGIN_PX;
+      const x = clamp(center.x + unit.x * distance, 24, stageRect.width - 24);
+      const y = clamp(center.y + unit.y * distance, 24, stageRect.height - 24);
+      image.style.left = `${x}px`;
+      image.style.top = `${y}px`;
+    }
+    if (orientationNudgeMode) {
+      orientationNudgeMode.textContent = orientationMode === "local" ? "Local Nudge" : "World Nudge";
+      orientationNudgeMode.style.left = `${clamp(center.x, 52, stageRect.width - 52)}px`;
+      orientationNudgeMode.style.top = `${clamp(localBounds.top - 22, 18, stageRect.height - 18)}px`;
+    }
+    orientationNudgeOverlay.hidden = false;
+  }
+
+  function selectedScreenBounds() {
+    const bounds = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
+    for (const placement of selectedPlacements()) {
+      const placementBounds = placementScreenBounds(placement);
+      if (!placementBounds) continue;
+      bounds.left = Math.min(bounds.left, placementBounds.left);
+      bounds.right = Math.max(bounds.right, placementBounds.right);
+      bounds.top = Math.min(bounds.top, placementBounds.top);
+      bounds.bottom = Math.max(bounds.bottom, placementBounds.bottom);
+    }
+    return Number.isFinite(bounds.left) ? bounds : null;
+  }
+
+  function selectedOrientationBounds(basis = nudgeWorldBasisVectors()) {
+    const bounds = {
+      basis,
+      minRight: Infinity,
+      maxRight: -Infinity,
+      minForward: Infinity,
+      maxForward: -Infinity,
+      minVertical: Infinity,
+      maxVertical: -Infinity,
+      hasPoint: false,
+    };
+    for (const placement of selectedPlacements()) {
+      placement.group.updateMatrixWorld(true);
+      expandOrientationBoundsByObject(bounds, placement.group);
+    }
+    if (!bounds.hasPoint) return null;
+    bounds.width = bounds.maxRight - bounds.minRight;
+    bounds.depth = bounds.maxForward - bounds.minForward;
+    bounds.height = bounds.maxVertical - bounds.minVertical;
+    bounds.center = basis.right.clone().multiplyScalar((bounds.minRight + bounds.maxRight) / 2)
+      .add(basis.forward.clone().multiplyScalar((bounds.minForward + bounds.maxForward) / 2))
+      .add(basis.vertical.clone().multiplyScalar((bounds.minVertical + bounds.maxVertical) / 2));
+    return bounds;
+  }
+
+  function expandOrientationBoundsByObject(bounds, object) {
+    let expanded = false;
+    object.traverse((child) => {
+      if ((!child.isMesh && !child.isSkinnedMesh) || !child.geometry) return;
+      if (!child.geometry.boundingBox) child.geometry.computeBoundingBox();
+      const box = child.geometry.boundingBox;
+      if (!box || box.isEmpty()) return;
+      for (const point of boxCorners(box)) {
+        expandOrientationBoundsByPoint(bounds, point.applyMatrix4(child.matrixWorld));
+        expanded = true;
+      }
+    });
+    if (expanded) return;
+    const fallbackBox = new THREE.Box3().setFromObject(object);
+    if (fallbackBox.isEmpty()) return;
+    for (const point of boxCorners(fallbackBox)) expandOrientationBoundsByPoint(bounds, point);
+  }
+
+  function expandOrientationBoundsByPoint(bounds, point) {
+    const right = point.dot(bounds.basis.right);
+    const forward = point.dot(bounds.basis.forward);
+    const vertical = point.dot(bounds.basis.vertical);
+    bounds.minRight = Math.min(bounds.minRight, right);
+    bounds.maxRight = Math.max(bounds.maxRight, right);
+    bounds.minForward = Math.min(bounds.minForward, forward);
+    bounds.maxForward = Math.max(bounds.maxForward, forward);
+    bounds.minVertical = Math.min(bounds.minVertical, vertical);
+    bounds.maxVertical = Math.max(bounds.maxVertical, vertical);
+    bounds.hasPoint = true;
+  }
+
+  function boxCorners(box) {
+    return [
+      new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+      new THREE.Vector3(box.min.x, box.min.y, box.max.z),
+      new THREE.Vector3(box.min.x, box.max.y, box.min.z),
+      new THREE.Vector3(box.min.x, box.max.y, box.max.z),
+      new THREE.Vector3(box.max.x, box.min.y, box.min.z),
+      new THREE.Vector3(box.max.x, box.min.y, box.max.z),
+      new THREE.Vector3(box.max.x, box.max.y, box.min.z),
+      new THREE.Vector3(box.max.x, box.max.y, box.max.z),
+    ];
+  }
+
+  function orientedBoundsStageBounds(bounds) {
+    if (!bounds) return null;
+    const screenBounds = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
+    for (const point of orientedBoundsCorners(bounds)) {
+      const screenPoint = worldToStagePoint(point);
+      if (!screenPoint) continue;
+      screenBounds.left = Math.min(screenBounds.left, screenPoint.x);
+      screenBounds.right = Math.max(screenBounds.right, screenPoint.x);
+      screenBounds.top = Math.min(screenBounds.top, screenPoint.y);
+      screenBounds.bottom = Math.max(screenBounds.bottom, screenPoint.y);
+    }
+    return Number.isFinite(screenBounds.left) ? screenBounds : null;
+  }
+
+  function orientedBoundsCorners(bounds) {
+    const corners = [];
+    for (const right of [bounds.minRight, bounds.maxRight]) {
+      for (const forward of [bounds.minForward, bounds.maxForward]) {
+        for (const vertical of [bounds.minVertical, bounds.maxVertical]) {
+          corners.push(bounds.basis.right.clone().multiplyScalar(right)
+            .add(bounds.basis.forward.clone().multiplyScalar(forward))
+            .add(bounds.basis.vertical.clone().multiplyScalar(vertical)));
+        }
+      }
+    }
+    return corners;
+  }
+
+  function nudgeScreenDirections(orientedBounds) {
+    const center = orientedBounds.center;
+    const probeDistance = Math.max(orientedBounds.width, orientedBounds.depth, orientedBounds.height, 1);
+    const basis = orientedBounds.basis;
+    const directions = {};
+    for (const direction of SMART_NUDGE_DIRECTIONS) {
+      const vector = basis.right.clone().multiplyScalar(direction.right)
+        .add(basis.forward.clone().multiplyScalar(direction.forward))
+        .add(basis.vertical.clone().multiplyScalar(direction.vertical));
+      directions[direction.id] = projectedScreenDirection(center, vector, probeDistance) || fallbackScreenDirection(direction);
+    }
+    return directions;
+  }
+
+  function nudgeWorldBasisVectors() {
+    if (orientationMode === "world") {
+      return {
+        right: new THREE.Vector3(1, 0, 0),
+        forward: new THREE.Vector3(0, 0, 1),
+        vertical: new THREE.Vector3(0, 1, 0),
+      };
+    }
+    const active = activeSelectedPlacement();
+    const yaw = THREE.MathUtils.degToRad(active?.state?.yaw || 0);
+    return {
+      right: new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw)),
+      forward: new THREE.Vector3(-Math.sin(yaw), 0, Math.cos(yaw)),
+      vertical: new THREE.Vector3(0, 1, 0),
+    };
+  }
+
+  function projectedScreenDirection(origin, direction, distance) {
+    const start = worldToStagePoint(origin);
+    const end = worldToStagePoint(origin.clone().add(direction.clone().normalize().multiplyScalar(distance)));
+    if (!start || !end) return null;
+    const x = end.x - start.x;
+    const y = end.y - start.y;
+    return Math.hypot(x, y) > 0.001 ? { x, y } : null;
+  }
+
+  function worldToStagePoint(point) {
+    const projected = point.clone().project(camera);
+    if (projected.z < -1 || projected.z > 1) return null;
+    const stageRect = renderer.domElement.getBoundingClientRect();
+    return {
+      x: ((projected.x + 1) / 2) * stageRect.width,
+      y: ((-projected.y + 1) / 2) * stageRect.height,
+    };
+  }
+
+  function fallbackScreenDirection(direction) {
+    const x = direction.right + direction.forward * 0.65;
+    const y = -direction.vertical - direction.forward * 0.65;
+    if (Math.hypot(x, y) > 0.001) return { x, y };
+    return { x: direction.right || 1, y: 0 };
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function syncTransformControlMode() {
+    if (!transformControls) return;
+    const selected = selectedPlacements();
+    transformControls.setSpace(orientationMode);
+    if (activeGizmoMode === "scale" && selected.length && !selected.every(canScalePlacement)) {
+      activeGizmoMode = "";
+    }
+    if (!activeGizmoMode || !selected.length) {
+      transformControls.detach();
+      transformControls.showX = true;
+      transformControls.showY = true;
+      transformControls.showZ = true;
+      syncTransformSnaps();
+      if (controls && previewPreviousEnableZoom === null) controls.enableZoom = true;
+      return;
+    }
+    transformControls.setMode(activeGizmoMode);
+    if (activeGizmoMode === "rotate") {
+      const yawOnly = selected.some((placement) => placement.target.asset_kind === "building_piece");
+      transformControls.showX = !yawOnly;
+      transformControls.showY = true;
+      transformControls.showZ = !yawOnly;
+    } else {
+      transformControls.showX = true;
+      transformControls.showY = true;
+      transformControls.showZ = true;
+    }
+    syncTransformSnaps();
+  }
+
+  function updateGizmoSnapModifierFromEvent(event) {
+    setGizmoSnapModifier(Boolean(event.ctrlKey || event.metaKey));
+  }
+
+  function setGizmoSnapModifier(active) {
+    if (gizmoSnapModifierActive === active) return;
+    gizmoSnapModifierActive = active;
+    syncTransformSnaps();
+  }
+
+  function syncTransformSnaps() {
+    if (!transformControls) return;
+    const enabled = Boolean(transformControls.dragging && gizmoSnapModifierActive);
+    transformControls.setTranslationSnap(enabled ? GIZMO_TRANSLATE_SNAP_CM * UNIT_SCALE : null);
+    transformControls.setRotationSnap(enabled ? THREE.MathUtils.degToRad(GIZMO_ROTATE_SNAP_DEGREES) : null);
+    transformControls.setScaleSnap(enabled ? GIZMO_SCALE_SNAP : null);
+  }
+
+  function activateGizmo(mode) {
+    const nextMode = ["translate", "rotate", "scale"].includes(mode) ? mode : "";
+    if (activeGizmoMode === nextMode) {
+      clearActiveGizmo();
+      return;
+    }
+    if (nextMode === "scale") {
+      const selected = selectedPlacements();
+      if (selected.length && !selected.every(canScalePlacement)) {
+        activeGizmoMode = "";
+        syncSelectionAttachment();
+        renderScaleOverrideMessage();
+        return;
+      }
+    }
+    activeGizmoMode = nextMode;
+    if (controls && previewPreviousEnableZoom === null) controls.enableZoom = true;
+    syncSelectionAttachment();
+  }
+
+  function clearActiveGizmo() {
+    activeGizmoMode = "";
+    syncTransformControlMode();
+  }
+
+  function toggleSelectAll() {
+    if (selectedPlacedIds.size === placements.size && placements.size > 0) {
+      setSelection([]);
+      return;
+    }
+    setSelection(Array.from(placements.keys()));
+  }
+
+  function renderInspector() {
+    const selected = selectedPlacements();
+    const placement = selectedPlacement();
+    const hasSelection = selected.length > 0;
+    const hasSingleSelection = selected.length === 1;
+    const hasSnapSelection = selected.some((row) => row.target.asset_kind === "building_piece");
+    els.duplicateObject.disabled = !hasSelection;
+    els.deleteObject.disabled = !hasSelection;
+    els.snapObject.disabled = !hasSnapSelection;
+    els.setAnchor.disabled = !hasSingleSelection || placement.target.asset_kind !== "building_piece";
+    els.clearAnchor.disabled = !anchorPieceId;
+    for (const input of els.transformInputs) {
+      const key = input.dataset.transform;
+      const scaleLocked = hasSingleSelection && key.startsWith("scale") && !canScalePlacement(placement);
+      input.disabled = !hasSingleSelection || scaleLocked;
+      if (!hasSingleSelection) {
+        input.value = "";
+      } else {
+        input.value = roundValue(placement.state[key], key.startsWith("scale") ? 4 : 3);
+      }
+    }
+    if (!hasSelection) {
+      els.selectionTitle.textContent = "No Selection";
+      els.selectionMeta.textContent = "Select an object";
+      return;
+    }
+    if (!hasSingleSelection) {
+      els.selectionTitle.textContent = `${selected.length} Selected`;
+      els.selectionMeta.textContent = "Transform selected objects as a group";
+      return;
+    }
+    els.selectionTitle.textContent = placement.target.display_name;
+    els.selectionMeta.textContent = `${kindLabel(placement.target.asset_kind)} | ${placement.target.catalog_path}`;
+  }
+
+  function renderPlacedList() {
+    els.placedList.textContent = "";
+    let shown = 0;
+    for (const placement of placements.values()) {
+      if (shown >= PLACED_LIST_LIMIT) break;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `placed-row${hasSelection(placement.id) ? " is-active" : ""}`;
+      button.innerHTML = `
+        <span>
+          <span class="placed-name"></span>
+          <span class="placed-meta"></span>
+        </span>
+        <span class="asset-kind">${kindLabel(placement.target.asset_kind)}</span>
+      `;
+      button.querySelector(".placed-name").textContent = placement.target.display_name;
+      button.querySelector(".placed-meta").textContent =
+        `${roundValue(placement.state.x)}, ${roundValue(placement.state.y)}, ${roundValue(placement.state.z)}`;
+      button.addEventListener("click", (event) => {
+        selectPlacement(placement.id, { toggle: event.shiftKey });
+      });
+      els.placedList.appendChild(button);
+      shown += 1;
+    }
+    if (placements.size > PLACED_LIST_LIMIT) {
+      const summary = document.createElement("div");
+      summary.className = "placed-row placed-summary";
+      summary.textContent = `Showing ${PLACED_LIST_LIMIT.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
+      els.placedList.appendChild(summary);
+    }
+  }
+
+  function updateCounters() {
+    const total = placements.size;
+    els.buildCount.textContent = `${total} placed`;
+    if (anchorPieceId) {
+      const anchor = Array.from(placements.values()).find((placement) => Number(placement.metadata.piece_id) === anchorPieceId);
+      els.anchorStatus.textContent = anchor ? `Anchor ${anchorPieceId}` : "Anchor missing";
+    } else {
+      els.anchorStatus.textContent = "No anchor";
+    }
+    scheduleAutosave();
+  }
+
+  async function onPointerDown(event) {
+    if (dragSession?.clickToPlace) {
+      await commitClickPreviewPlacement(event);
+      return;
+    }
+    if (dragSession) return;
+    if (transformControls.dragging) return;
+    if (event.button !== 0) return;
+    if (transformControls.axis) return;
+    selectionGesture = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      currentX: event.clientX,
+      currentY: event.clientY,
+      additive: event.shiftKey,
+      dragging: false,
+      hitId: hitPlacementId(event),
+    };
+    renderer.domElement.setPointerCapture?.(event.pointerId);
+    window.addEventListener("pointermove", onSelectionPointerMove);
+    window.addEventListener("pointerup", onSelectionPointerUp);
+    window.addEventListener("pointercancel", onSelectionPointerCancel);
+  }
+
+  function onSelectionPointerMove(event) {
+    if (!selectionGesture || event.pointerId !== selectionGesture.pointerId) return;
+    selectionGesture.currentX = event.clientX;
+    selectionGesture.currentY = event.clientY;
+    const dx = event.clientX - selectionGesture.startX;
+    const dy = event.clientY - selectionGesture.startY;
+    if (!selectionGesture.dragging && Math.hypot(dx, dy) < DRAG_START_DISTANCE_PX) return;
+    if (!selectionGesture.dragging && selectionGesture.hitId && !selectionGesture.additive) {
+      const placement = placements.get(selectionGesture.hitId);
+      endSelectionGesture();
+      beginMovePreviewPlacement(placement, event);
+      return;
+    }
+    selectionGesture.dragging = true;
+    controls.enabled = false;
+    updateSelectionMarquee();
+  }
+
+  function onSelectionPointerUp(event) {
+    if (!selectionGesture || event.pointerId !== selectionGesture.pointerId) return;
+    selectionGesture.currentX = event.clientX;
+    selectionGesture.currentY = event.clientY;
+    if (selectionGesture.dragging) {
+      selectByMarquee(selectionGesture);
+    } else if (selectionGesture.hitId) {
+      selectPlacement(selectionGesture.hitId, { toggle: selectionGesture.additive });
+    } else if (!selectionGesture.additive) {
+      selectPlacement("");
+    }
+    endSelectionGesture();
+  }
+
+  function onSelectionPointerCancel() {
+    endSelectionGesture();
+  }
+
+  function endSelectionGesture() {
+    if (selectionGesture?.pointerId !== undefined) {
+      renderer.domElement.releasePointerCapture?.(selectionGesture.pointerId);
+    }
+    selectionGesture = null;
+    controls.enabled = true;
+    if (selectionMarquee) selectionMarquee.hidden = true;
+    window.removeEventListener("pointermove", onSelectionPointerMove);
+    window.removeEventListener("pointerup", onSelectionPointerUp);
+    window.removeEventListener("pointercancel", onSelectionPointerCancel);
+  }
+
+  function hitPlacementId(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const hits = raycaster.intersectObjects(Array.from(placements.values()).map((placement) => placement.group), true);
+    const hit = hits.find((row) => row.object.userData.placedId);
+    return hit?.object.userData.placedId || screenBoundsHitPlacementId(event);
+  }
+
+  function screenBoundsHitPlacementId(event) {
+    const point = {
+      left: event.clientX - 6,
+      right: event.clientX + 6,
+      top: event.clientY - 6,
+      bottom: event.clientY + 6,
+    };
+    let best = null;
+    for (const placement of placements.values()) {
+      const bounds = placementScreenBounds(placement);
+      if (!bounds || !rectsIntersect(point, bounds)) continue;
+      const area = Math.max(1, bounds.right - bounds.left) * Math.max(1, bounds.bottom - bounds.top);
+      const selectedBias = selectedPlacedIds.has(placement.id) ? -1_000_000_000 : 0;
+      const score = selectedBias + area;
+      if (!best || score < best.score) best = { id: placement.id, score };
+    }
+    return best?.id || "";
+  }
+
+  function updateSelectionMarquee() {
+    if (!selectionMarquee || !selectionGesture) return;
+    const stageRect = els.stage.getBoundingClientRect();
+    const left = Math.min(selectionGesture.startX, selectionGesture.currentX) - stageRect.left;
+    const top = Math.min(selectionGesture.startY, selectionGesture.currentY) - stageRect.top;
+    const width = Math.abs(selectionGesture.currentX - selectionGesture.startX);
+    const height = Math.abs(selectionGesture.currentY - selectionGesture.startY);
+    selectionMarquee.hidden = false;
+    selectionMarquee.style.left = `${Math.max(0, left)}px`;
+    selectionMarquee.style.top = `${Math.max(0, top)}px`;
+    selectionMarquee.style.width = `${width}px`;
+    selectionMarquee.style.height = `${height}px`;
+  }
+
+  function selectByMarquee(gesture) {
+    const rect = normalizedClientRect(gesture.startX, gesture.startY, gesture.currentX, gesture.currentY);
+    const ids = [];
+    for (const placement of placements.values()) {
+      const screenBox = placementScreenBounds(placement);
+      if (screenBox && rectsIntersect(rect, screenBox)) ids.push(placement.id);
+    }
+    const next = gesture.additive ? new Set(selectedPlacedIds) : new Set();
+    for (const id of ids) next.add(id);
+    setSelection(next);
+  }
+
+  function normalizedClientRect(x1, y1, x2, y2) {
+    return {
+      left: Math.min(x1, x2),
+      right: Math.max(x1, x2),
+      top: Math.min(y1, y2),
+      bottom: Math.max(y1, y2),
+    };
+  }
+
+  function placementScreenBounds(placement) {
+    const box = new THREE.Box3().setFromObject(placement.group);
+    if (box.isEmpty()) return null;
+    const points = [
+      new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+      new THREE.Vector3(box.min.x, box.min.y, box.max.z),
+      new THREE.Vector3(box.min.x, box.max.y, box.min.z),
+      new THREE.Vector3(box.min.x, box.max.y, box.max.z),
+      new THREE.Vector3(box.max.x, box.min.y, box.min.z),
+      new THREE.Vector3(box.max.x, box.min.y, box.max.z),
+      new THREE.Vector3(box.max.x, box.max.y, box.min.z),
+      new THREE.Vector3(box.max.x, box.max.y, box.max.z),
+    ];
+    const stageRect = renderer.domElement.getBoundingClientRect();
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+    for (const point of points) {
+      point.project(camera);
+      if (point.z < -1 || point.z > 1) continue;
+      const x = stageRect.left + ((point.x + 1) / 2) * stageRect.width;
+      const y = stageRect.top + ((-point.y + 1) / 2) * stageRect.height;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+    }
+    if (!Number.isFinite(left)) return null;
+    return { left, right, top, bottom };
+  }
+
+  function rectsIntersect(a, b) {
+    return a.left <= b.right && a.right >= b.left && a.top <= b.bottom && a.bottom >= b.top;
+  }
+
+  function setLoading(value) {
+    els.loading.hidden = !value;
+  }
+
+  function captureBuildSnapshot() {
+    return {
+      placements: Array.from(placements.values()).map((placement) => ({
+        id: placement.id,
+        target_id: placement.target.target_id,
+        state: { ...placement.state },
+        metadata: { ...placement.metadata },
+      })),
+      selected_ids: Array.from(selectedPlacedIds),
+      view_offset: { ...viewOffset },
+      build_name: buildName,
+      build_schema: buildSchema,
+      anchor_piece_id: anchorPieceId,
+      next_object_id: nextObjectId,
+      next_piece_id: nextPieceId,
+    };
+  }
+
+  function scheduleAutosave() {
+    if (!autosaveReady || restoringSnapshot || bulkMutationActive) return;
+    if (autosaveTimer) window.clearTimeout(autosaveTimer);
+    autosaveTimer = window.setTimeout(saveAutosave, AUTOSAVE_DEBOUNCE_MS);
+  }
+
+  function saveAutosave() {
+    if (!autosaveReady || restoringSnapshot || bulkMutationActive) return;
+    if (autosaveTimer) {
+      window.clearTimeout(autosaveTimer);
+      autosaveTimer = 0;
+    }
+    try {
+      window.localStorage.setItem(AUTOSAVE_STORAGE_KEY, JSON.stringify({
+        schema: "RSDWBaseBuilder.Autosave.v1",
+        saved_at: new Date().toISOString(),
+        snapshot: captureBuildSnapshot(),
+      }));
+    } catch (error) {
+      console.warn("Autosave failed", error);
+    }
+  }
+
+  function loadAutosaveSnapshot() {
+    try {
+      const payload = JSON.parse(window.localStorage.getItem(AUTOSAVE_STORAGE_KEY) || "null");
+      if (!payload) return null;
+      const snapshot = payload.snapshot || payload;
+      return Array.isArray(snapshot.placements) ? snapshot : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function restoreBuildSnapshot(snapshot) {
+    const entries = [];
+    for (const row of snapshot.placements || []) {
+      const target = targetLookup.byId.get(row.target_id);
+      if (!target) continue;
+      entries.push({
+        id: row.id,
+        target,
+        transform: row.state,
+        metadata: row.metadata,
+      });
+    }
+    await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading restored models" });
+    bulkMutationActive = true;
+    try {
+      clearBuild({ resetOffset: false, render: false });
+      viewOffset = { x: 0, y: 0, z: 0, ...(snapshot.view_offset || {}) };
+      buildName = snapshot.build_name || "Browser Base";
+      buildSchema = snapshot.build_schema || "rsdwtools.buildings.v1";
+      anchorPieceId = Number(snapshot.anchor_piece_id || 0);
+      nextObjectId = Number(snapshot.next_object_id || 1);
+      nextPieceId = Number(snapshot.next_piece_id || 1);
+      await createPlacementsBulk(entries, { statusPrefix: "Restoring" });
+      nextObjectId = Number(snapshot.next_object_id || nextObjectId);
+      nextPieceId = Number(snapshot.next_piece_id || nextPieceId);
+    } finally {
+      bulkMutationActive = false;
+    }
+    setSelection(snapshot.selected_ids || [], { render: false });
+    renderInspector();
+    renderPlacedList();
+    updateCounters();
+  }
+
+  async function restoreAutosavedBuild() {
+    const snapshot = loadAutosaveSnapshot();
+    if (!snapshot || !snapshot.placements?.length) return false;
+    restoringSnapshot = true;
+    try {
+      await restoreBuildSnapshot(snapshot);
+      focusCameraOnBuild();
+      els.assetStatus.textContent = "Autosaved build restored";
+      return true;
+    } catch (error) {
+      console.error(error);
+      els.assetStatus.textContent = `Autosave restore failed: ${error.message}`;
+      return false;
+    } finally {
+      restoringSnapshot = false;
+    }
+  }
+
+  function pushUndoSnapshot(snapshot = captureBuildSnapshot()) {
+    if (restoringSnapshot) return;
+    undoStack.push(snapshot);
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  }
+
+  async function undoLastAction() {
+    if (restoringSnapshot || !undoStack.length) return;
+    const snapshot = undoStack.pop();
+    restoringSnapshot = true;
+    setLoading(true);
+    try {
+      await restoreBuildSnapshot(snapshot);
+    } catch (error) {
+      console.error(error);
+      els.selectionMeta.textContent = `Undo failed: ${error.message}`;
+    } finally {
+      restoringSnapshot = false;
+      setLoading(false);
+      saveAutosave();
+    }
+  }
+
+  async function duplicateSelected() {
+    const selected = selectedPlacements();
+    if (!selected.length) return;
+    pushUndoSnapshot();
+    const newIds = [];
+    setLoading(true);
+    try {
+      for (const placement of selected) {
+        const transform = { ...placement.state };
+        const metadata = { ...placement.metadata };
+        delete metadata.piece_id;
+        const duplicated = await createPlacement(placement.target, transform, metadata, { select: false });
+        newIds.push(duplicated.id);
+      }
+      setSelection(newIds);
+      showViewportNotice(newIds.length === 1 ? "Duplicated" : `Duplicated ${newIds.length}`);
+    } catch (error) {
+      console.error(error);
+      els.selectionMeta.textContent = `Duplicate failed: ${error.message}`;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function smartDuplicateNudge(directionId) {
+    if (smartDuplicateNudgeActive || dragSession) return;
+    const selected = selectedPlacements();
+    if (!selected.length) return;
+    const offset = smartDuplicateNudgeOffset(directionId);
+    if (!offset) return;
+    smartDuplicateNudgeActive = true;
+    pushUndoSnapshot();
+    const duplicatedPlacements = [];
+    const newIds = [];
+    setLoading(true);
+    try {
+      for (const placement of selected) {
+        const transform = {
+          ...placement.state,
+          x: placement.state.x + offset.x,
+          y: placement.state.y + offset.y,
+          z: placement.state.z + offset.z,
+        };
+        const metadata = { ...placement.metadata };
+        delete metadata.piece_id;
+        const duplicated = await createPlacement(placement.target, transform, metadata, { select: false });
+        duplicatedPlacements.push(duplicated);
+        newIds.push(duplicated.id);
+      }
+      setSelection(newIds);
+      const snapResult = snapPlacements(duplicatedPlacements, {
+        excludedIds: new Set(newIds),
+        recordUndo: false,
+      });
+      els.selectionMeta.textContent = smartDuplicateNudgeMessage(newIds.length, offset, snapResult);
+      showViewportNotice(newIds.length === 1 ? "Smart duplicated" : `Smart duplicated ${newIds.length}`);
+    } catch (error) {
+      console.error(error);
+      els.selectionMeta.textContent = `Smart duplicate failed: ${error.message}`;
+    } finally {
+      smartDuplicateNudgeActive = false;
+      setLoading(false);
+    }
+  }
+
+  function smartDuplicateNudgeOffset(directionId) {
+    const direction = SMART_NUDGE_BY_ID.get(directionId);
+    if (!direction) return null;
+    const bounds = selectedOrientationBounds();
+    if (!bounds) return null;
+    const rightStep = Math.max(roundValue(bounds.width / UNIT_SCALE), 10);
+    const forwardStep = Math.max(roundValue(bounds.depth / UNIT_SCALE), 10);
+    const zStep = Math.max(roundValue(bounds.height / UNIT_SCALE), 10);
+    const right = { x: bounds.basis.right.x, y: bounds.basis.right.z };
+    const forward = { x: bounds.basis.forward.x, y: bounds.basis.forward.z };
+    return {
+      x: roundValue((right.x * direction.right * rightStep) + (forward.x * direction.forward * forwardStep)),
+      y: roundValue((right.y * direction.right * rightStep) + (forward.y * direction.forward * forwardStep)),
+      z: roundValue(direction.vertical * zStep),
+    };
+  }
+
+  function smartDuplicateNudgeMessage(count, offset, snapResult) {
+    const moved = [];
+    if (offset.x) moved.push(`X ${signedNumber(offset.x)}`);
+    if (offset.y) moved.push(`Y ${signedNumber(offset.y)}`);
+    if (offset.z) moved.push(`Z ${signedNumber(offset.z)}`);
+    const snapText = snapResult.snapped
+      ? `, snapped ${snapResult.snapped} of ${snapResult.total} pieces`
+      : "";
+    const orientationText = offset.z ? "vertical" : orientationMode;
+    return `Smart duplicated ${count} selected (${orientationText}: ${moved.join(", ")})${snapText}`;
+  }
+
+  function signedNumber(value) {
+    return `${value > 0 ? "+" : ""}${roundValue(value)}`;
+  }
+
+  function smartDuplicateNudgeDirectionFromEvent(event) {
+    return SMART_NUDGE_BY_CODE.get(event.code) || null;
+  }
+
+  function deleteSelected() {
+    const selected = selectedPlacements();
+    if (!selected.length) return;
+    pushUndoSnapshot();
+    for (const placement of selected) {
+      if (Number(placement.metadata.piece_id) === anchorPieceId) anchorPieceId = 0;
+      rootGroup.remove(placement.group);
+      placements.delete(placement.id);
+    }
+    selectPlacement("");
+    renderPlacedList();
+    updateCounters();
+  }
+
+  function clearBuild({ resetOffset = true, recordUndo = false, render = true } = {}) {
+    if (recordUndo && placements.size) pushUndoSnapshot();
+    for (const placement of placements.values()) {
+      rootGroup.remove(placement.group);
+    }
+    placements.clear();
+    selectedPlacedIds.clear();
+    activePlacementId = "";
+    activeGizmoMode = "";
+    anchorPieceId = 0;
+    nextPieceId = 1;
+    if (resetOffset) viewOffset = { x: 0, y: 0, z: 0 };
+    transformControls.detach();
+    syncSelectionBoxes();
+    if (!render) return;
+    if (index) renderAssets();
+    renderInspector();
+    renderPlacedList();
+    updateCounters();
+  }
+
+  function setSelectedAnchor() {
+    const placement = selectedPlacement();
+    if (!placement || placement.target.asset_kind !== "building_piece") return;
+    pushUndoSnapshot();
+    if (!placement.metadata.piece_id) {
+      placement.metadata.piece_id = allocatePieceId();
+    }
+    anchorPieceId = Number(placement.metadata.piece_id);
+    updateCounters();
+  }
+
+  function allocatePieceId() {
+    const used = new Set();
+    for (const placement of placements.values()) {
+      const pid = Number(placement.metadata.piece_id || 0);
+      if (pid > 0) used.add(pid);
+    }
+    while (used.has(nextPieceId)) nextPieceId += 1;
+    return nextPieceId++;
+  }
+
+  function snapSelected() {
+    const selected = selectedPlacements();
+    const movers = selected.filter((placement) => placement.target.asset_kind === "building_piece");
+    if (!movers.length) return;
+    const excludedIds = movers.length > 1 ? new Set(selectedPlacedIds) : new Set([movers[0].id]);
+    const result = snapPlacements(movers, { excludedIds });
+    if (!result.snapped) {
+      els.selectionMeta.textContent = "No compatible snap in range";
+      showViewportNotice("No snap found");
+      return;
+    }
+    showViewportNotice(result.snapped === 1 ? "Snapped" : `Snapped ${result.snapped}`);
+    if (movers.length > 1) {
+      els.selectionMeta.textContent = `${result.snapped} of ${result.total} selected pieces snapped`;
+    }
+  }
+
+  function snapPlacements(movers, { excludedIds = null, recordUndo = true } = {}) {
+    const pieces = movers.filter((placement) => placement?.target.asset_kind === "building_piece");
+    const excludeSet = excludedIds ? toIdSet(excludedIds) : new Set(pieces.map((placement) => placement.id));
+    const snapPlans = [];
+    for (const mover of pieces) {
+      const best = findCompatibleSnap(mover.target, mover.state, excludeSet);
+      if (best) snapPlans.push({ mover, best });
+    }
+    if (!snapPlans.length) return { snapped: 0, total: pieces.length };
+    if (recordUndo) pushUndoSnapshot();
+    for (const { mover, best } of snapPlans) {
+      mover.state.x += best.candidatePos.x - best.moverPos.x;
+      mover.state.y += best.candidatePos.y - best.moverPos.y;
+      mover.state.z += best.candidatePos.z - best.moverPos.z;
+      applyPlacementTransform(mover);
+    }
+    renderInspector();
+    renderPlacedList();
+    updateCounters();
+    return { snapped: snapPlans.length, total: pieces.length };
+  }
+
+  function snapStateForTarget(target, state, excludeId = "") {
+    const best = findCompatibleSnap(target, state, excludeId);
+    if (!best) return { state, snapped: false };
+    return {
+      state: {
+        ...state,
+        x: state.x + best.candidatePos.x - best.moverPos.x,
+        y: state.y + best.candidatePos.y - best.moverPos.y,
+        z: state.z + best.candidatePos.z - best.moverPos.z,
+      },
+      snapped: true,
+    };
+  }
+
+  function findCompatibleSnap(target, state, excludeIds = "") {
+    if (!target || target.asset_kind !== "building_piece") return null;
+    const moverSnaps = index.snaps[target.snap_class];
+    if (!moverSnaps || !Array.isArray(moverSnaps.plugs)) return null;
+    const excludedIds = toIdSet(excludeIds);
+
+    let best = null;
+    for (const candidate of placements.values()) {
+      if (excludedIds.has(candidate.id) || candidate.target.asset_kind !== "building_piece") continue;
+      const candidateSnaps = index.snaps[candidate.target.snap_class];
+      if (!candidateSnaps || !Array.isArray(candidateSnaps.plugs)) continue;
+      for (const moverPlug of moverSnaps.plugs) {
+        const moverMatrix = plugWorldMatrix(state, moverPlug);
+        const moverPos = matrixTranslation(moverMatrix);
+        for (const candidatePlug of candidateSnaps.plugs) {
+          if (!plugsCompatible(moverPlug, candidatePlug)) continue;
+          const candidateMatrix = plugWorldMatrix(candidate.state, candidatePlug);
+          const candidatePos = matrixTranslation(candidateMatrix);
+          const d2 = distanceSquared(moverPos, candidatePos);
+          if (d2 > SNAP_MAX_DISTANCE_CM * SNAP_MAX_DISTANCE_CM) continue;
+          if (!best || d2 < best.d2) {
+            best = { d2, moverPos, candidatePos };
+          }
+        }
+      }
+    }
+    return best;
+  }
+
+  function toIdSet(ids) {
+    if (ids instanceof Set) return ids;
+    if (Array.isArray(ids)) return new Set(ids.filter(Boolean));
+    return ids ? new Set([ids]) : new Set();
+  }
+
+  function plugsCompatible(a, b) {
+    const aPlugIgn = new Set(a.plug_ign || []);
+    const bPlugIgn = new Set(b.plug_ign || []);
+    const aPieceIgn = new Set(a.piece_ign || []);
+    const bPieceIgn = new Set(b.piece_ign || []);
+    if (bPlugIgn.has(a.plug_tag)) return false;
+    if (aPlugIgn.has(b.plug_tag)) return false;
+    if (bPieceIgn.has(a.piece_tag)) return false;
+    if (aPieceIgn.has(b.piece_tag)) return false;
+    return true;
+  }
+
+  function buildImportPlacementEntries(data) {
+    const entries = [];
+    let skipped = 0;
+    for (const row of data.pieces || []) {
+      const target =
+        targetLookup.byPieceClass.get(shortenClass(row.class_name)) ||
+        targetLookup.byPieceDataName.get(pieceDataStem(row.piece_data_name));
+      if (!target) {
+        skipped += 1;
+        continue;
+      }
+      entries.push({
+        target,
+        transform: row,
+        metadata: {
+          piece_id: Number(row.piece_id || 0),
+          stability: Number(row.stability || target.export.default_stability || 3000),
+          is_ghosted: Boolean(row.is_ghosted),
+          spud_guid: row.spud_guid || "",
+        },
+      });
+    }
+    for (const row of data.items || []) {
+      const target = targetLookup.byItemName.get(row.item_asset_name);
+      if (!target) {
+        skipped += 1;
+        continue;
+      }
+      entries.push({
+        target,
+        transform: row,
+        metadata: {
+          actor_name: row.actor_name || "",
+          actor_class: row.actor_class || ITEM_ACTOR_CLASS,
+          item_count: Number(row.count || 1),
+          item_source: row.item_source || "ItemData",
+        },
+      });
+    }
+    for (const row of data.actors || []) {
+      const target = targetLookup.byBpClass.get(shortenClass(row.actor_class || row.class_path));
+      if (!target) {
+        skipped += 1;
+        continue;
+      }
+      entries.push({
+        target,
+        transform: row,
+        metadata: {
+          actor_name: row.actor_name || "",
+        },
+      });
+    }
+    return { entries, skipped };
+  }
+
+  async function createPlacementsBulk(entries, { statusPrefix = "Importing" } = {}) {
+    for (let index = 0; index < entries.length; index += 1) {
+      const entry = entries[index];
+      await createPlacement(entry.target, entry.transform, entry.metadata, {
+        id: entry.id,
+        select: false,
+        render: false,
+      });
+      const completed = index + 1;
+      if (completed === entries.length || completed % IMPORT_RENDER_BATCH_SIZE === 0) {
+        els.assetStatus.textContent = `${statusPrefix} ${completed.toLocaleString()} of ${entries.length.toLocaleString()}`;
+        await nextFrame();
+      }
+    }
+  }
+
+  async function importBuildingJson(file) {
+    setLoading(true);
+    try {
+      const data = JSON.parse(await file.text());
+      pushUndoSnapshot();
+      const rows = [...(data.pieces || []), ...(data.items || []), ...(data.actors || [])];
+      const importedAnchor = importedAnchorPiece(data);
+      const { entries, skipped } = buildImportPlacementEntries(data);
+      await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading import models" });
+      viewOffset = importViewOffset(rows, importedAnchor);
+      bulkMutationActive = true;
+      clearBuild({ resetOffset: false, render: false });
+      buildName = data.name || file.name.replace(/\.json$/i, "") || "Browser Base";
+      buildSchema = data.schema || "rsdwtools.buildings.v1";
+      anchorPieceId = Number(importedAnchor?.piece_id || data.anchor_piece_id || 0);
+      await createPlacementsBulk(entries);
+      bulkMutationActive = false;
+      setSelection([], { render: false });
+      renderInspector();
+      renderPlacedList();
+      updateCounters();
+      focusCameraOnBuild();
+      const skippedText = skipped ? `, skipped ${skipped.toLocaleString()} missing targets` : "";
+      els.assetStatus.textContent = `Imported ${entries.length.toLocaleString()} objects${skippedText}`;
+    } catch (error) {
+      console.error(error);
+      els.assetStatus.textContent = `Import failed: ${error.message}`;
+    } finally {
+      bulkMutationActive = false;
+      setLoading(false);
+    }
+  }
+
+  function importViewOffset(rows, anchorPiece) {
+    const offset = medianOffset(rows);
+    if (anchorPiece) {
+      const anchorZ = Number(anchorPiece.z ?? 0);
+      if (Number.isFinite(anchorZ)) offset.z = anchorZ;
+    }
+    return offset;
+  }
+
+  function importedAnchorPiece(data) {
+    const pieces = Array.isArray(data.pieces) ? data.pieces : [];
+    if (!pieces.length) return null;
+
+    const anchorPieceIdValue = Number(data.anchor_piece_id || 0);
+    if (anchorPieceIdValue > 0) {
+      const byPieceId = pieces.find((piece) => Number(piece.piece_id || 0) === anchorPieceIdValue);
+      if (byPieceId) return byPieceId;
+    }
+
+    const anchorPieceDataIndex = Number(data.anchor_piece_data_index || 0);
+    if (anchorPieceDataIndex > 0) {
+      return pieces.find((piece) => Number(piece.piece_data_index || 0) === anchorPieceDataIndex) || null;
+    }
+
+    return null;
+  }
+
+  function medianOffset(rows) {
+    if (!rows.length) return { x: 0, y: 0, z: 0 };
+    const xs = rows.map((row) => Number(row.x || 0)).sort((a, b) => a - b);
+    const ys = rows.map((row) => Number(row.y || 0)).sort((a, b) => a - b);
+    const zs = rows.map((row) => Number(row.z || 0)).sort((a, b) => a - b);
+    const mid = Math.floor(rows.length / 2);
+    return { x: xs[mid] || 0, y: ys[mid] || 0, z: zs[mid] || 0 };
+  }
+
+  function exportBuildingJson() {
+    const pieces = [];
+    const items = [];
+    const actors = [];
+    const usedPieceIds = new Set();
+    for (const placement of placements.values()) {
+      if (placement.target.asset_kind !== "building_piece") continue;
+      let pid = Number(placement.metadata.piece_id || 0);
+      if (pid <= 0 || usedPieceIds.has(pid)) {
+        pid = allocatePieceId();
+        placement.metadata.piece_id = pid;
+      }
+      usedPieceIds.add(pid);
+    }
+
+    for (const placement of placements.values()) {
+      const target = placement.target;
+      const transform = exportTransform(placement.state);
+      if (target.asset_kind === "building_piece") {
+        pieces.push({
+          piece_id: Number(placement.metadata.piece_id || allocatePieceId()),
+          piece_data_index: Number(target.export.piece_data_index || 0),
+          piece_data_name: target.export.piece_data_name || "",
+          class_name: target.export.class_name || "",
+          ...transform,
+          stability: Number(placement.metadata.stability || target.export.default_stability || 3000),
+          is_ghosted: Boolean(placement.metadata.is_ghosted),
+          ...(placement.metadata.spud_guid ? { spud_guid: placement.metadata.spud_guid } : {}),
+        });
+      } else if (target.asset_kind === "item") {
+        items.push({
+          actor_name: placement.metadata.actor_name || target.asset_stem,
+          actor_class: placement.metadata.actor_class || target.export.actor_class || ITEM_ACTOR_CLASS,
+          item_asset_name: target.export.item_asset_name || target.asset_stem,
+          item_asset_path: target.export.item_asset_path || "",
+          item_source: placement.metadata.item_source || target.export.item_source || "ItemData",
+          count: Number(placement.metadata.item_count || target.export.item_count || 1),
+          ...transform,
+        });
+      } else if (target.asset_kind === "bp") {
+        actors.push({
+          actor_name: placement.metadata.actor_name || target.asset_stem,
+          actor_class: target.export.actor_class || "",
+          class_path: target.export.class_path || target.export.runtime_path || "",
+          ...transform,
+        });
+      }
+    }
+
+    const out = {
+      schema: buildSchema,
+      name: buildName,
+      generated_unix: Math.floor(Date.now() / 1000),
+      count: pieces.length,
+      skipped: 0,
+      item_count: items.length,
+      item_skipped: 0,
+      hidden: 0,
+      pieces,
+      items,
+      actors,
+    };
+    if (anchorPieceId && pieces.some((piece) => Number(piece.piece_id) === Number(anchorPieceId))) {
+      const anchorPiece = pieces.find((piece) => Number(piece.piece_id) === Number(anchorPieceId));
+      out.anchor_piece_id = Number(anchorPieceId);
+      out.anchor_piece_data_index = Number(anchorPiece.piece_data_index || 0);
+    }
+    downloadJson(out, `${safeFileName(buildName || "browser_build")}.json`);
+  }
+
+  function downloadJson(data, filename) {
+    const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    link.remove();
+  }
+
+  function safeFileName(value) {
+    return String(value || "building").replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "") || "building";
+  }
+
+  function focusCameraOnBuild() {
+    if (!placements.size) return;
+    const box = new THREE.Box3();
+    for (const placement of placements.values()) {
+      box.expandByObject(placement.group);
+    }
+    if (box.isEmpty()) return;
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxSize = Math.max(size.x, size.y, size.z, 3);
+    controls.target.copy(center);
+    camera.position.set(center.x + maxSize * 0.85, center.y + maxSize * 0.7, center.z + maxSize * 0.85);
+    camera.near = Math.max(0.01, maxSize / 1000);
+    camera.far = Math.max(1500, maxSize * 20);
+    camera.updateProjectionMatrix();
+    controls.update();
+  }
+
+  function bindEvents() {
+    setMenu("discord-toggle", "discord-menu");
+    setMenu("links-toggle", "links-menu");
+    document.addEventListener("click", () => {
+      closeMenus();
+      closeAssetContextMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeMenus();
+        closeAssetContextMenu();
+      }
+    });
+    els.assetSearch.addEventListener("input", renderAssets);
+    document.addEventListener("dragstart", (event) => {
+      if (event.target?.closest?.(".asset-row, .favorite-tile")) event.preventDefault();
+    });
+    els.controlsHud?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleControlsHud();
+    });
+    els.controlsHud?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleControlsHud();
+    });
+    els.orientationToggle?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleOrientationMode();
+    });
+    els.assetFolder.addEventListener("change", () => {
+      activeFolder = els.assetFolder.value || FOLDER_ALL;
+      renderAssets();
+    });
+    for (const button of els.kindButtons) {
+      button.addEventListener("click", () => {
+        activeKind = button.dataset.kind;
+        activeFolder = FOLDER_ALL;
+        for (const other of els.kindButtons) other.classList.toggle("is-active", other === button);
+        renderFolderOptions();
+        renderAssets();
+      });
+    }
+    els.importJson.addEventListener("click", () => els.fileInput.click());
+    els.fileInput.addEventListener("change", () => {
+      const file = els.fileInput.files && els.fileInput.files[0];
+      if (file) importBuildingJson(file);
+      els.fileInput.value = "";
+    });
+    els.exportJson.addEventListener("click", exportBuildingJson);
+    els.clearBuild.addEventListener("click", () => clearBuild({ recordUndo: true }));
+    els.duplicateObject.addEventListener("click", duplicateSelected);
+    els.deleteObject.addEventListener("click", deleteSelected);
+    els.snapObject.addEventListener("click", snapSelected);
+    els.setAnchor.addEventListener("click", setSelectedAnchor);
+    els.clearAnchor.addEventListener("click", () => {
+      pushUndoSnapshot();
+      anchorPieceId = 0;
+      updateCounters();
+      renderInspector();
+      scheduleAutosave();
+    });
+    for (const input of els.transformInputs) {
+      input.addEventListener("change", () => {
+        const placement = selectedPlacement();
+        if (!placement) return;
+        const key = input.dataset.transform;
+        if (key.startsWith("scale") && !canScalePlacement(placement)) {
+          renderInspector();
+          renderScaleOverrideMessage();
+          return;
+        }
+        pushUndoSnapshot();
+        placement.state[key] = Number(input.value);
+        if (key.startsWith("scale") && placement.state[key] <= 0) placement.state[key] = 0.01;
+        applyPlacementTransform(placement);
+        renderInspector();
+        renderPlacedList();
+        scheduleAutosave();
+      });
+    }
+    window.addEventListener("beforeunload", saveAutosave);
+    window.addEventListener("pointermove", (event) => {
+      if (transformControls?.dragging) updateGizmoSnapModifierFromEvent(event);
+    }, { passive: true });
+    window.addEventListener("keyup", (event) => {
+      updateGizmoSnapModifierFromEvent(event);
+      if (event.key.toLowerCase() === "d") setDuplicateNudgeModifier(false);
+    });
+    window.addEventListener("blur", () => {
+      setGizmoSnapModifier(false);
+      setDuplicateNudgeModifier(false);
+    });
+    window.addEventListener("keydown", (event) => {
+      updateGizmoSnapModifierFromEvent(event);
+      if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
+      const key = event.key.toLowerCase();
+      if (key === "d") setDuplicateNudgeModifier(true);
+      const smartNudgeDirection = smartDuplicateNudgeDirectionFromEvent(event);
+      if (duplicateNudgeModifierActive && smartNudgeDirection) {
+        event.preventDefault();
+        if (!event.repeat) smartDuplicateNudge(smartNudgeDirection.id);
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && key === "z" && !event.shiftKey) {
+        event.preventDefault();
+        undoLastAction();
+      } else if (dragSession && key === "r") {
+        event.preventDefault();
+        cycleDragRotateStep();
+      } else if (dragSession && key === "f") {
+        event.preventDefault();
+        flipDragPreviewYaw();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        if (dragSession) endDragPlacement();
+        if (selectionGesture) endSelectionGesture();
+        else selectPlacement("");
+      } else if (event.key === "Delete" || event.key === "Backspace" || key === "x") {
+        event.preventDefault();
+        deleteSelected();
+      } else if (key === "d" && (event.ctrlKey || event.metaKey || event.shiftKey)) {
+        event.preventDefault();
+        duplicateSelected();
+      } else if (key === "e") {
+        event.preventDefault();
+        beginSmartDuplicatePlacement();
+      } else if (key === "g") {
+        event.preventDefault();
+        activateGizmo("translate");
+      } else if (key === "r") {
+        event.preventDefault();
+        activateGizmo("rotate");
+      } else if (key === "s") {
+        event.preventDefault();
+        activateGizmo("scale");
+      } else if (key === "q") {
+        event.preventDefault();
+        snapSelected();
+      } else if (key === "o") {
+        event.preventDefault();
+        toggleOrientationMode();
+      } else if (key === "a") {
+        event.preventDefault();
+        toggleSelectAll();
+      }
+    });
+  }
+
+  function setMenu(toggleId, menuId) {
+    const toggle = document.getElementById(toggleId);
+    const menu = document.getElementById(menuId);
+    if (!toggle || !menu) return;
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const open = menu.hidden;
+      closeMenus();
+      menu.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
+
+  function closeMenus() {
+    document.querySelectorAll(".rsdw-menu__panel").forEach((panel) => {
+      panel.hidden = true;
+    });
+    document.querySelectorAll(".rsdw-iconbtn[aria-expanded]").forEach((button) => {
+      button.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  async function init() {
+    bindEvents();
+    config = { ...config, ...(await loadJson(CONFIG_URL).catch(() => ({}))) };
+    index = await loadJson(INDEX_URL);
+    buildLookups();
+    loadScaleOverride();
+    loadFavorites();
+    pruneFavorites();
+    initThree();
+    syncOrientationUi();
+    renderFolderOptions();
+    renderAssets();
+    renderControlsHud();
+    await restoreAutosavedBuild();
+    renderInspector();
+    updateCounters();
+    autosaveReady = true;
+    setLoading(false);
+    window.__RSDW_BASE_BUILDER_DEBUG__ = {
+      objectCount: () => placements.size,
+      selectedName: () => selectedPlacement()?.target.display_name || "",
+      dragActive: () => Boolean(dragSession),
+    };
+  }
+
+  init().catch((error) => {
+    console.error(error);
+    els.assetStatus.textContent = "Unable to load browser builder data.";
+    els.loading.textContent = error.message;
+  });
+})();

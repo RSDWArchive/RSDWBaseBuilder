@@ -104,6 +104,39 @@ def _is_useful_preview(obj: bpy.types.Object | None) -> bool:
     return bool(metrics.get("nonblank")) and alpha_pixels >= useful_pixels
 
 
+def _save_preview_to_webp(obj: bpy.types.Object | None, web_preview_path: Path | None) -> tuple[bool, int | None, str | None]:
+    if web_preview_path is None:
+        return False, None, None
+    if obj is None:
+        return False, None, "no asset object"
+    preview = getattr(obj, "preview", None)
+    size = getattr(preview, "image_size", None) if preview else None
+    pixels = list(getattr(preview, "image_pixels_float", []) or []) if preview else []
+    if not size or not pixels:
+        return False, None, "asset preview has no pixels"
+    width = int(size[0])
+    height = int(size[1])
+    if width <= 0 or height <= 0 or len(pixels) < width * height * 4:
+        return False, None, "asset preview pixel buffer is invalid"
+
+    web_preview_path.parent.mkdir(parents=True, exist_ok=True)
+    image = bpy.data.images.new(web_preview_path.stem, width=width, height=height, alpha=True, float_buffer=False)
+    try:
+        image.pixels.foreach_set(pixels[:width * height * 4])
+        image.filepath_raw = str(web_preview_path)
+        image.file_format = "WEBP"
+        image.save()
+    finally:
+        bpy.data.images.remove(image)
+    try:
+        size_on_disk = web_preview_path.stat().st_size
+    except FileNotFoundError:
+        return False, None, "WebP file was not written"
+    if size_on_disk <= 0:
+        return False, size_on_disk, "WebP file is empty"
+    return True, size_on_disk, None
+
+
 def _render_objects() -> list[bpy.types.Object]:
     meshes = [obj for obj in bpy.data.objects if obj.type == "MESH"]
     asset = _asset_object()
@@ -400,13 +433,24 @@ def _save_current_file(path: Path) -> None:
     bpy.ops.wm.save_as_mainfile(filepath=str(path), compress=True, copy=False)
 
 
-def _process_one(path: Path, *, force: bool, verify_only: bool, results_path: Path) -> bool:
+def _process_one(
+    path: Path,
+    *,
+    force: bool,
+    verify_only: bool,
+    results_path: Path,
+    web_preview_path: Path | None = None,
+) -> bool:
     t0 = time.time()
     row = {
         "blend_file": str(path),
         "status": "failed",
         "action": "failed",
         "duration_s": None,
+        "web_preview_path": str(web_preview_path) if web_preview_path else "",
+        "web_preview_written": False,
+        "web_preview_size": None,
+        "web_preview_error": None,
     }
     try:
         if not path.is_file():
@@ -430,16 +474,32 @@ def _process_one(path: Path, *, force: bool, verify_only: bool, results_path: Pa
         if verify_only:
             after_metrics = _preview_metrics(obj)
             ok = bool(after_metrics["nonblank"])
+            web_ok = True
+            if web_preview_path is not None:
+                web_ok = web_preview_path.is_file() and web_preview_path.stat().st_size > 0
             row.update({
-                "status": "success" if ok else "failed",
-                "action": "verified" if ok else "missing_preview",
+                "status": "success" if ok and web_ok else "failed",
+                "action": "verified" if ok and web_ok else "missing_preview",
                 "preview_after": ok,
                 "preview_after_metrics": after_metrics,
                 "preview_after_size": after_metrics["size"],
+                "web_preview_written": web_ok if web_preview_path is not None else False,
+                "web_preview_size": web_preview_path.stat().st_size if web_ok and web_preview_path is not None else None,
+                "web_preview_error": None if web_ok else "missing browser WebP preview",
             })
-            return ok
+            return ok and web_ok
 
         if before_has_preview and not force:
+            if web_preview_path is not None:
+                written, web_size, web_error = _save_preview_to_webp(obj, web_preview_path)
+                row.update({
+                    "web_preview_written": written,
+                    "web_preview_size": web_size,
+                    "web_preview_error": web_error,
+                })
+                if not written:
+                    row.update({"action": "web_preview_failed", "error": web_error})
+                    return False
             row.update({
                 "status": "success",
                 "action": "already_present",
@@ -464,6 +524,17 @@ def _process_one(path: Path, *, force: bool, verify_only: bool, results_path: Pa
         if not after_has_preview:
             row.update({"action": "render_failed", "error": "rendered preview is empty"})
             return False
+
+        if web_preview_path is not None:
+            written, web_size, web_error = _save_preview_to_webp(obj, web_preview_path)
+            row.update({
+                "web_preview_written": written,
+                "web_preview_size": web_size,
+                "web_preview_error": web_error,
+            })
+            if not written:
+                row.update({"action": "web_preview_failed", "error": web_error})
+                return False
 
         _save_current_file(path)
         row.update({"status": "success", "action": "baked"})
@@ -491,7 +562,9 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv or sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:])
     payload = json.loads(args.input.read_text(encoding="utf-8"))
-    files = [Path(value) for value in payload.get("blend_files") or []]
+    jobs = payload.get("preview_jobs") or []
+    if not jobs:
+        jobs = [{"blend_file": value} for value in payload.get("blend_files") or []]
     force = bool(payload.get("force"))
     verify_only = bool(payload.get("verify_only"))
     args.results.parent.mkdir(parents=True, exist_ok=True)
@@ -502,8 +575,16 @@ def main(argv: list[str] | None = None) -> int:
 
     ok = 0
     failed = 0
-    for path in files:
-        if _process_one(path, force=force, verify_only=verify_only, results_path=args.results):
+    for job in jobs:
+        path = Path(job.get("blend_file") or "")
+        web_preview_path = Path(job["web_preview_path"]) if job.get("web_preview_path") else None
+        if _process_one(
+            path,
+            force=force,
+            verify_only=verify_only,
+            results_path=args.results,
+            web_preview_path=web_preview_path,
+        ):
             ok += 1
         else:
             failed += 1

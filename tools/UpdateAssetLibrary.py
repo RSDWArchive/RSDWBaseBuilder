@@ -788,6 +788,8 @@ def main(argv: list[str] | None = None) -> int:
     building_targets = root / "tools" / "AssetLibrary" / "catalog_asset_targets.json"
     unified_targets = root / "tools" / "AssetLibrary" / "asset_library_targets.json"
     catalog_file = Path(inputs["library_root"]) / "blender_assets.cats.txt"
+    browser_web_index = root / "website" / "basebuilder-index.json"
+    browser_web_preview_root = root / "website" / "previews" / version / "bp"
     material_inventory = root / "tools" / "ModelData" / "MaterialInventory.json"
     materials_blend = Path(inputs["library_root"]) / "_Materials.blend"
     materials_manifest = Path(inputs["library_root"]) / "_Materials.manifest.json"
@@ -919,6 +921,21 @@ def main(argv: list[str] | None = None) -> int:
         cwd=root,
     ))
 
+    stages.append(run_command(
+        "Browser web index",
+        [
+            sys.executable,
+            root / "tools" / "Web" / "BuildBaseBuilderWebIndex.py",
+            "--target-file", unified_targets,
+            "--model-index", args.model_root / "website" / "model-index.json",
+            "--snaps", args.extension_source_root / "data" / "Snaps.json",
+            "--out", browser_web_index,
+            "--bp-web-preview-root", browser_web_preview_root,
+        ],
+        log_path=log_dir / "05b_browser_web_index.log",
+        cwd=root,
+    ))
+
     build_target_ids: list[str] = []
     only_list: Path | None = None
     if args.mode == "smoke":
@@ -1040,6 +1057,7 @@ def main(argv: list[str] | None = None) -> int:
             "--library-root", Path(inputs["library_root"]),
             "--progress-file", generated_preview_progress_file,
             "--out", log_dir / "generated_preview_report.json",
+            "--web-preview-root", browser_web_preview_root,
             "--batch-log-dir", log_dir / "generated_preview_batches",
             "--batch-size", str(args.preview_batch_size),
         ]
@@ -1060,6 +1078,34 @@ def main(argv: list[str] | None = None) -> int:
                 "Generated asset previews",
                 preview_cmd,
                 log_path=log_dir / "08b_generated_previews.log",
+                cwd=root,
+            ))
+
+        final_web_index_cmd: list[str | Path] = [
+            sys.executable,
+            root / "tools" / "Web" / "BuildBaseBuilderWebIndex.py",
+            "--target-file", unified_targets,
+            "--model-index", args.model_root / "website" / "model-index.json",
+            "--snaps", args.extension_source_root / "data" / "Snaps.json",
+            "--out", browser_web_index,
+            "--bp-web-preview-root", browser_web_preview_root,
+        ]
+        if (
+            args.mode == "full"
+            and not args.limit
+            and not args.only
+            and not args.skip_generated_previews
+        ):
+            final_web_index_cmd.append("--require-bp-web-previews")
+        if args.dry_run:
+            print_section("Browser web index final")
+            print("Skipped because --dry-run was supplied.")
+            stages.append({"title": "Browser web index final", "skipped": True, "reason": "--dry-run"})
+        else:
+            stages.append(run_command(
+                "Browser web index final",
+                final_web_index_cmd,
+                log_path=log_dir / "08c_browser_web_index.log",
                 cwd=root,
             ))
 
@@ -1183,6 +1229,8 @@ def main(argv: list[str] | None = None) -> int:
             "building_targets": str(building_targets),
             "asset_library_targets": str(unified_targets),
             "asset_catalog": str(catalog_file),
+            "browser_web_index": str(browser_web_index),
+            "browser_web_preview_root": str(browser_web_preview_root),
             "asset_target_quality_report": str(log_dir / "asset_target_quality_report.json"),
             "asset_quality_report": str(log_dir / "asset_quality_report.json"),
             "material_inventory": str(material_inventory),

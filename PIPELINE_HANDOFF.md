@@ -128,16 +128,19 @@ For `targets`, `smoke`, and `full`, the main stage order is:
 5. Build unified asset targets
 6. Verify target quality
 7. Write `blender_assets.cats.txt`
-8. Build material inventory
-9. Build shared materials when material mode requires them
-10. Build generated asset `.blend` files
-11. Bake generated previews for BP assets unless skipped
-12. Verify Blender asset metadata
-13. Verify built asset quality
-14. Audit generated file sizes for Git safety
-15. Optionally package the extension
-16. Optionally sync the portable Blender extension
-17. Optionally write or execute the Git commit plan
+8. Build the browser web index from target data
+9. Build material inventory
+10. Build shared materials when material mode requires them
+11. Build generated asset `.blend` files
+12. Bake generated previews for BP assets unless skipped; this also writes
+    browser BP preview WebPs
+13. Rebuild the browser web index so generated BP preview paths are included
+14. Verify Blender asset metadata
+15. Verify built asset quality
+16. Audit generated file sizes for Git safety
+17. Optionally package the extension
+18. Optionally sync the portable Blender extension
+19. Optionally write or execute the Git commit plan
 
 ## Inputs and Outputs
 
@@ -148,6 +151,8 @@ Tracked source/config files that may be refreshed by the pipeline:
 - `tools\AssetLibrary\catalog_reconciliation.json`
 - `tools\ModelData\BPMap.json`
 - `tools\ModelData\MaterialInventory.json`
+- `website\basebuilder-index.json`
+- `website\previews\<version>\bp\*.webp`
 
 Ignored generated outputs:
 
@@ -164,6 +169,7 @@ Important generated reports:
 - `PipelineLogs\<timestamp>\asset_target_quality_report.json`
 - `PipelineLogs\<timestamp>\asset_metadata_report.json`
 - `PipelineLogs\<timestamp>\asset_quality_report.json`
+- `PipelineLogs\<timestamp>\generated_preview_report.json`
 - `PipelineLogs\<timestamp>\git_file_size_audit.json`
 - `PipelineLogs\<timestamp>\GitCommitPlan.json`
 - `PipelineLogs\<timestamp>\portable_extension_sync.json`
@@ -183,6 +189,8 @@ An orchestration run should treat the BaseBuilder step as successful only when:
   skipped.
 - `PipelineRun.json` points at the current `PipelineLogs\<timestamp>\` folder.
 - `asset_target_quality_report.json` has no blocking icon or target errors.
+- `website\basebuilder-index.json` contains no local absolute paths and points
+  at browser BP previews after a full, non-limited build.
 - `asset_metadata_report.json` and `asset_quality_report.json` pass for build
   modes that generate assets.
 - `git_file_size_audit.json` has no oversized generated source files.
@@ -218,6 +226,10 @@ Common recovery choices:
 - If generated previews are the only failing stage, inspect
   `08b_generated_previews.log`; use `--skip-generated-previews` only for local
   diagnosis, not for release builds.
+- If browser BP thumbnails are missing or blank, inspect
+  `08b_generated_previews.log` and `08c_browser_web_index.log`. Full,
+  non-limited release builds require BP preview WebPs before the final browser
+  index is accepted.
 - If packaging fails, inspect `11_package.log` and the package report.
 - If portable sync fails, verify the target is under
   `portable\extensions\user_default\rsdw_base_builder`.
@@ -226,8 +238,9 @@ Common recovery choices:
 
 ## Git and Release Policy
 
-Commit source and small pipeline metadata only. Do not commit generated Blender
-asset libraries, release zips, pipeline logs, or local Blender runtimes.
+Commit source, small pipeline metadata, and website browser assets only. Do not
+commit generated Blender asset libraries, release zips, pipeline logs, or local
+Blender runtimes.
 
 Ignored paths that should stay out of Git:
 
@@ -274,6 +287,8 @@ success_files:
   - 'PipelineLogs\<timestamp>\asset_metadata_report.json'
   - 'PipelineLogs\<timestamp>\asset_quality_report.json'
   - 'PipelineLogs\<timestamp>\git_file_size_audit.json'
+  - 'website\basebuilder-index.json'
+  - 'website\previews\<version>\bp\*.webp'
 release_artifact: 'dist\rsdw_base_builder-<addon-version>.zip'
 ignored_outputs:
   - '_local\'

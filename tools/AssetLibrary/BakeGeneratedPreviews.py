@@ -66,6 +66,22 @@ def _default_progress_file() -> Path:
     return _repo_root() / "_build" / "GeneratedPreviewProgress.json"
 
 
+def _safe_stem(value: str) -> str:
+    cleaned = "".join(ch if ch.isalnum() or ch in {"-", "_", "."} else "_" for ch in value.strip())
+    return cleaned.strip("._") or "asset"
+
+
+def _web_preview_path_for_target(args: argparse.Namespace, target: dict[str, Any]) -> Path | None:
+    if args.web_preview_root is None:
+        return None
+    if str(target.get("asset_kind") or "") != "bp":
+        return None
+    target_id = str(target.get("target_id") or target.get("asset_stem") or "").strip()
+    if not target_id:
+        return None
+    return args.web_preview_root / f"{_safe_stem(target_id)}.webp"
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -151,7 +167,7 @@ def _matches_only(target: dict[str, Any], blend_path: Path, only_values: set[str
     return bool(candidates & only_values)
 
 
-def _is_fresh_success(record: dict[str, Any] | None, blend_path: Path) -> bool:
+def _is_fresh_success(record: dict[str, Any] | None, blend_path: Path, web_preview_path: Path | None = None) -> bool:
     if not record or record.get("status") != "success":
         return False
     if record.get("preview_nonblank") is not True:
@@ -160,9 +176,25 @@ def _is_fresh_success(record: dict[str, Any] | None, blend_path: Path) -> bool:
         stat = blend_path.stat()
     except FileNotFoundError:
         return False
-    return (
+    blend_is_fresh = (
         int(record.get("blend_mtime_ns") or -1) == int(stat.st_mtime_ns)
         and int(record.get("blend_size") or -1) == int(stat.st_size)
+    )
+    if not blend_is_fresh:
+        return False
+    if web_preview_path is None:
+        return True
+    if not web_preview_path.is_file():
+        return False
+    if record.get("web_preview_written") is not True:
+        return False
+    try:
+        preview_stat = web_preview_path.stat()
+    except FileNotFoundError:
+        return False
+    return (
+        str(record.get("web_preview_path") or "") == str(web_preview_path)
+        and int(record.get("web_preview_size") or -1) == int(preview_stat.st_size)
     )
 
 
@@ -200,7 +232,8 @@ def _select_plans(args: argparse.Namespace, progress: ProgressManifest) -> tuple
             continue
 
         key = str(target.get("target_id") or blend_path)
-        if not args.force and _is_fresh_success(progress.get(key), blend_path):
+        web_preview_path = _web_preview_path_for_target(args, target)
+        if not args.force and _is_fresh_success(progress.get(key), blend_path, web_preview_path):
             counts["skipped_fresh"] += 1
             continue
 
@@ -210,6 +243,7 @@ def _select_plans(args: argparse.Namespace, progress: ProgressManifest) -> tuple
             "target": target,
             "blend_path": blend_path,
             "asset_kind": asset_kind,
+            "web_preview_path": web_preview_path,
         })
         if args.limit is not None and len(plans) >= args.limit:
             break
@@ -250,6 +284,15 @@ def _run_batch(
         "force": bool(args.force),
         "verify_only": bool(args.verify_only),
         "blend_files": [str(plan["blend_path"]) for plan in batch],
+        "preview_jobs": [
+            {
+                "blend_file": str(plan["blend_path"]),
+                "target_id": plan["key"],
+                "asset_kind": plan["asset_kind"],
+                **({"web_preview_path": str(plan["web_preview_path"])} if plan.get("web_preview_path") else {}),
+            }
+            for plan in batch
+        ],
     }
     _write_json(input_path, payload)
     try:
@@ -311,6 +354,10 @@ def _run_batch(
             "preview_after_size": row.get("preview_after_size"),
             "preview_after_metrics": row.get("preview_after_metrics"),
             "preview_nonblank": bool(row.get("preview_after")),
+            "web_preview_path": row.get("web_preview_path"),
+            "web_preview_written": bool(row.get("web_preview_written")),
+            "web_preview_size": row.get("web_preview_size"),
+            "web_preview_error": row.get("web_preview_error"),
             "asset_object": row.get("asset_object"),
             "duration_s": row.get("duration_s"),
             "finished_utc": _now_utc(),
@@ -345,6 +392,8 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--target-file", type=Path, default=_default_target_file())
     parser.add_argument("--library-root", type=Path, default=_default_library_root())
     parser.add_argument("--progress-file", type=Path, default=_default_progress_file())
+    parser.add_argument("--web-preview-root", type=Path, default=None,
+                        help="Write browser-only BP preview WebP files under this directory.")
     parser.add_argument("--out", type=Path, default=None)
     parser.add_argument("--batch-log-dir", type=Path, default=None)
     parser.add_argument("--only-list", type=Path, default=None)
@@ -366,6 +415,8 @@ def main(argv: list[str] | None = None) -> int:
     args.target_file = args.target_file.resolve()
     args.library_root = args.library_root.resolve()
     args.progress_file = args.progress_file.resolve()
+    if args.web_preview_root is not None:
+        args.web_preview_root = args.web_preview_root.resolve()
     if args.batch_size <= 0:
         raise SystemExit("--batch-size must be positive.")
     if not args.blender.is_file():
@@ -433,6 +484,7 @@ def main(argv: list[str] | None = None) -> int:
         "target_file": str(args.target_file),
         "library_root": str(args.library_root),
         "progress_file": str(args.progress_file),
+        "web_preview_root": str(args.web_preview_root) if args.web_preview_root else None,
         "batch_log_dir": str(args.batch_log_dir),
         "counts": counts,
         "selected": len(plans),
