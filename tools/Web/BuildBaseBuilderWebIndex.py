@@ -135,6 +135,89 @@ def _find_absolute_strings(value: Any, path: str = "$") -> list[str]:
     return found
 
 
+def _natural_label_key(value: str) -> list[Any]:
+    return [
+        int(part) if part.isdigit() else part.casefold()
+        for part in re.split(r"(\d+)", str(value or ""))
+    ]
+
+
+def _category_segments(row: dict[str, Any], root_label: str) -> list[str]:
+    parts = [
+        part.strip()
+        for part in str(row.get("catalog_path") or "").split("/")
+        if part.strip()
+    ]
+    if root_label and parts[:1] == [root_label]:
+        parts = parts[1:]
+    return parts or ["Unsorted"]
+
+
+def _build_category_tree(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_kind: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        kind = str(row.get("asset_kind") or "")
+        if kind:
+            by_kind.setdefault(kind, []).append(row)
+
+    out: dict[str, Any] = {}
+    for kind, kind_rows in by_kind.items():
+        first_segments = {
+            str(row.get("catalog_path") or "").split("/", 1)[0].strip()
+            for row in kind_rows
+            if str(row.get("catalog_path") or "").split("/", 1)[0].strip()
+        }
+        root_label = next(iter(first_segments)) if len(first_segments) == 1 else ""
+        root: dict[str, Any] = {"children": {}, "count": 0}
+
+        for row in kind_rows:
+            node = root
+            node["count"] += 1
+            path_parts: list[str] = []
+            for segment in _category_segments(row, root_label):
+                path_parts.append(segment)
+                children = node.setdefault("children", {})
+                node = children.setdefault(segment, {
+                    "label": segment,
+                    "path": "/".join(path_parts),
+                    "count": 0,
+                    "children": {},
+                })
+                node["count"] += 1
+
+        def to_rows(children: dict[str, Any], depth: int = 0) -> list[dict[str, Any]]:
+            child_values = list(children.values())
+            is_tier_row = bool(child_values) and all(
+                re.match(r"^tier\s+\d+\b", str(child.get("label") or ""), flags=re.IGNORECASE)
+                for child in child_values
+            )
+            if is_tier_row:
+                items = sorted(
+                    child_values,
+                    key=lambda child: _natural_label_key(str(child.get("label") or "")),
+                )
+            else:
+                items = sorted(
+                    child_values,
+                    key=lambda child: (-int(child.get("count") or 0), _natural_label_key(str(child.get("label") or ""))),
+                )
+            return [
+                {
+                    "label": str(child.get("label") or ""),
+                    "path": str(child.get("path") or ""),
+                    "count": int(child.get("count") or 0),
+                    "children": to_rows(child.get("children") or {}, depth + 1),
+                }
+                for child in items
+            ]
+
+        out[kind] = {
+            "root_label": root_label,
+            "nodes": to_rows(root.get("children") or {}),
+        }
+    return out
+
+
 def _model_index_by_path(model_index: dict[str, Any]) -> dict[str, dict[str, Any]]:
     rows = model_index.get("models")
     if not isinstance(rows, list):
@@ -349,6 +432,7 @@ def build_index(
         "source_unresolved_model_ref_records": source_unresolved_records,
         "source_unresolved_unique_model_refs": source_unresolved_unique,
     })
+    category_tree = _build_category_tree(rows)
     out = {
         "schema": SCHEMA,
         "generated_at_utc": now_iso(),
@@ -361,6 +445,7 @@ def build_index(
             "bp_web_preview_root": _relative_web_path(bp_web_preview_root, website_root) if bp_web_preview_root else "",
         },
         "summary": summary,
+        "category_tree": category_tree,
         "targets": rows,
         "snaps": used_snaps,
     }

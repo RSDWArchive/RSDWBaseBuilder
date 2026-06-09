@@ -76,21 +76,29 @@
         <button type="button" data-kind="bp">BP</button>
       </div>
 
-      <section class="favorites-panel" aria-label="Favorite assets">
+      <section class="asset-column-section favorites-panel" aria-label="Favorite assets">
+        <h2>Favorites</h2>
         <div id="favorite-strip" class="favorite-strip"></div>
       </section>
 
-      <div class="folder-row">
-        <label class="rsdw-sr" for="asset-folder">Asset folder</label>
-        <select id="asset-folder" aria-label="Asset folder"></select>
-      </div>
+      <section class="asset-column-section category-panel-section" aria-label="Asset categories">
+        <h2>Categories</h2>
+        <div class="category-panel">
+          <div id="asset-category-primary" class="category-button-row category-button-row--primary"></div>
+          <div id="asset-category-children" class="category-children"></div>
+        </div>
+      </section>
 
-      <div class="search-row">
-        <label class="rsdw-sr" for="asset-search">Search assets</label>
-        <input id="asset-search" type="search" placeholder="Search assets" autocomplete="off" />
-      </div>
+      <section class="asset-column-section asset-results-section" aria-label="Asset results">
+        <h2>Assets</h2>
+        <div class="search-row">
+          <label class="rsdw-sr" for="asset-search">Search assets</label>
+          <input id="asset-search" type="search" placeholder="Search assets" autocomplete="off" />
+          <button id="asset-view-toggle" class="asset-view-toggle" type="button" aria-pressed="false">Grid</button>
+        </div>
 
-      <div id="asset-list" class="asset-list" aria-label="Assets"></div>
+        <div id="asset-list" class="asset-list" aria-label="Assets"></div>
+      </section>
     </aside>
 
     <section class="workspace" aria-label="Base editor">
@@ -102,11 +110,6 @@
           <input id="file-input" type="file" accept=".json,application/json" hidden />
         </div>
         <div class="toolbar-group">
-          <button id="duplicate-object" type="button" disabled>Duplicate</button>
-          <button id="delete-object" type="button" disabled>Delete</button>
-        </div>
-        <div class="toolbar-group">
-          <button id="snap-object" type="button" disabled>Snap</button>
           <button id="set-anchor" type="button" disabled>Set Anchor</button>
           <button id="clear-anchor" type="button" disabled>Clear Anchor</button>
         </div>
@@ -118,9 +121,126 @@
 
             <section id="builder-stage" class="builder-stage" aria-label="3D editor">
                 <div id="stage-loading" class="stage-loading">Loading...</div>
-                <button id="orientation-toggle" class="orientation-toggle" type="button" aria-pressed="false" title="Toggle transform orientation">World Orientation</button>
+                <div class="viewport-hotkey-row viewport-hotkey-row--navigation viewport-hotkey-panel" aria-hidden="true">
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Mouse/T_Mouse-Buttons-Left.png" alt="" draggable="false" />
+                        </span>
+                        <span>Select</span>
+                    </div>
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Keyboard/T_Keys-Special-Shift.png" alt="" draggable="false" />
+                            <span class="viewport-hotkey-plus">+</span>
+                            <img src="./shared/assets/Mouse/T_Mouse-Buttons-Left.png" alt="" draggable="false" />
+                        </span>
+                        <span>Multi-select</span>
+                    </div>
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Mouse/T_Mouse-Buttons-Middle.png" alt="" draggable="false" />
+                        </span>
+                        <span>Orbit</span>
+                    </div>
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Mouse/T_Mouse-Buttons-Right.png" alt="" draggable="false" />
+                        </span>
+                        <span>Pan</span>
+                    </div>
+                </div>
+                <div class="viewport-hotkey-stack viewport-hotkey-stack--global viewport-hotkey-panel" aria-hidden="true">
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Keyboard/T_Keys-Standard-A.png" alt="" draggable="false" />
+                        </span>
+                        <span>Select All</span>
+                    </div>
+                    <div class="viewport-hotkey-chip viewport-hotkey-chip--nav">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Keyboard/T_Keys-Special-Ctrl.png" alt="" draggable="false" />
+                            <span class="viewport-hotkey-plus">+</span>
+                            <img src="./shared/assets/Keyboard/T_Keys-Standard-Z.png" alt="" draggable="false" />
+                        </span>
+                        <span>Undo</span>
+                    </div>
+                </div>
+                <div id="selection-hotkeys" class="viewport-hotkey-stack viewport-hotkey-stack--selection viewport-hotkey-panel" aria-hidden="true" hidden>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-Q.png" alt="" draggable="false" />
+                        <span>Snap Selected</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-E.png" alt="" draggable="false" />
+                        <span>Fast Duplicate</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-D.png" alt="" draggable="false" />
+                        <span>Directional Duplicate</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Keyboard/T_Keys-Special-Shift.png" alt="" draggable="false" />
+                            <span class="viewport-hotkey-plus">+</span>
+                            <img src="./shared/assets/Keyboard/T_Keys-Standard-D.png" alt="" draggable="false" />
+                        </span>
+                        <span>Duplicate</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-X.png" alt="" draggable="false" />
+                        <span>Delete</span>
+                    </div>
+                </div>
+                <div id="preview-hotkeys" class="viewport-hotkey-stack viewport-hotkey-stack--preview viewport-hotkey-panel" aria-hidden="true" hidden>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Mouse/T_Mouse-Buttons-Left.png" alt="" draggable="false" />
+                        <span id="preview-place-label">Place Preview</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Mouse/T_Mouse-Buttons-Scroll.png" alt="" draggable="false" />
+                        <span>Rotate Preview</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-R.png" alt="" draggable="false" />
+                        <span>Rotation Step</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-F.png" alt="" draggable="false" />
+                        <span>Flip 180</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <span class="viewport-hotkey-icons">
+                            <img src="./shared/assets/Keyboard/T_Keys-Special-Ctrl.png" alt="" draggable="false" />
+                            <span class="viewport-hotkey-plus">+</span>
+                            <img src="./shared/assets/Mouse/T_Mouse-Buttons-Scroll.png" alt="" draggable="false" />
+                        </span>
+                        <span>Height Offset</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Special-Esc.png" alt="" draggable="false" />
+                        <span>Cancel Preview</span>
+                    </div>
+                </div>
+                <button id="orientation-toggle" class="orientation-toggle" type="button" aria-pressed="false" title="Toggle transform orientation">
+                    <img src="./shared/assets/Keyboard/T_Keys-Standard-O.png" alt="" draggable="false" />
+                    <span>World Orientation</span>
+                </button>
+                <div id="gizmo-hotkeys" class="viewport-hotkey-stack viewport-hotkey-stack--gizmos viewport-hotkey-panel" aria-hidden="true" hidden>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-G.png" alt="" draggable="false" />
+                        <span>Move Gizmo</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-R.png" alt="" draggable="false" />
+                        <span>Rotate Gizmo</span>
+                    </div>
+                    <div class="viewport-hotkey-chip">
+                        <img src="./shared/assets/Keyboard/T_Keys-Standard-S.png" alt="" draggable="false" />
+                        <span>Scale Gizmo</span>
+                    </div>
+                </div>
                 <div id="viewport-notice" class="viewport-notice" aria-live="polite" hidden></div>
-                <aside id="controls-hud" class="controls-hud" role="button" tabindex="0" aria-label="Editor controls" aria-expanded="true" hidden></aside>
+                <aside id="controls-hud" class="controls-hud" role="button" tabindex="0" aria-label="Camera controls" aria-expanded="true" hidden></aside>
             </section>
     </section>
 

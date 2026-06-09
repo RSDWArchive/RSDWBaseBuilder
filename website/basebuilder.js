@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { ViewHelper } from "three/addons/helpers/ViewHelper.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 
@@ -39,11 +40,33 @@ import {
   const IMPORT_RENDER_BATCH_SIZE = 100;
   const PLACED_LIST_LIMIT = 500;
   const FAVORITES_STORAGE_KEY = "RSDWBaseBuilder.favoriteTargetIds.v1";
+  const ASSET_VIEW_STORAGE_KEY = "RSDWBaseBuilder.assetViewMode.v1";
   const SCALE_OVERRIDE_STORAGE_KEY = "RSDWBaseBuilder.scaleRestrictionOverride.v1";
   const AUTOSAVE_STORAGE_KEY = "RSDWBaseBuilder.autosave.v1";
   const AUTOSAVE_DEBOUNCE_MS = 350;
-  const FOLDER_ALL = "__all__";
+  const CAMERA_FOV_DEGREES = 45;
+  const CAMERA_DEFAULT_DISTANCE = 12;
+  const ORTHOGRAPHIC_PADDING = 1.25;
+  const VIEW_HELPER_SIZE = 128;
+  const VIEW_HELPER_TOP = 86;
+  const VIEW_HELPER_RIGHT = 14;
+  const VIEW_HELPER_DRAG_THRESHOLD_PX = 4;
+  const WORLD_UP = new THREE.Vector3(0, 1, 0);
   const ITEM_ACTOR_CLASS = "BlueprintGeneratedClass /Game/Gameplay/WorldItems/BP_RuntimeSpawnedWorldItem.BP_RuntimeSpawnedWorldItem_C";
+  const VIEW_SNAP_SHORTCUTS = {
+    Numpad1: {
+      front: { label: "Front View", direction: new THREE.Vector3(0, 0, -1), up: WORLD_UP },
+      back: { label: "Back View", direction: new THREE.Vector3(0, 0, 1), up: WORLD_UP },
+    },
+    Numpad3: {
+      front: { label: "Right View", direction: new THREE.Vector3(1, 0, 0), up: WORLD_UP },
+      back: { label: "Left View", direction: new THREE.Vector3(-1, 0, 0), up: WORLD_UP },
+    },
+    Numpad7: {
+      front: { label: "Top View", direction: new THREE.Vector3(0, 1, 0), up: WORLD_UP },
+      back: { label: "Bottom View", direction: new THREE.Vector3(0, -1, 0), up: WORLD_UP },
+    },
+  };
   const SMART_NUDGE_DIRECTIONS = [
     { id: "left", icon: "4", label: "Left", codes: ["Numpad4", "ArrowLeft"], right: -1, forward: 0, vertical: 0 },
     { id: "right", icon: "6", label: "Right", codes: ["Numpad6", "ArrowRight"], right: 1, forward: 0, vertical: 0 },
@@ -64,7 +87,9 @@ import {
   const els = {
     assetStatus: document.getElementById("asset-status"),
     assetSearch: document.getElementById("asset-search"),
-    assetFolder: document.getElementById("asset-folder"),
+    assetViewToggle: document.getElementById("asset-view-toggle"),
+    assetCategoryPrimary: document.getElementById("asset-category-primary"),
+    assetCategoryChildren: document.getElementById("asset-category-children"),
     assetList: document.getElementById("asset-list"),
     favoriteStrip: document.getElementById("favorite-strip"),
     kindButtons: Array.from(document.querySelectorAll("[data-kind]")),
@@ -73,13 +98,14 @@ import {
     orientationToggle: document.getElementById("orientation-toggle"),
     viewportNotice: document.getElementById("viewport-notice"),
     controlsHud: document.getElementById("controls-hud"),
+    selectionHotkeys: document.getElementById("selection-hotkeys"),
+    previewHotkeys: document.getElementById("preview-hotkeys"),
+    previewPlaceLabel: document.getElementById("preview-place-label"),
+    gizmoHotkeys: document.getElementById("gizmo-hotkeys"),
     importJson: document.getElementById("import-json"),
     exportJson: document.getElementById("export-json"),
     clearBuild: document.getElementById("clear-build"),
     fileInput: document.getElementById("file-input"),
-    duplicateObject: document.getElementById("duplicate-object"),
-    deleteObject: document.getElementById("delete-object"),
-    snapObject: document.getElementById("snap-object"),
     setAnchor: document.getElementById("set-anchor"),
     clearAnchor: document.getElementById("clear-anchor"),
     buildCount: document.getElementById("build-count"),
@@ -102,7 +128,8 @@ import {
   };
   let index = null;
   let activeKind = "building_piece";
-  let activeFolder = FOLDER_ALL;
+  let activeCategoryPath = "";
+  let assetViewMode = "list";
   let selectedTargetId = "";
   let selectedPlacedIds = new Set();
   let activePlacementId = "";
@@ -119,10 +146,16 @@ import {
   let camera = null;
   let controls = null;
   let transformControls = null;
+  let viewHelper = null;
+  let viewHelperHitZone = null;
+  let viewHelperDrag = null;
+  let viewHelperClock = new THREE.Clock();
   let rootGroup = null;
   let loader = null;
   let raycaster = null;
   let pointer = null;
+  let cameraProjectionMode = "perspective";
+  let orthographicViewSize = CAMERA_DEFAULT_DISTANCE;
   let targetLookup = null;
   let dragCandidate = null;
   let dragSession = null;
@@ -236,17 +269,16 @@ import {
 
   function renderControlsHud() {
     if (!els.controlsHud) return;
-    const isPreviewHud = Boolean(dragSession);
+    syncSelectionHotkeys();
     els.controlsHud.classList.toggle("is-collapsed", controlsHudCollapsed);
-    els.controlsHud.classList.toggle("is-preview", isPreviewHud);
     els.controlsHud.setAttribute("aria-expanded", String(!controlsHudCollapsed));
-    els.controlsHud.title = controlsHudCollapsed ? "Show hotkeys" : "Hide hotkeys";
+    els.controlsHud.title = controlsHudCollapsed ? "Show camera controls" : "Hide camera controls";
     if (controlsHudCollapsed) {
       els.controlsHud.replaceChildren(createHudCollapsedRow());
       els.controlsHud.hidden = false;
       return;
     }
-    const rows = isPreviewHud ? previewHudRows() : defaultHudRows();
+    const rows = defaultHudRows();
     els.controlsHud.replaceChildren(...rows.map(createHudRow));
     els.controlsHud.hidden = !rows.length;
   }
@@ -256,34 +288,27 @@ import {
     renderControlsHud();
   }
 
-  function defaultHudRows() {
-    return [
-      { icons: [hudIcon(mouseIcon("Middle"), "Middle Mouse")], label: "Orbit" },
-      { icons: [hudIcon(mouseIcon("Left"), "Left Mouse")], label: "Select / drag move" },
-      { icons: [hudIcon(specialKeyIcon("Shift"), "Shift"), hudIcon(mouseIcon("Left"), "Left Mouse")], label: "Multi-select" },
-      { icons: [hudIcon(keyIcon("G"), "G")], label: "Move gizmo" },
-      { icons: [hudIcon(keyIcon("R"), "R")], label: "Rotate gizmo" },
-      { icons: [hudIcon(keyIcon("S"), "S")], label: "Scale gizmo" },
-      { icons: [hudIcon(keyIcon("Q"), "Q")], label: "Snap selected" },
-      { icons: [hudIcon(keyIcon("O"), "O")], label: "Toggle orientation" },
-      { icons: [hudIcon(keyIcon("E"), "E")], label: "Duplicate preview" },
-      { icons: [hudIcon(specialKeyIcon("Shift"), "Shift"), hudIcon(keyIcon("D"), "D")], label: "Duplicate in place" },
-      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("Z"), "Z")], label: "Undo" },
-      { icons: [hudIcon(keyIcon("A"), "A")], label: "Select all" },
-      { icons: [hudIcon(keyIcon("X"), "X")], label: "Delete" },
-      { icons: [hudIcon(keyIcon("D"), "D"), hudIcon(keyIcon("8"), "Numpad")], label: "Numpad nudge" },
-    ];
+  function syncSelectionHotkeys() {
+    const previewActive = Boolean(dragSession);
+    const selectionHidden = !selectedPlacedIds.size || previewActive;
+    if (els.selectionHotkeys) els.selectionHotkeys.hidden = selectionHidden;
+    if (els.gizmoHotkeys) els.gizmoHotkeys.hidden = selectionHidden;
+    if (els.previewHotkeys) els.previewHotkeys.hidden = !previewActive;
+    if (els.previewPlaceLabel && previewActive) {
+      els.previewPlaceLabel.textContent = dragSession?.moveExisting ? "Release Move" : "Place Preview";
+    }
   }
 
-  function previewHudRows() {
-    const placeLabel = dragSession?.moveExisting ? "Release move" : "Place preview";
+  function defaultHudRows() {
     return [
-      { icons: [hudIcon(mouseIcon("Left"), "Left Mouse")], label: placeLabel },
-      { icons: [hudIcon(mouseIcon("Scroll"), "Mouse Wheel")], label: "Rotate preview" },
-      { icons: [hudIcon(keyIcon("R"), "R")], label: "Rotation step" },
-      { icons: [hudIcon(keyIcon("F"), "F")], label: "Flip 180" },
-      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(mouseIcon("Scroll"), "Mouse Wheel")], label: "Height offset" },
-      { icons: [hudIcon(specialKeyIcon("Esc"), "Esc")], label: "Cancel preview" },
+      { icons: [hudIcon(keyIcon("1"), "Numpad 1")], label: "Front view" },
+      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("1"), "Numpad 1")], label: "Back view" },
+      { icons: [hudIcon(keyIcon("3"), "Numpad 3")], label: "Right view" },
+      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("3"), "Numpad 3")], label: "Left view" },
+      { icons: [hudIcon(keyIcon("7"), "Numpad 7")], label: "Top view" },
+      { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("7"), "Numpad 7")], label: "Bottom view" },
+      { icons: [hudIcon(keyIcon("5"), "Numpad 5")], label: "Ortho / perspective" },
+      { icons: [hudIcon(keyIcon("9"), "Numpad 9")], label: "Opposite view" },
     ];
   }
 
@@ -316,7 +341,7 @@ import {
   function createHudCollapsedRow() {
     const item = document.createElement("div");
     item.className = "hud-collapsed-row";
-    item.textContent = "Hotkeys";
+    item.textContent = "Camera Controls";
     return item;
   }
 
@@ -341,9 +366,25 @@ import {
     els.stage.appendChild(orientationNudgeOverlay);
   }
 
-  function showViewportNotice(message) {
+  function showViewportNotice(message, { actionLabel = "", onAction = null, duration = 2000 } = {}) {
     if (!els.viewportNotice) return;
-    els.viewportNotice.textContent = message;
+    els.viewportNotice.replaceChildren();
+    const text = document.createElement("span");
+    text.textContent = message;
+    els.viewportNotice.appendChild(text);
+    if (actionLabel && typeof onAction === "function") {
+      const action = document.createElement("button");
+      action.type = "button";
+      action.className = "viewport-notice-action";
+      action.textContent = actionLabel;
+      action.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onAction();
+      });
+      els.viewportNotice.appendChild(action);
+    }
+    els.viewportNotice.classList.toggle("has-action", Boolean(actionLabel && typeof onAction === "function"));
     els.viewportNotice.hidden = false;
     els.viewportNotice.classList.remove("is-visible");
     void els.viewportNotice.offsetWidth;
@@ -354,13 +395,18 @@ import {
       viewportNoticeTimer = window.setTimeout(() => {
         els.viewportNotice.hidden = true;
       }, 180);
-    }, 2000);
+    }, duration);
   }
 
   function syncOrientationUi() {
     if (!els.orientationToggle) return;
     const isLocal = orientationMode === "local";
-    els.orientationToggle.textContent = isLocal ? "Local Orientation" : "World Orientation";
+    const label = els.orientationToggle.querySelector("span");
+    if (label) {
+      label.textContent = isLocal ? "Local Orientation" : "World Orientation";
+    } else {
+      els.orientationToggle.textContent = isLocal ? "Local Orientation" : "World Orientation";
+    }
     els.orientationToggle.setAttribute("aria-pressed", String(isLocal));
     els.orientationToggle.title = isLocal
       ? "Using active object's local orientation"
@@ -402,19 +448,110 @@ import {
     return "Assets";
   }
 
-  function assetFolderName(target) {
+  function catalogPathParts(value) {
+    return String(value || "").split("/").map((part) => part.trim()).filter(Boolean);
+  }
+
+  function categoryPathParts(value) {
+    return catalogPathParts(value);
+  }
+
+  function categoryTreeForKind(kind = activeKind) {
+    const tree = index?.category_tree?.[kind];
+    if (tree && Array.isArray(tree.nodes)) return tree;
+    return buildFallbackCategoryTree(kind);
+  }
+
+  function buildFallbackCategoryTree(kind) {
+    const kindTargets = (index?.targets || []).filter((target) => target.asset_kind === kind);
+    const firstSegments = new Set();
+    for (const target of kindTargets) {
+      const first = catalogPathParts(target.catalog_path)[0];
+      if (first) firstSegments.add(first);
+    }
+    const rootLabel = firstSegments.size === 1 ? Array.from(firstSegments)[0] : "";
+    const root = new Map();
+    for (const target of kindTargets) {
+      let map = root;
+      const parts = targetCategorySegments(target, rootLabel);
+      const pathParts = [];
+      for (const part of parts) {
+        pathParts.push(part);
+        if (!map.has(part)) {
+          map.set(part, { label: part, path: pathParts.join("/"), count: 0, children: new Map() });
+        }
+        const node = map.get(part);
+        node.count += 1;
+        map = node.children;
+      }
+    }
+    const toRows = (map) => {
+      const nodes = Array.from(map.values());
+      const isTierRow = nodes.length > 0 && nodes.every((node) => /^tier\s+\d+\b/i.test(node.label));
+      nodes.sort((a, b) => {
+        if (isTierRow) return a.label.localeCompare(b.label, undefined, { numeric: true });
+        return b.count - a.count || a.label.localeCompare(b.label, undefined, { numeric: true });
+      });
+      return nodes.map((node) => ({
+        label: node.label,
+        path: node.path,
+        count: node.count,
+        children: toRows(node.children),
+      }));
+    };
+    return { root_label: rootLabel, nodes: toRows(root) };
+  }
+
+  function targetCategorySegments(target, rootOverride = null) {
     const parts = String(target.catalog_path || "").split("/").map((part) => part.trim()).filter(Boolean);
-    if (target.asset_kind === "building_piece" && parts[0] === "Building Pieces") return parts[1] || "Misc";
-    if (target.asset_kind === "item" && parts[0] === "Items") return parts[1] || "Items";
-    if (target.asset_kind === "bp" && parts[0] === "BP") return parts[1] || "BP";
-    return parts[0] || "Unsorted";
+    const rootLabel = rootOverride === null ? (categoryTreeForKind(target.asset_kind).root_label || "") : rootOverride;
+    if (rootLabel && parts[0] === rootLabel) parts.shift();
+    return parts.length ? parts : ["Unsorted"];
+  }
+
+  function targetTopCategoryName(target) {
+    return targetCategorySegments(target)[0] || "Unsorted";
+  }
+
+  function findCategoryNode(nodes, path) {
+    const parts = categoryPathParts(path);
+    let currentNodes = nodes || [];
+    let node = null;
+    for (const part of parts) {
+      node = currentNodes.find((candidate) => candidate.label === part);
+      if (!node) return null;
+      currentNodes = node.children || [];
+    }
+    return node;
+  }
+
+  function normalizeActiveCategory() {
+    const nodes = categoryTreeForKind().nodes || [];
+    if (!nodes.length) {
+      activeCategoryPath = "";
+      return;
+    }
+    if (!activeCategoryPath || !findCategoryNode(nodes, activeCategoryPath)) {
+      activeCategoryPath = nodes[0].path || nodes[0].label || "";
+    }
+  }
+
+  function targetMatchesActiveCategory(target) {
+    if (!activeCategoryPath) return true;
+    const activeParts = categoryPathParts(activeCategoryPath);
+    const targetParts = targetCategorySegments(target);
+    return activeParts.every((part, index) => targetParts[index] === part);
+  }
+
+  function activeCategoryLabel() {
+    return categoryPathParts(activeCategoryPath).join(" / ");
   }
 
   function canScaleTarget(target) {
     if (!target) return false;
     if (scaleRestrictionOverride) return true;
     if (target.asset_kind !== "building_piece") return true;
-    return assetFolderName(target) === "Crafting Stations";
+    return targetTopCategoryName(target) === "Crafting Stations";
   }
 
   function canScalePlacement(placement) {
@@ -438,17 +575,15 @@ import {
     }
     renderInspector();
     activateGizmo("scale");
+    showViewportNotice("Scale override enabled");
   }
 
   function renderScaleOverrideMessage() {
-    els.selectionMeta.textContent = "";
-    els.selectionMeta.append("Only Crafting Station pieces, items, and BP actors can be scaled. ");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "inline-action";
-    button.textContent = "Click here to override.";
-    button.addEventListener("click", enableScaleOverride);
-    els.selectionMeta.appendChild(button);
+    showViewportNotice("Only Crafting Station pieces, items, and BP actors can be scaled.", {
+      actionLabel: "Click here to override.",
+      duration: 5000,
+      onAction: enableScaleOverride,
+    });
   }
 
   function shortenClass(className) {
@@ -499,9 +634,220 @@ import {
     targetLookup = { byId, byPieceClass, byPieceDataName, byItemName, byBpClass };
   }
 
+  function stageAspect() {
+    const width = Math.max(1, els.stage?.clientWidth || 1);
+    const height = Math.max(1, els.stage?.clientHeight || 1);
+    return width / height;
+  }
+
+  function createViewportCamera(mode = cameraProjectionMode) {
+    const aspect = stageAspect();
+    if (mode === "orthographic") {
+      const halfHeight = orthographicViewSize / 2;
+      const cameraObject = new THREE.OrthographicCamera(
+        -halfHeight * aspect,
+        halfHeight * aspect,
+        halfHeight,
+        -halfHeight,
+        0.01,
+        1500,
+      );
+      cameraObject.zoom = 1;
+      return cameraObject;
+    }
+    return new THREE.PerspectiveCamera(CAMERA_FOV_DEGREES, aspect, 0.01, 1500);
+  }
+
+  function updateCameraProjection() {
+    if (!camera) return;
+    const aspect = stageAspect();
+    if (camera.isOrthographicCamera) {
+      const halfHeight = orthographicViewSize / 2;
+      camera.left = -halfHeight * aspect;
+      camera.right = halfHeight * aspect;
+      camera.top = halfHeight;
+      camera.bottom = -halfHeight;
+    } else if (camera.isPerspectiveCamera) {
+      camera.aspect = aspect;
+    }
+    camera.updateProjectionMatrix();
+  }
+
+  function matchingOrthographicSize() {
+    if (!camera || !controls) return orthographicViewSize || CAMERA_DEFAULT_DISTANCE;
+    if (camera.isOrthographicCamera) return orthographicViewSize / Math.max(camera.zoom || 1, 0.001);
+    const distance = Math.max(camera.position.distanceTo(controls.target), 1);
+    return 2 * distance * Math.tan(THREE.MathUtils.degToRad((camera.fov || CAMERA_FOV_DEGREES) / 2));
+  }
+
+  function switchCameraProjection(mode, { notify = true } = {}) {
+    const nextMode = mode === "orthographic" ? "orthographic" : "perspective";
+    if (cameraProjectionMode === nextMode && camera) return;
+    stopViewHelperAnimation();
+    const previousCamera = camera;
+    if (nextMode === "orthographic") {
+      orthographicViewSize = Math.max(matchingOrthographicSize(), 1);
+    }
+    const nextCamera = createViewportCamera(nextMode);
+    if (previousCamera) {
+      nextCamera.position.copy(previousCamera.position);
+      nextCamera.quaternion.copy(previousCamera.quaternion);
+      nextCamera.up.copy(previousCamera.up);
+      nextCamera.near = previousCamera.near;
+      nextCamera.far = previousCamera.far;
+    }
+    camera = nextCamera;
+    cameraProjectionMode = nextMode;
+    updateCameraProjection();
+    if (controls) {
+      controls.object = camera;
+      controls.update();
+    }
+    if (transformControls) {
+      transformControls.camera = camera;
+      transformControls.updateMatrixWorld?.(true);
+    }
+    refreshViewHelper();
+    if (notify) {
+      showViewportNotice(nextMode === "orthographic" ? "Orthographic View" : "Perspective View");
+    }
+  }
+
+  function toggleCameraProjection() {
+    switchCameraProjection(cameraProjectionMode === "orthographic" ? "perspective" : "orthographic");
+  }
+
+  function createViewHelperHitZone() {
+    if (viewHelperHitZone) return;
+    viewHelperHitZone = document.createElement("div");
+    viewHelperHitZone.className = "view-helper-hit-zone";
+    viewHelperHitZone.setAttribute("role", "application");
+    viewHelperHitZone.tabIndex = 0;
+    viewHelperHitZone.title = "View gizmo: drag to orbit, click an axis to snap";
+    viewHelperHitZone.setAttribute("aria-label", "View gizmo. Drag to orbit. Click an axis to snap the view.");
+    viewHelperHitZone.addEventListener("pointerdown", onViewHelperPointerDown);
+    applyViewHelperHitZoneStyle(false);
+    els.stage.appendChild(viewHelperHitZone);
+  }
+
+  function refreshViewHelper() {
+    if (!renderer || !camera) return;
+    if (viewHelper) viewHelper.dispose();
+    viewHelper = new ViewHelper(camera, renderer.domElement);
+    viewHelper.location.top = VIEW_HELPER_TOP;
+    viewHelper.location.right = VIEW_HELPER_RIGHT;
+    viewHelper.location.bottom = null;
+    viewHelper.location.left = null;
+    viewHelper.setLabels("X", "Y", "Z");
+    viewHelper.setLabelStyle("700 20px Sofia Sans, Arial, sans-serif", "#14120f", 15);
+    if (viewHelperHitZone) {
+      viewHelperHitZone.style.setProperty("--view-helper-size", `${VIEW_HELPER_SIZE}px`);
+      viewHelperHitZone.style.setProperty("--view-helper-top", `${VIEW_HELPER_TOP}px`);
+      viewHelperHitZone.style.setProperty("--view-helper-right", `${VIEW_HELPER_RIGHT}px`);
+      viewHelperHitZone.style.position = "absolute";
+      viewHelperHitZone.style.top = `${VIEW_HELPER_TOP}px`;
+      viewHelperHitZone.style.right = `${VIEW_HELPER_RIGHT}px`;
+      viewHelperHitZone.style.width = `${VIEW_HELPER_SIZE}px`;
+      viewHelperHitZone.style.height = `${VIEW_HELPER_SIZE}px`;
+      applyViewHelperHitZoneStyle(viewHelperHitZone.classList.contains("is-dragging"));
+    }
+    viewHelperClock.getDelta();
+  }
+
+  function applyViewHelperHitZoneStyle(isDragging) {
+    if (!viewHelperHitZone) return;
+    viewHelperHitZone.style.zIndex = "4";
+    viewHelperHitZone.style.border = `1px solid ${isDragging ? "rgba(243, 207, 137, 0.58)" : "rgba(243, 207, 137, 0.2)"}`;
+    viewHelperHitZone.style.borderRadius = "50%";
+    viewHelperHitZone.style.background = "radial-gradient(circle at 50% 50%, rgba(8, 8, 11, 0.08), rgba(8, 8, 11, 0.28) 68%, rgba(8, 8, 11, 0.44))";
+    viewHelperHitZone.style.boxShadow = "inset 0 0 0 1px rgba(245, 239, 224, 0.05), 0 12px 28px rgba(0, 0, 0, 0.26)";
+    viewHelperHitZone.style.cursor = isDragging ? "grabbing" : "grab";
+    viewHelperHitZone.style.pointerEvents = "auto";
+    viewHelperHitZone.style.touchAction = "none";
+    viewHelperHitZone.style.userSelect = "none";
+  }
+
+  function renderViewHelper() {
+    if (!viewHelper || !renderer || !controls) return;
+    viewHelper.center.copy(controls.target);
+    viewHelper.render(renderer);
+  }
+
+  function stopViewHelperAnimation() {
+    if (viewHelper) viewHelper.animating = false;
+  }
+
+  function onViewHelperPointerDown(event) {
+    if (event.button !== 0 || !viewHelper || !controls) return;
+    event.preventDefault();
+    event.stopPropagation();
+    stopViewHelperAnimation();
+    viewHelperDrag = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      dragged: false,
+    };
+    viewHelperHitZone.classList.add("is-dragging");
+    applyViewHelperHitZoneStyle(true);
+    viewHelperHitZone.setPointerCapture?.(event.pointerId);
+    viewHelperHitZone.addEventListener("pointermove", onViewHelperPointerMove);
+    viewHelperHitZone.addEventListener("pointerup", onViewHelperPointerUp);
+    viewHelperHitZone.addEventListener("pointercancel", onViewHelperPointerUp);
+    window.addEventListener("pointerup", onViewHelperPointerUp);
+    window.addEventListener("pointercancel", onViewHelperPointerUp);
+    window.addEventListener("mouseup", onViewHelperMouseUpFallback);
+  }
+
+  function onViewHelperPointerMove(event) {
+    if (!viewHelperDrag || event.pointerId !== viewHelperDrag.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const totalDistance = Math.hypot(event.clientX - viewHelperDrag.startX, event.clientY - viewHelperDrag.startY);
+    if (totalDistance >= VIEW_HELPER_DRAG_THRESHOLD_PX) viewHelperDrag.dragged = true;
+    if (!viewHelperDrag.dragged) return;
+    const dx = event.clientX - viewHelperDrag.lastX;
+    const dy = event.clientY - viewHelperDrag.lastY;
+    viewHelperDrag.lastX = event.clientX;
+    viewHelperDrag.lastY = event.clientY;
+    const rotateScale = 2 * Math.PI / Math.max(1, renderer.domElement.clientHeight || VIEW_HELPER_SIZE);
+    controls.rotateLeft(dx * rotateScale);
+    controls.rotateUp(dy * rotateScale);
+    controls.update();
+  }
+
+  function onViewHelperPointerUp(event) {
+    const pointerId = event.pointerId ?? viewHelperDrag?.pointerId;
+    if (!viewHelperDrag || pointerId !== viewHelperDrag.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const wasDrag = viewHelperDrag.dragged;
+    viewHelperHitZone.releasePointerCapture?.(pointerId);
+    viewHelperHitZone.classList.remove("is-dragging");
+    applyViewHelperHitZoneStyle(false);
+    viewHelperHitZone.removeEventListener("pointermove", onViewHelperPointerMove);
+    viewHelperHitZone.removeEventListener("pointerup", onViewHelperPointerUp);
+    viewHelperHitZone.removeEventListener("pointercancel", onViewHelperPointerUp);
+    window.removeEventListener("pointerup", onViewHelperPointerUp);
+    window.removeEventListener("pointercancel", onViewHelperPointerUp);
+    window.removeEventListener("mouseup", onViewHelperMouseUpFallback);
+    viewHelperDrag = null;
+    if (!wasDrag && viewHelper) {
+      viewHelper.center.copy(controls.target);
+      viewHelper.handleClick(event);
+    }
+  }
+
+  function onViewHelperMouseUpFallback(event) {
+    if (!viewHelperDrag) return;
+    onViewHelperPointerUp(event);
+  }
+
   function initThree() {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1500);
+    camera = createViewportCamera("perspective");
     camera.position.set(6, 7, 8);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
@@ -509,6 +855,7 @@ import {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
+    renderer.autoClear = false;
     els.stage.appendChild(renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -524,6 +871,8 @@ import {
       MIDDLE: THREE.MOUSE.ROTATE,
       RIGHT: THREE.MOUSE.PAN,
     };
+    createViewHelperHitZone();
+    refreshViewHelper();
 
     transformControls = new TransformControls(camera, renderer.domElement);
     transformControls.setSpace(orientationMode);
@@ -591,16 +940,22 @@ import {
     const width = Math.max(1, els.stage.clientWidth);
     const height = Math.max(1, els.stage.clientHeight);
     renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+    updateCameraProjection();
   }
 
   function animate() {
     requestAnimationFrame(animate);
+    const delta = viewHelperClock.getDelta();
+    if (viewHelper?.animating) {
+      viewHelper.center.copy(controls.target);
+      viewHelper.update(delta);
+    }
     controls.update();
     updateSelectionBoxes();
     updateOrientationNudgeOverlay();
+    renderer.clear();
     renderer.render(scene, camera);
+    renderViewHelper();
   }
 
   async function loadGltf(gltfPath) {
@@ -691,9 +1046,10 @@ import {
   }
 
   function renderAssets() {
+    normalizeActiveCategory();
     const query = els.assetSearch.value.trim().toLowerCase();
     const kindTargets = index.targets.filter((target) => target.asset_kind === activeKind);
-    const scopedTargets = kindTargets.filter((target) => activeFolder === FOLDER_ALL || assetFolderName(target) === activeFolder);
+    const scopedTargets = kindTargets.filter(targetMatchesActiveCategory);
     const scored = scopedTargets
       .map((target) => ({ target, score: targetSearchScore(target, query) }))
       .filter((row) => row.score > 0)
@@ -704,8 +1060,11 @@ import {
       els.assetList.appendChild(createAssetRow(row.target));
     }
     renderFavorites();
-    const folderSuffix = activeFolder === FOLDER_ALL ? "" : ` in ${activeFolder}`;
-    els.assetStatus.textContent = `${scored.length.toLocaleString()} shown from ${kindTargets.length.toLocaleString()} ${kindPluralLabel(activeKind)}${folderSuffix}`;
+    const categorySuffix = activeCategoryPath ? ` in ${activeCategoryLabel()}` : "";
+    const visibleText = visible.length < scored.length
+      ? `Showing ${visible.length.toLocaleString()} of ${scored.length.toLocaleString()}`
+      : `Showing ${scored.length.toLocaleString()}`;
+    els.assetStatus.textContent = `${visibleText} from ${kindTargets.length.toLocaleString()} ${kindPluralLabel(activeKind)}${categorySuffix}`;
   }
 
   function createAssetRow(target) {
@@ -771,25 +1130,97 @@ import {
     }
   }
 
-  function renderFolderOptions() {
-    const current = activeFolder;
-    const folders = Array.from(new Set(index.targets
-      .filter((target) => target.asset_kind === activeKind)
-      .map(assetFolderName)))
-      .sort((a, b) => a.localeCompare(b));
-    activeFolder = current !== FOLDER_ALL && folders.includes(current) ? current : FOLDER_ALL;
-    els.assetFolder.textContent = "";
-    const allOption = document.createElement("option");
-    allOption.value = FOLDER_ALL;
-    allOption.textContent = `All ${kindPluralLabel(activeKind)}`;
-    els.assetFolder.appendChild(allOption);
-    for (const folder of folders) {
-      const option = document.createElement("option");
-      option.value = folder;
-      option.textContent = folder;
-      els.assetFolder.appendChild(option);
+  function loadAssetViewMode() {
+    try {
+      assetViewMode = window.localStorage.getItem(ASSET_VIEW_STORAGE_KEY) === "grid" ? "grid" : "list";
+    } catch {
+      assetViewMode = "list";
     }
-    els.assetFolder.value = activeFolder;
+    syncAssetViewMode();
+  }
+
+  function saveAssetViewMode() {
+    try {
+      window.localStorage.setItem(ASSET_VIEW_STORAGE_KEY, assetViewMode);
+    } catch {
+      // The toggle still works for the current page lifetime.
+    }
+  }
+
+  function syncAssetViewMode() {
+    const isGrid = assetViewMode === "grid";
+    els.assetList?.classList.toggle("is-grid", isGrid);
+    if (!els.assetViewToggle) return;
+    els.assetViewToggle.textContent = isGrid ? "List" : "Grid";
+    els.assetViewToggle.setAttribute("aria-pressed", String(isGrid));
+    els.assetViewToggle.title = isGrid ? "Switch to list view" : "Switch to grid view";
+  }
+
+  function toggleAssetViewMode() {
+    assetViewMode = assetViewMode === "grid" ? "list" : "grid";
+    saveAssetViewMode();
+    syncAssetViewMode();
+    showViewportNotice(assetViewMode === "grid" ? "Grid View" : "List View");
+  }
+
+  function createCategoryButton(node, isActive, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `category-button${isActive ? " is-active" : ""}`;
+    button.setAttribute("aria-pressed", String(isActive));
+    button.title = `${node.label} (${Number(node.count || 0).toLocaleString()})`;
+    button.setAttribute("aria-label", `${node.label}, ${Number(node.count || 0).toLocaleString()} assets`);
+
+    const label = document.createElement("span");
+    label.className = "category-button-label";
+    label.textContent = node.label;
+    const count = document.createElement("span");
+    count.className = "category-button-count";
+    count.textContent = Number(node.count || 0).toLocaleString();
+    button.append(label, count);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick();
+    });
+    return button;
+  }
+
+  function renderCategoryButtons() {
+    if (!els.assetCategoryPrimary || !els.assetCategoryChildren) return;
+    normalizeActiveCategory();
+    const tree = categoryTreeForKind();
+    const nodes = tree.nodes || [];
+    const activeParts = categoryPathParts(activeCategoryPath);
+
+    els.assetCategoryPrimary.textContent = "";
+    for (const node of nodes) {
+      const isActive = activeParts[0] === node.label;
+      els.assetCategoryPrimary.appendChild(createCategoryButton(node, isActive, () => {
+        activeCategoryPath = node.path || node.label || "";
+        renderCategoryButtons();
+        renderAssets();
+      }));
+    }
+
+    els.assetCategoryChildren.textContent = "";
+    let currentNodes = nodes;
+    for (let depth = 0; depth < activeParts.length; depth += 1) {
+      const selected = currentNodes.find((node) => node.label === activeParts[depth]);
+      if (!selected || !selected.children?.length) break;
+      const selectedChild = activeParts[depth + 1] || "";
+      const row = document.createElement("div");
+      row.className = "category-button-row category-button-row--child";
+      for (const child of selected.children) {
+        row.appendChild(createCategoryButton(child, selectedChild === child.label, () => {
+          activeCategoryPath = child.path || child.label || "";
+          renderCategoryButtons();
+          renderAssets();
+        }));
+      }
+      els.assetCategoryChildren.appendChild(row);
+      currentNodes = selected.children;
+    }
   }
 
   function renderAssetThumb(thumb, target) {
@@ -1479,6 +1910,7 @@ import {
     }
     if (!selectedPlacedIds.size) activeGizmoMode = "";
     syncSelectionAttachment();
+    syncSelectionHotkeys();
     if (options.render !== false) {
       renderInspector();
       renderPlacedList();
@@ -1888,12 +2320,7 @@ import {
   function renderInspector() {
     const selected = selectedPlacements();
     const placement = selectedPlacement();
-    const hasSelection = selected.length > 0;
     const hasSingleSelection = selected.length === 1;
-    const hasSnapSelection = selected.some((row) => row.target.asset_kind === "building_piece");
-    els.duplicateObject.disabled = !hasSelection;
-    els.deleteObject.disabled = !hasSelection;
-    els.snapObject.disabled = !hasSnapSelection;
     els.setAnchor.disabled = !hasSingleSelection || placement.target.asset_kind !== "building_piece";
     els.clearAnchor.disabled = !anchorPieceId;
     for (const input of els.transformInputs) {
@@ -2233,7 +2660,7 @@ import {
     restoringSnapshot = true;
     try {
       await restoreBuildSnapshot(snapshot);
-      focusCameraOnBuild();
+      focusCameraOnBuild({ notify: false });
       els.assetStatus.textContent = "Autosaved build restored";
       return true;
     } catch (error) {
@@ -2370,6 +2797,35 @@ import {
     return SMART_NUDGE_BY_CODE.get(event.code) || null;
   }
 
+  function handleViewportViewShortcut(event) {
+    if (duplicateNudgeModifierActive || event.altKey || event.shiftKey) return false;
+    const hasCtrl = event.ctrlKey || event.metaKey;
+    const snapShortcut = VIEW_SNAP_SHORTCUTS[event.code];
+    if (snapShortcut) {
+      snapCameraToView(hasCtrl ? snapShortcut.back : snapShortcut.front);
+      return true;
+    }
+    if (hasCtrl) return false;
+    if (event.code === "Numpad5") {
+      toggleCameraProjection();
+      return true;
+    }
+    if (event.code === "Numpad9") {
+      snapCameraToOppositeView();
+      return true;
+    }
+    if (event.code === "NumpadDecimal" || event.code === "NumpadPeriod") {
+      if (!focusCameraOnSelected()) showViewportNotice("No selection to frame");
+      return true;
+    }
+    if (event.code === "Home") {
+      if (placements.size) focusCameraOnBuild();
+      else showViewportNotice("No objects to frame");
+      return true;
+    }
+    return false;
+  }
+
   function deleteSelected() {
     const selected = selectedPlacements();
     if (!selected.length) return;
@@ -2398,6 +2854,7 @@ import {
     if (resetOffset) viewOffset = { x: 0, y: 0, z: 0 };
     transformControls.detach();
     syncSelectionBoxes();
+    syncSelectionHotkeys();
     if (!render) return;
     if (index) renderAssets();
     renderInspector();
@@ -2619,7 +3076,7 @@ import {
       renderInspector();
       renderPlacedList();
       updateCounters();
-      focusCameraOnBuild();
+      focusCameraOnBuild({ notify: false });
       const skippedText = skipped ? `, skipped ${skipped.toLocaleString()} missing targets` : "";
       els.assetStatus.textContent = `Imported ${entries.length.toLocaleString()} objects${skippedText}`;
     } catch (error) {
@@ -2752,22 +3209,68 @@ import {
     return String(value || "building").replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "") || "building";
   }
 
-  function focusCameraOnBuild() {
+  function snapCameraToView(view) {
+    if (!camera || !controls || !view) return;
+    stopViewHelperAnimation();
+    const target = controls.target.clone();
+    const distance = Math.max(camera.position.distanceTo(target), CAMERA_DEFAULT_DISTANCE);
+    camera.position.copy(target).add(view.direction.clone().normalize().multiplyScalar(distance));
+    camera.up.copy(view.up).normalize();
+    camera.lookAt(target);
+    controls.update();
+    showViewportNotice(view.label);
+  }
+
+  function snapCameraToOppositeView() {
+    if (!camera || !controls) return;
+    stopViewHelperAnimation();
+    const target = controls.target.clone();
+    const offset = camera.position.clone().sub(target);
+    if (offset.lengthSq() < 0.0001) offset.set(1, 1, 1).normalize().multiplyScalar(CAMERA_DEFAULT_DISTANCE);
+    camera.position.copy(target).sub(offset);
+    camera.lookAt(target);
+    controls.update();
+    showViewportNotice("Opposite View");
+  }
+
+  function focusCameraOnBox(box, { selectedOnly = false, notify = true } = {}) {
+    if (!camera || !controls || !box || box.isEmpty()) return false;
+    stopViewHelperAnimation();
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxSize = Math.max(size.x, size.y, size.z, selectedOnly ? 1 : 3);
+    const offset = camera.position.clone().sub(controls.target);
+    if (offset.lengthSq() < 0.0001) offset.set(0.85, 0.7, 0.85).normalize();
+    const distance = Math.max(maxSize * 1.45, CAMERA_DEFAULT_DISTANCE / 2);
+    controls.target.copy(center);
+    camera.position.copy(center).add(offset.normalize().multiplyScalar(distance));
+    camera.near = Math.max(0.01, maxSize / 1000);
+    camera.far = Math.max(1500, maxSize * 20);
+    if (camera.isOrthographicCamera) {
+      orthographicViewSize = Math.max(maxSize * ORTHOGRAPHIC_PADDING, 1);
+      camera.zoom = 1;
+    }
+    updateCameraProjection();
+    controls.update();
+    if (notify) showViewportNotice(selectedOnly ? "Frame Selected" : "Frame All");
+    return true;
+  }
+
+  function focusCameraOnSelected({ notify = true } = {}) {
+    const selected = selectedPlacements();
+    if (!selected.length) return false;
+    const box = new THREE.Box3();
+    for (const placement of selected) box.expandByObject(placement.group);
+    return focusCameraOnBox(box, { selectedOnly: true, notify });
+  }
+
+  function focusCameraOnBuild({ notify = true } = {}) {
     if (!placements.size) return;
     const box = new THREE.Box3();
     for (const placement of placements.values()) {
       box.expandByObject(placement.group);
     }
-    if (box.isEmpty()) return;
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxSize = Math.max(size.x, size.y, size.z, 3);
-    controls.target.copy(center);
-    camera.position.set(center.x + maxSize * 0.85, center.y + maxSize * 0.7, center.z + maxSize * 0.85);
-    camera.near = Math.max(0.01, maxSize / 1000);
-    camera.far = Math.max(1500, maxSize * 20);
-    camera.updateProjectionMatrix();
-    controls.update();
+    focusCameraOnBox(box, { notify });
   }
 
   function bindEvents() {
@@ -2784,6 +3287,11 @@ import {
       }
     });
     els.assetSearch.addEventListener("input", renderAssets);
+    els.assetViewToggle?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleAssetViewMode();
+    });
     document.addEventListener("dragstart", (event) => {
       if (event.target?.closest?.(".asset-row, .favorite-tile")) event.preventDefault();
     });
@@ -2803,16 +3311,12 @@ import {
       event.stopPropagation();
       toggleOrientationMode();
     });
-    els.assetFolder.addEventListener("change", () => {
-      activeFolder = els.assetFolder.value || FOLDER_ALL;
-      renderAssets();
-    });
     for (const button of els.kindButtons) {
       button.addEventListener("click", () => {
         activeKind = button.dataset.kind;
-        activeFolder = FOLDER_ALL;
+        activeCategoryPath = "";
         for (const other of els.kindButtons) other.classList.toggle("is-active", other === button);
-        renderFolderOptions();
+        renderCategoryButtons();
         renderAssets();
       });
     }
@@ -2824,9 +3328,6 @@ import {
     });
     els.exportJson.addEventListener("click", exportBuildingJson);
     els.clearBuild.addEventListener("click", () => clearBuild({ recordUndo: true }));
-    els.duplicateObject.addEventListener("click", duplicateSelected);
-    els.deleteObject.addEventListener("click", deleteSelected);
-    els.snapObject.addEventListener("click", snapSelected);
     els.setAnchor.addEventListener("click", setSelectedAnchor);
     els.clearAnchor.addEventListener("click", () => {
       pushUndoSnapshot();
@@ -2875,6 +3376,10 @@ import {
       if (duplicateNudgeModifierActive && smartNudgeDirection) {
         event.preventDefault();
         if (!event.repeat) smartDuplicateNudge(smartNudgeDirection.id);
+        return;
+      }
+      if (handleViewportViewShortcut(event)) {
+        event.preventDefault();
         return;
       }
       if ((event.ctrlKey || event.metaKey) && key === "z" && !event.shiftKey) {
@@ -2951,10 +3456,11 @@ import {
     buildLookups();
     loadScaleOverride();
     loadFavorites();
+    loadAssetViewMode();
     pruneFavorites();
     initThree();
     syncOrientationUi();
-    renderFolderOptions();
+    renderCategoryButtons();
     renderAssets();
     renderControlsHud();
     await restoreAutosavedBuild();
