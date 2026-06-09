@@ -59,6 +59,8 @@ import {
   const GROUND_GRID_MIN_DIVISIONS = 40;
   const GROUND_GRID_MAX_DIVISIONS = 240;
   const GROUND_GRID_Y = -0.001;
+  const INSTANCE_INITIAL_CAPACITY = 64;
+  const SELECTION_PROMOTION_LIMIT = 250;
   const VIEW_HELPER_SIZE = 128;
   const VIEW_HELPER_TOP = 86;
   const VIEW_HELPER_RIGHT = 14;
@@ -198,6 +200,10 @@ import {
   const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const gltfCache = new Map();
   const targetVisualTemplateCache = new Map();
+  const targetVisualResolvedCache = new Map();
+  const targetInstanceTemplateCache = new Map();
+  const instanceBatches = new Map();
+  const promotedPlacementIds = new Set();
   const placements = new Map();
   const selectionBoxes = new Map();
   const undoStack = [];
@@ -322,6 +328,7 @@ import {
 
   function defaultHudRows() {
     return [
+      { icons: [hudIcon(keyIcon("0"), "0")], label: "Frame View" },
       { icons: [hudIcon(keyIcon("1"), "Numpad 1")], label: "Front view" },
       { icons: [hudIcon(specialKeyIcon("Ctrl"), "Ctrl"), hudIcon(keyIcon("1"), "Numpad 1")], label: "Back view" },
       { icons: [hudIcon(keyIcon("3"), "Numpad 3")], label: "Right view" },
@@ -1151,6 +1158,10 @@ import {
     return cloned;
   }
 
+  function targetCacheKey(target) {
+    return target?.target_id || target?.asset_stem || "";
+  }
+
   async function buildVisualTemplate(target) {
     const assetRoot = new THREE.Group();
     assetRoot.name = target.asset_stem || target.target_id;
@@ -1183,18 +1194,252 @@ import {
   }
 
   async function visualTemplateForTarget(target) {
-    const key = target.target_id || target.asset_stem;
+    const key = targetCacheKey(target);
     if (!targetVisualTemplateCache.has(key)) {
-      targetVisualTemplateCache.set(key, buildVisualTemplate(target));
+      const promise = buildVisualTemplate(target).then((template) => {
+        template.updateMatrixWorld(true);
+        targetVisualResolvedCache.set(key, template);
+        return template;
+      });
+      targetVisualTemplateCache.set(key, promise);
     }
     return targetVisualTemplateCache.get(key);
   }
 
-  async function buildVisualGroup(target) {
-    const template = await visualTemplateForTarget(target);
+  function resolvedVisualTemplateForTarget(target) {
+    return targetVisualResolvedCache.get(targetCacheKey(target)) || null;
+  }
+
+  function cloneResolvedVisualGroup(target) {
+    const template = resolvedVisualTemplateForTarget(target);
+    if (!template) return null;
     const visual = cloneScene(template);
     visual.name = target.asset_stem || target.target_id;
     return visual;
+  }
+
+  async function buildVisualGroup(target) {
+    await visualTemplateForTarget(target);
+    return cloneResolvedVisualGroup(target);
+  }
+
+  function instanceTemplateForTarget(target) {
+    const key = targetCacheKey(target);
+    if (targetInstanceTemplateCache.has(key)) return targetInstanceTemplateCache.get(key);
+    const template = resolvedVisualTemplateForTarget(target);
+    if (!template) return null;
+    template.updateMatrixWorld(true);
+    const descriptors = [];
+    const bounds = new THREE.Box3();
+    let eligible = true;
+    template.traverse((obj) => {
+      if (obj.isSkinnedMesh) {
+        eligible = false;
+        return;
+      }
+      if (!obj.isMesh || !obj.geometry || !obj.material) return;
+      obj.updateMatrixWorld(true);
+      descriptors.push({
+        geometry: obj.geometry,
+        material: obj.material,
+        localMatrix: obj.matrixWorld.clone(),
+      });
+      const meshBounds = new THREE.Box3().setFromObject(obj);
+      if (!meshBounds.isEmpty()) bounds.union(meshBounds);
+    });
+    const instanceTemplate = {
+      key,
+      eligible: eligible && descriptors.length > 0 && !bounds.isEmpty(),
+      descriptors,
+      bounds,
+    };
+    targetInstanceTemplateCache.set(key, instanceTemplate);
+    return instanceTemplate;
+  }
+
+  function createHiddenInstanceMatrix() {
+    return new THREE.Matrix4().makeScale(0, 0, 0);
+  }
+
+  function placementRootMatrix(placement) {
+    const object = new THREE.Object3D();
+    updateObjectFromState(object, placement.state, viewOffset);
+    object.updateMatrix();
+    return object.matrix.clone();
+  }
+
+  function instancingEligibleForPlacement(placement) {
+    const instanceTemplate = instanceTemplateForTarget(placement.target);
+    return Boolean(instanceTemplate?.eligible);
+  }
+
+  function ensureInstanceBatch(target) {
+    const instanceTemplate = instanceTemplateForTarget(target);
+    if (!instanceTemplate?.eligible) return null;
+    if (instanceBatches.has(instanceTemplate.key)) return instanceBatches.get(instanceTemplate.key);
+    const batch = {
+      key: instanceTemplate.key,
+      target,
+      template: instanceTemplate,
+      meshes: [],
+      placementSlots: new Map(),
+      slotIds: [],
+      count: 0,
+      capacity: 0,
+    };
+    instanceBatches.set(instanceTemplate.key, batch);
+    growInstanceBatch(batch, INSTANCE_INITIAL_CAPACITY);
+    return batch;
+  }
+
+  function growInstanceBatch(batch, minCapacity) {
+    const nextCapacity = Math.max(INSTANCE_INITIAL_CAPACITY, batch.capacity ? batch.capacity * 2 : 0, minCapacity);
+    const previousMeshes = batch.meshes;
+    const nextMeshes = batch.template.descriptors.map((descriptor, index) => {
+      const mesh = new THREE.InstancedMesh(descriptor.geometry, descriptor.material, nextCapacity);
+      mesh.name = `${batch.target.asset_stem || batch.target.target_id} Instances ${index + 1}`;
+      mesh.frustumCulled = false;
+      mesh.count = batch.count;
+      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      mesh.userData.instanceBatchKey = batch.key;
+      if (previousMeshes[index]) {
+        const matrix = new THREE.Matrix4();
+        for (let slot = 0; slot < batch.count; slot += 1) {
+          previousMeshes[index].getMatrixAt(slot, matrix);
+          mesh.setMatrixAt(slot, matrix);
+        }
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      rootGroup.add(mesh);
+      return mesh;
+    });
+    for (const mesh of previousMeshes) {
+      rootGroup.remove(mesh);
+      mesh.dispose?.();
+    }
+    batch.meshes = nextMeshes;
+    batch.capacity = nextCapacity;
+  }
+
+  function addPlacementToInstanceBatch(placement) {
+    const batch = ensureInstanceBatch(placement.target);
+    if (!batch) return false;
+    if (batch.count >= batch.capacity) growInstanceBatch(batch, batch.count + 1);
+    const slot = batch.count;
+    batch.count += 1;
+    batch.placementSlots.set(placement.id, slot);
+    batch.slotIds[slot] = placement.id;
+    for (const mesh of batch.meshes) mesh.count = batch.count;
+    const visual = ensurePlacementVisualState(placement);
+    visual.backend = "instanced";
+    visual.root = null;
+    visual.batchKey = batch.key;
+    visual.instanceSlot = slot;
+    visual.localBounds = batch.template.bounds.clone();
+    visual.visible = true;
+    placement.group = null;
+    updateInstancePlacementTransform(placement);
+    syncInstanceStatsDataset();
+    return true;
+  }
+
+  function removePlacementFromInstanceBatch(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend !== "instanced" || !visual.batchKey) return false;
+    const batch = instanceBatches.get(visual.batchKey);
+    if (!batch) return false;
+    const slot = batch.placementSlots.get(placement.id);
+    if (slot === undefined) return false;
+    const lastSlot = batch.count - 1;
+    const hiddenMatrix = createHiddenInstanceMatrix();
+    if (slot !== lastSlot) {
+      const movedId = batch.slotIds[lastSlot];
+      const matrix = new THREE.Matrix4();
+      for (const mesh of batch.meshes) {
+        mesh.getMatrixAt(lastSlot, matrix);
+        mesh.setMatrixAt(slot, matrix);
+        mesh.setMatrixAt(lastSlot, hiddenMatrix);
+        mesh.instanceMatrix.needsUpdate = true;
+      }
+      batch.slotIds[slot] = movedId;
+      batch.placementSlots.set(movedId, slot);
+      const moved = placements.get(movedId);
+      if (moved?.visual) moved.visual.instanceSlot = slot;
+    } else {
+      for (const mesh of batch.meshes) {
+        mesh.setMatrixAt(lastSlot, hiddenMatrix);
+        mesh.instanceMatrix.needsUpdate = true;
+      }
+    }
+    batch.slotIds.pop();
+    batch.placementSlots.delete(placement.id);
+    batch.count -= 1;
+    for (const mesh of batch.meshes) mesh.count = batch.count;
+    visual.backend = "";
+    visual.batchKey = "";
+    visual.instanceSlot = -1;
+    syncInstanceStatsDataset();
+    return true;
+  }
+
+  function updateInstancePlacementTransform(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend !== "instanced" || !visual.batchKey) return;
+    const batch = instanceBatches.get(visual.batchKey);
+    if (!batch) return;
+    const slot = batch.placementSlots.get(placement.id);
+    if (slot === undefined) return;
+    const rootMatrix = visual.visible === false ? createHiddenInstanceMatrix() : placementRootMatrix(placement);
+    const matrix = new THREE.Matrix4();
+    batch.template.descriptors.forEach((descriptor, index) => {
+      matrix.copy(rootMatrix).multiply(descriptor.localMatrix);
+      batch.meshes[index].setMatrixAt(slot, matrix);
+      batch.meshes[index].instanceMatrix.needsUpdate = true;
+    });
+  }
+
+  function instanceBatchMeshesForPlacements(candidates) {
+    const keys = new Set();
+    for (const placement of candidates) {
+      const visual = ensurePlacementVisualState(placement);
+      if (visual.backend === "instanced" && visual.batchKey) keys.add(visual.batchKey);
+    }
+    return Array.from(keys)
+      .map((key) => instanceBatches.get(key))
+      .filter(Boolean)
+      .flatMap((batch) => batch.meshes);
+  }
+
+  function placementIdFromInstanceHit(hit) {
+    const key = hit?.object?.userData?.instanceBatchKey;
+    if (!key || hit.instanceId === undefined) return "";
+    const batch = instanceBatches.get(key);
+    return batch?.slotIds?.[hit.instanceId] || "";
+  }
+
+  function instanceStats() {
+    let meshCount = 0;
+    let instanceCount = 0;
+    for (const batch of instanceBatches.values()) {
+      if (!batch.count) continue;
+      meshCount += batch.meshes.length;
+      instanceCount += batch.count;
+    }
+    return {
+      batches: Array.from(instanceBatches.values()).filter((batch) => batch.count > 0).length,
+      meshes: meshCount,
+      instances: instanceCount,
+      promoted: promotedPlacementIds.size,
+    };
+  }
+
+  function syncInstanceStatsDataset() {
+    if (!els.stage) return;
+    const stats = instanceStats();
+    els.stage.dataset.instanceBatches = String(stats.batches);
+    els.stage.dataset.instanceMeshes = String(stats.meshes);
+    els.stage.dataset.instancePlacements = String(stats.instances);
+    els.stage.dataset.promotedPlacements = String(stats.promoted);
   }
 
   function renderAssets() {
@@ -1861,16 +2106,36 @@ import {
   function placementSurfacePointFromRay() {
     const excludedIds = new Set();
     if (dragSession?.sourcePlacementId) excludedIds.add(dragSession.sourcePlacementId);
-    const roots = raycastPlacementCandidates(raycaster.ray, { radius: SPATIAL_SURFACE_RADIUS_CM, excludeIds: excludedIds })
+    const candidates = raycastPlacementCandidates(raycaster.ray, { radius: SPATIAL_SURFACE_RADIUS_CM, excludeIds: excludedIds });
+    const roots = candidates
       .map((placement) => getVisualRoot(placement))
       .filter(Boolean);
-    if (!roots.length) return null;
-    const hits = raycaster.intersectObjects(roots, true);
-    const hit = hits.find((row) => {
-      const id = row.object.userData.placedId;
-      return id && !excludedIds.has(id) && !row.object.userData.dragGhost && objectTreeVisible(row.object);
-    });
-    return hit?.point?.clone() || null;
+    if (roots.length) {
+      const hits = raycaster.intersectObjects(roots, true);
+      const hit = hits.find((row) => {
+        const id = row.object.userData.placedId;
+        return id && !excludedIds.has(id) && !row.object.userData.dragGhost && objectTreeVisible(row.object);
+      });
+      if (hit?.point) return hit.point.clone();
+    }
+    return placementSurfacePointFromBounds(candidates, excludedIds);
+  }
+
+  function placementSurfacePointFromBounds(candidates, excludedIds) {
+    let best = null;
+    const point = new THREE.Vector3();
+    for (const placement of candidates) {
+      if (excludedIds.has(placement.id)) continue;
+      const visual = ensurePlacementVisualState(placement);
+      if (visual.visible === false) continue;
+      const box = getWorldBounds(placement);
+      if (!box || box.isEmpty()) continue;
+      const hit = raycaster.ray.intersectBox(box, point);
+      if (!hit) continue;
+      const distance = raycaster.ray.origin.distanceToSquared(hit);
+      if (!best || distance < best.distance) best = { distance, point: hit.clone() };
+    }
+    return best?.point || null;
   }
 
   function objectTreeVisible(object) {
@@ -1974,7 +2239,12 @@ import {
   function ensurePlacementVisualState(placement) {
     if (!placement.visual) {
       placement.visual = {
+        backend: "",
         root: placement.group || null,
+        batchKey: "",
+        instanceSlot: -1,
+        localBounds: null,
+        visible: true,
         worldBounds: new THREE.Box3(),
         screenBounds: null,
         worldBoundsDirty: true,
@@ -1985,37 +2255,113 @@ import {
   }
 
   function getVisualRoot(placement) {
-    return ensurePlacementVisualState(placement).root || placement.group || null;
+    const visual = ensurePlacementVisualState(placement);
+    return visual.backend === "real" ? visual.root : null;
   }
 
-  async function createVisual(placement) {
-    const root = await buildVisualGroup(placement.target);
-    root.userData.placedId = placement.id;
+  function attachRootUserData(root, placementId) {
+    root.userData.placedId = placementId;
     root.traverse((child) => {
-      child.userData.placedId = placement.id;
+      child.userData.placedId = placementId;
     });
+  }
+
+  function createRealVisualFromResolvedTemplate(placement) {
+    const root = cloneResolvedVisualGroup(placement.target);
+    if (!root) return null;
+    attachRootUserData(root, placement.id);
     rootGroup.add(root);
     placement.group = root;
-    placement.visual = {
-      root,
-      worldBounds: new THREE.Box3(),
-      screenBounds: null,
-      worldBoundsDirty: true,
-      screenBoundsRevision: -1,
-    };
+    const visual = ensurePlacementVisualState(placement);
+    visual.backend = "real";
+    visual.root = root;
+    visual.batchKey = "";
+    visual.instanceSlot = -1;
+    visual.visible = true;
+    visual.localBounds = null;
+    markPlacementBoundsDirty(placement);
+    if (instancingEligibleForPlacement(placement)) promotedPlacementIds.add(placement.id);
+    syncInstanceStatsDataset();
     return root;
+  }
+
+  async function createVisual(placement, { preferReal = false } = {}) {
+    await visualTemplateForTarget(placement.target);
+    if (!preferReal && addPlacementToInstanceBatch(placement)) return null;
+    const root = createRealVisualFromResolvedTemplate(placement);
+    if (!root) throw new Error(`Unable to create visual for ${placement.target.display_name || placement.target.target_id}`);
+    return root;
+  }
+
+  function promotePlacementVisual(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend === "real") return true;
+    if (visual.backend === "instanced") removePlacementFromInstanceBatch(placement);
+    const root = createRealVisualFromResolvedTemplate(placement);
+    if (!root) return false;
+    setVisualTransform(placement);
+    promotedPlacementIds.add(placement.id);
+    return true;
+  }
+
+  function demotePlacementVisual(placement, { force = false } = {}) {
+    if (!placement || (selectedPlacedIds.has(placement.id) && !force)) return false;
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend !== "real" || !instancingEligibleForPlacement(placement)) return false;
+    const root = visual.root;
+    if (root) rootGroup.remove(root);
+    visual.root = null;
+    placement.group = null;
+    const added = addPlacementToInstanceBatch(placement);
+    if (!added && root) {
+      rootGroup.add(root);
+      visual.backend = "real";
+      visual.root = root;
+      placement.group = root;
+      return false;
+    }
+    promotedPlacementIds.delete(placement.id);
+    syncInstanceStatsDataset();
+    markPlacementBoundsDirty(placement);
+    updatePlacementSpatialIndex(placement);
+    return true;
+  }
+
+  function syncVisualBackendsForSelection() {
+    const promoteSelection = selectedPlacedIds.size <= SELECTION_PROMOTION_LIMIT;
+    for (const id of Array.from(promotedPlacementIds)) {
+      if (!selectedPlacedIds.has(id) || !promoteSelection) demotePlacementVisual(placements.get(id), { force: !promoteSelection });
+    }
+    if (!promoteSelection) {
+      syncInstanceStatsDataset();
+      return;
+    }
+    for (const placement of selectedPlacements()) promotePlacementVisual(placement);
   }
 
   function disposeVisual(placement) {
     removePlacementFromSpatialIndex(placement.id);
-    const root = getVisualRoot(placement);
-    if (root) rootGroup.remove(root);
     const visual = ensurePlacementVisualState(placement);
+    if (visual.backend === "instanced") {
+      removePlacementFromInstanceBatch(placement);
+    } else {
+      const root = getVisualRoot(placement);
+      if (root) rootGroup.remove(root);
+    }
     visual.root = null;
+    visual.backend = "";
     placement.group = null;
+    promotedPlacementIds.delete(placement.id);
   }
 
   function setVisualTransform(placement, { updateIndex = true } = {}) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend === "instanced") {
+      updateInstancePlacementTransform(placement);
+      markPlacementBoundsDirty(placement);
+      if (updateIndex) updatePlacementSpatialIndex(placement);
+      return;
+    }
     const root = getVisualRoot(placement);
     if (!root) return;
     updateObjectFromState(root, placement.state, viewOffset);
@@ -2025,6 +2371,12 @@ import {
   }
 
   function setVisualVisible(placement, visible) {
+    const visual = ensurePlacementVisualState(placement);
+    visual.visible = visible;
+    if (visual.backend === "instanced") {
+      updateInstancePlacementTransform(placement);
+      return;
+    }
     const root = getVisualRoot(placement);
     if (root) root.visible = visible;
   }
@@ -2042,11 +2394,15 @@ import {
 
   function getWorldBounds(placement) {
     const visual = ensurePlacementVisualState(placement);
-    const root = getVisualRoot(placement);
-    if (!root) return visual.worldBounds.makeEmpty();
     if (visual.worldBoundsDirty) {
-      root.updateMatrixWorld(true);
-      visual.worldBounds.setFromObject(root);
+      if (visual.backend === "instanced" && visual.localBounds) {
+        visual.worldBounds.copy(visual.localBounds).applyMatrix4(placementRootMatrix(placement));
+      } else {
+        const root = getVisualRoot(placement);
+        if (!root) return visual.worldBounds.makeEmpty();
+        root.updateMatrixWorld(true);
+        visual.worldBounds.setFromObject(root);
+      }
       visual.worldBoundsDirty = false;
     }
     return visual.worldBounds;
@@ -2194,7 +2550,7 @@ import {
 
   function raycastPlacementCandidates(ray, { radius = SPATIAL_PICK_RADIUS_CM, excludeIds = new Set() } = {}) {
     return placementQueryCandidatesFromRay(ray, radius)
-      .filter((placement) => !excludeIds.has(placement.id) && getVisualRoot(placement)?.visible !== false);
+      .filter((placement) => !excludeIds.has(placement.id) && ensurePlacementVisualState(placement).visible !== false);
   }
 
   function clientPointOnDragPlane(x, y, localRaycaster = new THREE.Raycaster()) {
@@ -2242,7 +2598,7 @@ import {
       visual: null,
     };
     placements.set(id, placement);
-    await createVisual(placement);
+    await createVisual(placement, { preferReal: options.preferReal === true || options.select !== false });
     if (target.asset_kind === "building_piece") {
       const pid = Number(placement.metadata.piece_id || 0);
       if (pid >= nextPieceId) nextPieceId = pid + 1;
@@ -2331,6 +2687,7 @@ import {
       activePlacementId = selectedPlacedIds.values().next().value || "";
     }
     if (!selectedPlacedIds.size) activeGizmoMode = "";
+    syncVisualBackendsForSelection();
     syncSelectionAttachment();
     syncSelectionHotkeys();
     if (options.render !== false) {
@@ -2389,12 +2746,17 @@ import {
       const deltaMatrix = currentMatrix.clone().multiply(previousMatrix.clone().invert());
       for (const placement of selected) {
         const root = getVisualRoot(placement);
-        root.updateMatrixWorld(true);
-        const nextWorldMatrix = root.matrixWorld.clone().premultiply(deltaMatrix);
-        applyWorldMatrixToObject(root, nextWorldMatrix);
-        placement.state = updateStateFromObject(root, placement.state, viewOffset);
+        if (root) root.updateMatrixWorld(true);
+        const currentWorldMatrix = root ? root.matrixWorld.clone() : placementRootMatrix(placement);
+        const nextWorldMatrix = currentWorldMatrix.premultiply(deltaMatrix);
+        if (root) {
+          applyWorldMatrixToObject(root, nextWorldMatrix);
+          placement.state = updateStateFromObject(root, placement.state, viewOffset);
+        } else {
+          placement.state = stateFromWorldMatrix(placement, nextWorldMatrix);
+        }
         markPlacementBoundsDirty(placement);
-        updatePlacementSpatialIndex(placement);
+        setVisualTransform(placement);
       }
       previousMatrix.copy(currentMatrix);
     }
@@ -2413,6 +2775,13 @@ import {
     }
     localMatrix.decompose(object.position, object.quaternion, object.scale);
     object.updateMatrixWorld(true);
+  }
+
+  function stateFromWorldMatrix(placement, worldMatrix) {
+    const object = new THREE.Object3D();
+    worldMatrix.decompose(object.position, object.quaternion, object.scale);
+    object.updateMatrixWorld(true);
+    return updateStateFromObject(object, placement.state, viewOffset);
   }
 
   function syncSelectionBoxes() {
@@ -2521,9 +2890,12 @@ import {
     };
     for (const placement of selectedPlacements()) {
       const root = getVisualRoot(placement);
-      if (!root) continue;
-      root.updateMatrixWorld(true);
-      expandOrientationBoundsByObject(bounds, root);
+      if (root) {
+        root.updateMatrixWorld(true);
+        expandOrientationBoundsByObject(bounds, root);
+      } else {
+        expandOrientationBoundsByBox(bounds, getWorldBounds(placement));
+      }
     }
     if (!bounds.hasPoint) return null;
     bounds.width = bounds.maxRight - bounds.minRight;
@@ -2551,6 +2923,11 @@ import {
     const fallbackBox = new THREE.Box3().setFromObject(object);
     if (fallbackBox.isEmpty()) return;
     for (const point of boxCorners(fallbackBox)) expandOrientationBoundsByPoint(bounds, point);
+  }
+
+  function expandOrientationBoundsByBox(bounds, box) {
+    if (!box || box.isEmpty()) return;
+    for (const point of boxCorners(box)) expandOrientationBoundsByPoint(bounds, point);
   }
 
   function expandOrientationBoundsByPoint(bounds, point) {
@@ -3245,7 +3622,7 @@ import {
       if (!focusCameraOnSelected()) showViewportNotice("No selection to frame");
       return true;
     }
-    if (event.code === "Home") {
+    if (event.code === "Home" || event.code === "Digit0" || event.code === "Numpad0") {
       if (placements.size) focusCameraOnBuild();
       else showViewportNotice("No objects to frame");
       return true;
@@ -3610,6 +3987,7 @@ import {
       dragActive: () => Boolean(dragSession),
       spatialCells: () => spatialIndex.cells.size,
       visualTemplateCount: () => targetVisualTemplateCache.size,
+      instanceStats,
       generateSyntheticBuild: debugGenerateSyntheticBuild,
     };
   }
