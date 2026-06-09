@@ -39,6 +39,10 @@ import {
   const GLTF_PRELOAD_CONCURRENCY = 8;
   const IMPORT_RENDER_BATCH_SIZE = 100;
   const PLACED_LIST_LIMIT = 500;
+  const SPATIAL_CELL_SIZE_CM = 1000;
+  const SPATIAL_PICK_RADIUS_CM = 2500;
+  const SPATIAL_SURFACE_RADIUS_CM = 3500;
+  const SPATIAL_SNAP_RADIUS_CM = SNAP_MAX_DISTANCE_CM + 250;
   const FAVORITES_STORAGE_KEY = "RSDWBaseBuilder.favoriteTargetIds.v1";
   const ASSET_VIEW_STORAGE_KEY = "RSDWBaseBuilder.assetViewMode.v1";
   const SCALE_OVERRIDE_STORAGE_KEY = "RSDWBaseBuilder.scaleRestrictionOverride.v1";
@@ -47,6 +51,14 @@ import {
   const CAMERA_FOV_DEGREES = 45;
   const CAMERA_DEFAULT_DISTANCE = 12;
   const ORTHOGRAPHIC_PADDING = 1.25;
+  const GROUND_GRID_DEFAULT_SIZE = 80;
+  const GROUND_GRID_MIN_SIZE = 80;
+  const GROUND_GRID_PADDING_RATIO = 0.35;
+  const GROUND_GRID_MIN_PADDING = 20;
+  const GROUND_GRID_TARGET_DIVISIONS = 120;
+  const GROUND_GRID_MIN_DIVISIONS = 40;
+  const GROUND_GRID_MAX_DIVISIONS = 240;
+  const GROUND_GRID_Y = -0.001;
   const VIEW_HELPER_SIZE = 128;
   const VIEW_HELPER_TOP = 86;
   const VIEW_HELPER_RIGHT = 14;
@@ -151,6 +163,9 @@ import {
   let viewHelperDrag = null;
   let viewHelperClock = new THREE.Clock();
   let rootGroup = null;
+  let groundGrid = null;
+  let groundGridSignature = "";
+  let groundGridUpdateHandle = 0;
   let loader = null;
   let raycaster = null;
   let pointer = null;
@@ -179,11 +194,17 @@ import {
   let bulkMutationActive = false;
   let controlsHudCollapsed = false;
   let viewportNoticeTimer = 0;
+  let screenBoundsRevision = 0;
   const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const gltfCache = new Map();
+  const targetVisualTemplateCache = new Map();
   const placements = new Map();
   const selectionBoxes = new Map();
   const undoStack = [];
+  const spatialIndex = {
+    cells: new Map(),
+    placementCells: new Map(),
+  };
 
   function isLocalHost() {
     return ["localhost", "127.0.0.1", "::1", ""].includes(window.location.hostname);
@@ -673,6 +694,122 @@ import {
     camera.updateProjectionMatrix();
   }
 
+  function niceGridStep(minStep) {
+    const value = Math.max(Number(minStep) || 1, 0.01);
+    const exponent = Math.floor(Math.log10(value));
+    const base = 10 ** exponent;
+    for (const multiplier of [1, 2, 5, 10]) {
+      const step = multiplier * base;
+      if (step >= value) return step;
+    }
+    return 10 * base;
+  }
+
+  function evenDivisionCount(value) {
+    let divisions = Math.max(GROUND_GRID_MIN_DIVISIONS, Math.ceil(value));
+    if (divisions % 2 !== 0) divisions += 1;
+    return Math.min(GROUND_GRID_MAX_DIVISIONS, divisions);
+  }
+
+  function buildPlacementsWorldBox(rows = placements.values()) {
+    const box = new THREE.Box3();
+    for (const placement of rows) box.union(getWorldBounds(placement));
+    return box;
+  }
+
+  function groundGridMetricsForBox(box) {
+    if (!box || box.isEmpty()) {
+      return {
+        size: GROUND_GRID_DEFAULT_SIZE,
+        divisions: GROUND_GRID_DEFAULT_SIZE,
+        centerX: 0,
+        centerZ: 0,
+      };
+    }
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const footprint = Math.max(size.x, size.z, GROUND_GRID_MIN_SIZE);
+    const paddedSize = Math.max(
+      GROUND_GRID_MIN_SIZE,
+      footprint * (1 + GROUND_GRID_PADDING_RATIO) + GROUND_GRID_MIN_PADDING,
+    );
+    const step = niceGridStep(paddedSize / GROUND_GRID_TARGET_DIVISIONS);
+    const divisions = evenDivisionCount(paddedSize / step);
+    const gridSize = divisions * step;
+    return {
+      size: gridSize,
+      divisions,
+      centerX: Math.round(center.x / step) * step,
+      centerZ: Math.round(center.z / step) * step,
+    };
+  }
+
+  function installGroundGrid(metrics = groundGridMetricsForBox()) {
+    if (!scene) return;
+    const signature = [
+      roundValue(metrics.size, 4),
+      metrics.divisions,
+      roundValue(metrics.centerX, 4),
+      roundValue(metrics.centerZ, 4),
+    ].join(":");
+    if (signature === groundGridSignature && groundGrid) return;
+    if (groundGrid) {
+      scene.remove(groundGrid);
+      groundGrid.geometry?.dispose?.();
+      if (Array.isArray(groundGrid.material)) {
+        groundGrid.material.forEach((material) => material.dispose?.());
+      } else {
+        groundGrid.material?.dispose?.();
+      }
+    }
+    groundGrid = new THREE.GridHelper(metrics.size, metrics.divisions, 0x88928c, 0xd2d8d1);
+    groundGrid.name = "Dynamic Ground Grid";
+    groundGrid.position.set(metrics.centerX, GROUND_GRID_Y, metrics.centerZ);
+    groundGrid.renderOrder = -10;
+    scene.add(groundGrid);
+    groundGridSignature = signature;
+    if (els.stage) {
+      els.stage.dataset.gridSize = String(roundValue(metrics.size, 3));
+      els.stage.dataset.gridDivisions = String(metrics.divisions);
+      els.stage.dataset.gridCenter = `${roundValue(metrics.centerX, 3)},${roundValue(metrics.centerZ, 3)}`;
+    }
+  }
+
+  function updateGroundGrid() {
+    groundGridUpdateHandle = 0;
+    const box = placements.size ? buildPlacementsWorldBox() : null;
+    installGroundGrid(groundGridMetricsForBox(box));
+    syncCameraRangeWithBox(box);
+  }
+
+  function scheduleGroundGridUpdate() {
+    if (groundGridUpdateHandle) return;
+    groundGridUpdateHandle = window.requestAnimationFrame(updateGroundGrid);
+  }
+
+  function syncCameraRangeWithBox(box, { distance = 0 } = {}) {
+    if (!camera || !controls || !box || box.isEmpty()) return;
+    const size = box.getSize(new THREE.Vector3());
+    const radius = Math.max(box.getBoundingSphere(new THREE.Sphere()).radius, CAMERA_DEFAULT_DISTANCE);
+    const maxSize = Math.max(size.x, size.y, size.z, radius);
+    const targetDistance = distance || camera.position.distanceTo(controls.target);
+    camera.near = Math.max(0.01, Math.min(2, maxSize / 5000));
+    camera.far = Math.max(1500, maxSize * 30, radius * 16, targetDistance + radius * 8);
+    controls.maxDistance = Math.max(150, maxSize * 6, radius * 8);
+    if (els.stage) {
+      els.stage.dataset.cameraFar = String(roundValue(camera.far, 3));
+      els.stage.dataset.controlsMaxDistance = String(roundValue(controls.maxDistance, 3));
+    }
+    updateCameraProjection();
+  }
+
+  function perspectiveFitDistance(box) {
+    const sphere = box.getBoundingSphere(new THREE.Sphere());
+    const radius = Math.max(sphere.radius, 1);
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov || CAMERA_FOV_DEGREES);
+    return Math.max(radius / Math.sin(verticalFov / 2) * 1.08, CAMERA_DEFAULT_DISTANCE / 2);
+  }
+
   function matchingOrthographicSize() {
     if (!camera || !controls) return orthographicViewSize || CAMERA_DEFAULT_DISTANCE;
     if (camera.isOrthographicCamera) return orthographicViewSize / Math.max(camera.zoom || 1, 0.001);
@@ -871,6 +1008,7 @@ import {
       MIDDLE: THREE.MOUSE.ROTATE,
       RIGHT: THREE.MOUSE.PAN,
     };
+    controls.addEventListener("change", invalidateAllScreenBounds);
     createViewHelperHitZone();
     refreshViewHelper();
 
@@ -887,6 +1025,7 @@ import {
         pendingTransformUndo = null;
         pendingTransformChanged = false;
         syncTransformSnaps();
+        scheduleGroundGridUpdate();
       }
     });
     transformControls.addEventListener("objectChange", () => {
@@ -903,9 +1042,7 @@ import {
     selectionPivot.userData.previousMatrix = new THREE.Matrix4();
     scene.add(selectionPivot);
 
-    const grid = new THREE.GridHelper(80, 80, 0x88928c, 0xd2d8d1);
-    grid.position.y = -0.001;
-    scene.add(grid);
+    installGroundGrid();
 
     const hemi = new THREE.HemisphereLight(0xfff4df, 0x6f7d72, 2.3);
     scene.add(hemi);
@@ -941,6 +1078,7 @@ import {
     const height = Math.max(1, els.stage.clientHeight);
     renderer.setSize(width, height);
     updateCameraProjection();
+    invalidateAllScreenBounds();
   }
 
   function animate() {
@@ -951,7 +1089,6 @@ import {
       viewHelper.update(delta);
     }
     controls.update();
-    updateSelectionBoxes();
     updateOrientationNudgeOverlay();
     renderer.clear();
     renderer.render(scene, camera);
@@ -1014,7 +1151,7 @@ import {
     return cloned;
   }
 
-  async function buildVisualGroup(target) {
+  async function buildVisualTemplate(target) {
     const assetRoot = new THREE.Group();
     assetRoot.name = target.asset_stem || target.target_id;
     if (!target.components.length) {
@@ -1043,6 +1180,21 @@ import {
     const children = await Promise.all(jobs);
     for (const child of children) assetRoot.add(child);
     return assetRoot;
+  }
+
+  async function visualTemplateForTarget(target) {
+    const key = target.target_id || target.asset_stem;
+    if (!targetVisualTemplateCache.has(key)) {
+      targetVisualTemplateCache.set(key, buildVisualTemplate(target));
+    }
+    return targetVisualTemplateCache.get(key);
+  }
+
+  async function buildVisualGroup(target) {
+    const template = await visualTemplateForTarget(target);
+    const visual = cloneScene(template);
+    visual.name = target.asset_stem || target.target_id;
+    return visual;
   }
 
   function renderAssets() {
@@ -1470,7 +1622,7 @@ import {
       canDrop: true,
       snapped: false,
     };
-    placement.group.visible = false;
+    setVisualVisible(placement, false);
     const helper = selectionBoxes.get(placement.id);
     if (helper) helper.visible = false;
     selectedTargetId = placement.target.target_id;
@@ -1709,9 +1861,9 @@ import {
   function placementSurfacePointFromRay() {
     const excludedIds = new Set();
     if (dragSession?.sourcePlacementId) excludedIds.add(dragSession.sourcePlacementId);
-    const roots = Array.from(placements.values())
-      .filter((placement) => !excludedIds.has(placement.id) && placement.group.visible)
-      .map((placement) => placement.group);
+    const roots = raycastPlacementCandidates(raycaster.ray, { radius: SPATIAL_SURFACE_RADIUS_CM, excludeIds: excludedIds })
+      .map((placement) => getVisualRoot(placement))
+      .filter(Boolean);
     if (!roots.length) return null;
     const hits = raycaster.intersectObjects(roots, true);
     const hit = hits.find((row) => {
@@ -1742,7 +1894,7 @@ import {
   function endDragPlacement() {
     if (dragSession?.moveExisting && dragSession.sourcePlacementId) {
       const placement = placements.get(dragSession.sourcePlacementId);
-      if (placement) placement.group.visible = true;
+      if (placement) setVisualVisible(placement, true);
       const helper = selectionBoxes.get(dragSession.sourcePlacementId);
       if (helper) helper.visible = true;
     }
@@ -1810,36 +1962,293 @@ import {
       const placement = placements.get(session.sourcePlacementId);
       if (!placement) return null;
       placement.state = normalizeTransform(state);
-      placement.group.visible = true;
+      setVisualVisible(placement, true);
       applyPlacementTransform(placement);
       selectPlacement(placement.id);
+      scheduleGroundGridUpdate();
       return placement;
     }
     return createPlacement(session.target, state, session.metadata || {});
   }
 
+  function ensurePlacementVisualState(placement) {
+    if (!placement.visual) {
+      placement.visual = {
+        root: placement.group || null,
+        worldBounds: new THREE.Box3(),
+        screenBounds: null,
+        worldBoundsDirty: true,
+        screenBoundsRevision: -1,
+      };
+    }
+    return placement.visual;
+  }
+
+  function getVisualRoot(placement) {
+    return ensurePlacementVisualState(placement).root || placement.group || null;
+  }
+
+  async function createVisual(placement) {
+    const root = await buildVisualGroup(placement.target);
+    root.userData.placedId = placement.id;
+    root.traverse((child) => {
+      child.userData.placedId = placement.id;
+    });
+    rootGroup.add(root);
+    placement.group = root;
+    placement.visual = {
+      root,
+      worldBounds: new THREE.Box3(),
+      screenBounds: null,
+      worldBoundsDirty: true,
+      screenBoundsRevision: -1,
+    };
+    return root;
+  }
+
+  function disposeVisual(placement) {
+    removePlacementFromSpatialIndex(placement.id);
+    const root = getVisualRoot(placement);
+    if (root) rootGroup.remove(root);
+    const visual = ensurePlacementVisualState(placement);
+    visual.root = null;
+    placement.group = null;
+  }
+
+  function setVisualTransform(placement, { updateIndex = true } = {}) {
+    const root = getVisualRoot(placement);
+    if (!root) return;
+    updateObjectFromState(root, placement.state, viewOffset);
+    root.updateMatrixWorld(true);
+    markPlacementBoundsDirty(placement);
+    if (updateIndex) updatePlacementSpatialIndex(placement);
+  }
+
+  function setVisualVisible(placement, visible) {
+    const root = getVisualRoot(placement);
+    if (root) root.visible = visible;
+  }
+
+  function markPlacementBoundsDirty(placement) {
+    if (!placement) return;
+    const visual = ensurePlacementVisualState(placement);
+    visual.worldBoundsDirty = true;
+    visual.screenBoundsRevision = -1;
+  }
+
+  function invalidateAllScreenBounds() {
+    screenBoundsRevision += 1;
+  }
+
+  function getWorldBounds(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    const root = getVisualRoot(placement);
+    if (!root) return visual.worldBounds.makeEmpty();
+    if (visual.worldBoundsDirty) {
+      root.updateMatrixWorld(true);
+      visual.worldBounds.setFromObject(root);
+      visual.worldBoundsDirty = false;
+    }
+    return visual.worldBounds;
+  }
+
+  function getScreenBounds(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.screenBoundsRevision === screenBoundsRevision) return visual.screenBounds;
+    const box = getWorldBounds(placement);
+    visual.screenBounds = worldBoxScreenBounds(box);
+    visual.screenBoundsRevision = screenBoundsRevision;
+    return visual.screenBounds;
+  }
+
+  function worldBoxScreenBounds(box) {
+    if (!box || box.isEmpty()) return null;
+    const stageRect = renderer.domElement.getBoundingClientRect();
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+    for (const point of boxCorners(box)) {
+      point.project(camera);
+      if (point.z < -1 || point.z > 1) continue;
+      const x = stageRect.left + ((point.x + 1) / 2) * stageRect.width;
+      const y = stageRect.top + ((-point.y + 1) / 2) * stageRect.height;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+    }
+    return Number.isFinite(left) ? { left, right, top, bottom } : null;
+  }
+
+  function spatialCell(value) {
+    return Math.floor(Number(value || 0) / SPATIAL_CELL_SIZE_CM);
+  }
+
+  function spatialKey(cx, cy) {
+    return `${cx},${cy}`;
+  }
+
+  function placementSpatialBounds(placement) {
+    const box = getWorldBounds(placement);
+    if (!box || box.isEmpty()) {
+      const state = placement.state || {};
+      const x = Number(state.x || 0);
+      const y = Number(state.y || 0);
+      return { minX: x, maxX: x, minY: y, maxY: y };
+    }
+    return {
+      minX: (box.min.x / UNIT_SCALE) + viewOffset.x,
+      maxX: (box.max.x / UNIT_SCALE) + viewOffset.x,
+      minY: (box.min.z / UNIT_SCALE) + viewOffset.y,
+      maxY: (box.max.z / UNIT_SCALE) + viewOffset.y,
+    };
+  }
+
+  function cellsForSpatialBounds(bounds) {
+    const cells = [];
+    const minCx = spatialCell(Math.min(bounds.minX, bounds.maxX));
+    const maxCx = spatialCell(Math.max(bounds.minX, bounds.maxX));
+    const minCy = spatialCell(Math.min(bounds.minY, bounds.maxY));
+    const maxCy = spatialCell(Math.max(bounds.minY, bounds.maxY));
+    for (let cx = minCx; cx <= maxCx; cx += 1) {
+      for (let cy = minCy; cy <= maxCy; cy += 1) {
+        cells.push(spatialKey(cx, cy));
+      }
+    }
+    return cells;
+  }
+
+  function insertPlacementInSpatialIndex(placement) {
+    if (!placement || !placements.has(placement.id)) return;
+    const cells = cellsForSpatialBounds(placementSpatialBounds(placement));
+    spatialIndex.placementCells.set(placement.id, cells);
+    for (const key of cells) {
+      if (!spatialIndex.cells.has(key)) spatialIndex.cells.set(key, new Set());
+      spatialIndex.cells.get(key).add(placement.id);
+    }
+  }
+
+  function removePlacementFromSpatialIndex(id) {
+    const cells = spatialIndex.placementCells.get(id);
+    if (!cells) return;
+    for (const key of cells) {
+      const bucket = spatialIndex.cells.get(key);
+      if (!bucket) continue;
+      bucket.delete(id);
+      if (!bucket.size) spatialIndex.cells.delete(key);
+    }
+    spatialIndex.placementCells.delete(id);
+  }
+
+  function updatePlacementSpatialIndex(placement) {
+    removePlacementFromSpatialIndex(placement.id);
+    insertPlacementInSpatialIndex(placement);
+  }
+
+  function rebuildSpatialIndex() {
+    spatialIndex.cells.clear();
+    spatialIndex.placementCells.clear();
+    for (const placement of placements.values()) insertPlacementInSpatialIndex(placement);
+  }
+
+  function spatialCandidateIdsForBounds(bounds) {
+    const ids = new Set();
+    for (const key of cellsForSpatialBounds(bounds)) {
+      const bucket = spatialIndex.cells.get(key);
+      if (!bucket) continue;
+      for (const id of bucket) ids.add(id);
+    }
+    return ids;
+  }
+
+  function queryBounds(bounds) {
+    return Array.from(spatialCandidateIdsForBounds(bounds))
+      .map((id) => placements.get(id))
+      .filter(Boolean);
+  }
+
+  function queryPointRadius(point, radius) {
+    const x = Number(point.x || 0);
+    const y = Number(point.y || 0);
+    return queryBounds({
+      minX: x - radius,
+      maxX: x + radius,
+      minY: y - radius,
+      maxY: y + radius,
+    });
+  }
+
+  function uePointFromThreePoint(point) {
+    const ue = threeVectorToUe(point, viewOffset);
+    return { x: ue.x, y: ue.y };
+  }
+
+  function placementQueryCandidatesFromRay(ray, radius = SPATIAL_PICK_RADIUS_CM) {
+    const groundPoint = new THREE.Vector3();
+    if (!ray.intersectPlane(dragPlane, groundPoint)) return Array.from(placements.values());
+    if (!spatialIndex.placementCells.size && placements.size) return Array.from(placements.values());
+    const candidates = queryPointRadius(uePointFromThreePoint(groundPoint), radius);
+    return candidates;
+  }
+
+  function raycastPlacementCandidates(ray, { radius = SPATIAL_PICK_RADIUS_CM, excludeIds = new Set() } = {}) {
+    return placementQueryCandidatesFromRay(ray, radius)
+      .filter((placement) => !excludeIds.has(placement.id) && getVisualRoot(placement)?.visible !== false);
+  }
+
+  function clientPointOnDragPlane(x, y, localRaycaster = new THREE.Raycaster()) {
+    const rect = els.stage.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const point = new THREE.Vector2(
+      ((x - rect.left) / rect.width) * 2 - 1,
+      -((y - rect.top) / rect.height) * 2 + 1,
+    );
+    localRaycaster.setFromCamera(point, camera);
+    const hit = new THREE.Vector3();
+    return localRaycaster.ray.intersectPlane(dragPlane, hit) ? uePointFromThreePoint(hit) : null;
+  }
+
+  function marqueePlacementCandidates(rect) {
+    if (!spatialIndex.placementCells.size && placements.size) return Array.from(placements.values());
+    const localRaycaster = new THREE.Raycaster();
+    const points = [
+      clientPointOnDragPlane(rect.left, rect.top, localRaycaster),
+      clientPointOnDragPlane(rect.right, rect.top, localRaycaster),
+      clientPointOnDragPlane(rect.left, rect.bottom, localRaycaster),
+      clientPointOnDragPlane(rect.right, rect.bottom, localRaycaster),
+    ].filter(Boolean);
+    if (points.length < 2) return Array.from(placements.values());
+    const minX = Math.min(...points.map((point) => point.x));
+    const maxX = Math.max(...points.map((point) => point.x));
+    const minY = Math.min(...points.map((point) => point.y));
+    const maxY = Math.max(...points.map((point) => point.y));
+    return queryBounds({
+      minX: minX - SPATIAL_CELL_SIZE_CM,
+      maxX: maxX + SPATIAL_CELL_SIZE_CM,
+      minY: minY - SPATIAL_CELL_SIZE_CM,
+      maxY: maxY + SPATIAL_CELL_SIZE_CM,
+    });
+  }
+
   async function createPlacement(target, transform, metadata = {}, options = {}) {
     const id = options.id || `obj_${nextObjectId++}`;
-    const group = await buildVisualGroup(target);
-    group.userData.placedId = id;
-    group.traverse((child) => {
-      child.userData.placedId = id;
-    });
-    rootGroup.add(group);
-
     const placement = {
       id,
       target,
       state: normalizeTransform(transform),
       metadata: { ...metadata },
-      group,
+      group: null,
+      visual: null,
     };
     placements.set(id, placement);
+    await createVisual(placement);
     if (target.asset_kind === "building_piece") {
       const pid = Number(placement.metadata.piece_id || 0);
       if (pid >= nextPieceId) nextPieceId = pid + 1;
     }
     applyPlacementTransform(placement);
+    if (!bulkMutationActive && options.updateGrid !== false) scheduleGroundGridUpdate();
     if (!activePlacementId) activePlacementId = id;
     const shouldRender = options.render !== false;
     if (options.select !== false) {
@@ -1852,7 +2261,7 @@ import {
   }
 
   function applyPlacementTransform(placement) {
-    updateObjectFromState(placement.group, placement.state, viewOffset);
+    setVisualTransform(placement);
   }
 
   function selectedPlacements() {
@@ -1935,7 +2344,7 @@ import {
     if (!transformControls) return;
     const selected = selectedPlacements();
     if (selected.length === 1) {
-      transformControls.attach(selected[0].group);
+      transformControls.attach(getVisualRoot(selected[0]));
     } else if (selected.length > 1) {
       updateSelectionPivot();
       transformControls.attach(selectionPivot);
@@ -1949,7 +2358,7 @@ import {
   function updateSelectionPivot() {
     const box = new THREE.Box3();
     for (const placement of selectedPlacements()) {
-      box.expandByObject(placement.group);
+      box.union(getWorldBounds(placement));
     }
     if (box.isEmpty()) return;
     const center = box.getCenter(new THREE.Vector3());
@@ -1969,17 +2378,23 @@ import {
     pendingTransformChanged = true;
     if (selected.length === 1) {
       const placement = selected[0];
-      placement.state = updateStateFromObject(placement.group, placement.state, viewOffset);
+      const root = getVisualRoot(placement);
+      placement.state = updateStateFromObject(root, placement.state, viewOffset);
+      markPlacementBoundsDirty(placement);
+      updatePlacementSpatialIndex(placement);
     } else {
       selectionPivot.updateMatrixWorld(true);
       const previousMatrix = selectionPivot.userData.previousMatrix;
       const currentMatrix = selectionPivot.matrixWorld.clone();
       const deltaMatrix = currentMatrix.clone().multiply(previousMatrix.clone().invert());
       for (const placement of selected) {
-        placement.group.updateMatrixWorld(true);
-        const nextWorldMatrix = placement.group.matrixWorld.clone().premultiply(deltaMatrix);
-        applyWorldMatrixToObject(placement.group, nextWorldMatrix);
-        placement.state = updateStateFromObject(placement.group, placement.state, viewOffset);
+        const root = getVisualRoot(placement);
+        root.updateMatrixWorld(true);
+        const nextWorldMatrix = root.matrixWorld.clone().premultiply(deltaMatrix);
+        applyWorldMatrixToObject(root, nextWorldMatrix);
+        placement.state = updateStateFromObject(root, placement.state, viewOffset);
+        markPlacementBoundsDirty(placement);
+        updatePlacementSpatialIndex(placement);
       }
       previousMatrix.copy(currentMatrix);
     }
@@ -2011,7 +2426,9 @@ import {
     }
     for (const placement of selectedPlacements()) {
       if (selectionBoxes.has(placement.id)) continue;
-      const helper = new THREE.BoxHelper(placement.group, 0xf3cf89);
+      const root = getVisualRoot(placement);
+      if (!root) continue;
+      const helper = new THREE.BoxHelper(root, 0xf3cf89);
       helper.name = `Selection Box ${placement.id}`;
       helper.material.depthTest = false;
       helper.material.transparent = true;
@@ -2103,8 +2520,10 @@ import {
       hasPoint: false,
     };
     for (const placement of selectedPlacements()) {
-      placement.group.updateMatrixWorld(true);
-      expandOrientationBoundsByObject(bounds, placement.group);
+      const root = getVisualRoot(placement);
+      if (!root) continue;
+      root.updateMatrixWorld(true);
+      expandOrientationBoundsByObject(bounds, root);
     }
     if (!bounds.hasPoint) return null;
     bounds.width = bounds.maxRight - bounds.minRight;
@@ -2346,7 +2765,7 @@ import {
         input.value = roundValue(placement.state[key], key.startsWith("scale") ? 4 : 3);
       }
     }
-    if (!hasSelection) {
+    if (!selected.length) {
       els.selectionTitle.textContent = "No Selection";
       els.selectionMeta.textContent = "Select an object";
       return;
@@ -2402,7 +2821,7 @@ import {
     els.buildCount.textContent = `${total} placed`;
     if (anchorPieceId) {
       const anchor = Array.from(placements.values()).find((placement) => Number(placement.metadata.piece_id) === anchorPieceId);
-      els.anchorStatus.textContent = anchor ? `Anchor ${anchorPieceId}` : "Anchor missing";
+      els.anchorStatus.textContent = anchor ? anchor.target.display_name : "Anchor missing";
     } else {
       els.anchorStatus.textContent = "No anchor";
     }
@@ -2494,12 +2913,14 @@ import {
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(Array.from(placements.values()).map((placement) => placement.group), true);
+    const candidates = raycastPlacementCandidates(raycaster.ray);
+    const roots = candidates.map((placement) => getVisualRoot(placement)).filter(Boolean);
+    const hits = raycaster.intersectObjects(roots, true);
     const hit = hits.find((row) => row.object.userData.placedId);
-    return hit?.object.userData.placedId || screenBoundsHitPlacementId(event);
+    return hit?.object.userData.placedId || screenBoundsHitPlacementId(event, candidates);
   }
 
-  function screenBoundsHitPlacementId(event) {
+  function screenBoundsHitPlacementId(event, candidates = Array.from(placements.values())) {
     const point = {
       left: event.clientX - 6,
       right: event.clientX + 6,
@@ -2507,7 +2928,7 @@ import {
       bottom: event.clientY + 6,
     };
     let best = null;
-    for (const placement of placements.values()) {
+    for (const placement of candidates) {
       const bounds = placementScreenBounds(placement);
       if (!bounds || !rectsIntersect(point, bounds)) continue;
       const area = Math.max(1, bounds.right - bounds.left) * Math.max(1, bounds.bottom - bounds.top);
@@ -2535,7 +2956,7 @@ import {
   function selectByMarquee(gesture) {
     const rect = normalizedClientRect(gesture.startX, gesture.startY, gesture.currentX, gesture.currentY);
     const ids = [];
-    for (const placement of placements.values()) {
+    for (const placement of marqueePlacementCandidates(rect)) {
       const screenBox = placementScreenBounds(placement);
       if (screenBox && rectsIntersect(rect, screenBox)) ids.push(placement.id);
     }
@@ -2558,35 +2979,7 @@ import {
   }
 
   function placementScreenBounds(placement) {
-    const box = new THREE.Box3().setFromObject(placement.group);
-    if (box.isEmpty()) return null;
-    const points = [
-      new THREE.Vector3(box.min.x, box.min.y, box.min.z),
-      new THREE.Vector3(box.min.x, box.min.y, box.max.z),
-      new THREE.Vector3(box.min.x, box.max.y, box.min.z),
-      new THREE.Vector3(box.min.x, box.max.y, box.max.z),
-      new THREE.Vector3(box.max.x, box.min.y, box.min.z),
-      new THREE.Vector3(box.max.x, box.min.y, box.max.z),
-      new THREE.Vector3(box.max.x, box.max.y, box.min.z),
-      new THREE.Vector3(box.max.x, box.max.y, box.max.z),
-    ];
-    const stageRect = renderer.domElement.getBoundingClientRect();
-    let left = Infinity;
-    let right = -Infinity;
-    let top = Infinity;
-    let bottom = -Infinity;
-    for (const point of points) {
-      point.project(camera);
-      if (point.z < -1 || point.z > 1) continue;
-      const x = stageRect.left + ((point.x + 1) / 2) * stageRect.width;
-      const y = stageRect.top + ((-point.y + 1) / 2) * stageRect.height;
-      left = Math.min(left, x);
-      right = Math.max(right, x);
-      top = Math.min(top, y);
-      bottom = Math.max(bottom, y);
-    }
-    if (!Number.isFinite(left)) return null;
-    return { left, right, top, bottom };
+    return getScreenBounds(placement);
   }
 
   function rectsIntersect(a, b) {
@@ -2618,7 +3011,12 @@ import {
   function scheduleAutosave() {
     if (!autosaveReady || restoringSnapshot || bulkMutationActive) return;
     if (autosaveTimer) window.clearTimeout(autosaveTimer);
-    autosaveTimer = window.setTimeout(saveAutosave, AUTOSAVE_DEBOUNCE_MS);
+    const delay = placements.size >= 10000
+      ? 3000
+      : placements.size >= 5000
+        ? 1500
+        : AUTOSAVE_DEBOUNCE_MS;
+    autosaveTimer = window.setTimeout(saveAutosave, delay);
   }
 
   function saveAutosave() {
@@ -2861,20 +3259,23 @@ import {
     pushUndoSnapshot();
     for (const placement of selected) {
       if (Number(placement.metadata.piece_id) === anchorPieceId) anchorPieceId = 0;
-      rootGroup.remove(placement.group);
+      disposeVisual(placement);
       placements.delete(placement.id);
     }
     selectPlacement("");
     renderPlacedList();
+    scheduleGroundGridUpdate();
     updateCounters();
   }
 
   function clearBuild({ resetOffset = true, recordUndo = false, render = true } = {}) {
     if (recordUndo && placements.size) pushUndoSnapshot();
     for (const placement of placements.values()) {
-      rootGroup.remove(placement.group);
+      disposeVisual(placement);
     }
     placements.clear();
+    spatialIndex.cells.clear();
+    spatialIndex.placementCells.clear();
     selectedPlacedIds.clear();
     activePlacementId = "";
     activeGizmoMode = "";
@@ -2884,6 +3285,7 @@ import {
     transformControls.detach();
     syncSelectionBoxes();
     syncSelectionHotkeys();
+    if (!bulkMutationActive) updateGroundGrid();
     if (!render) return;
     if (index) renderAssets();
     renderInspector();
@@ -2945,6 +3347,7 @@ import {
       mover.state.z += best.candidatePos.z - best.moverPos.z;
       applyPlacementTransform(mover);
     }
+    scheduleGroundGridUpdate();
     renderInspector();
     renderPlacedList();
     updateCounters();
@@ -2970,23 +3373,34 @@ import {
     const moverSnaps = index.snaps[target.snap_class];
     if (!moverSnaps || !Array.isArray(moverSnaps.plugs)) return null;
     const excludedIds = toIdSet(excludeIds);
+    const moverPlugRows = moverSnaps.plugs.map((plug) => {
+      const matrix = plugWorldMatrix(state, plug);
+      return { plug, pos: matrixTranslation(matrix) };
+    });
+    const candidateIds = new Set();
+    for (const row of moverPlugRows) {
+      for (const candidate of queryPointRadius({ x: row.pos.x, y: row.pos.y }, SPATIAL_SNAP_RADIUS_CM)) {
+        if (!excludedIds.has(candidate.id)) candidateIds.add(candidate.id);
+      }
+    }
+    const candidates = candidateIds.size
+      ? Array.from(candidateIds).map((id) => placements.get(id)).filter(Boolean)
+      : (!spatialIndex.placementCells.size && placements.size ? Array.from(placements.values()) : []);
 
     let best = null;
-    for (const candidate of placements.values()) {
+    for (const candidate of candidates) {
       if (excludedIds.has(candidate.id) || candidate.target.asset_kind !== "building_piece") continue;
       const candidateSnaps = index.snaps[candidate.target.snap_class];
       if (!candidateSnaps || !Array.isArray(candidateSnaps.plugs)) continue;
-      for (const moverPlug of moverSnaps.plugs) {
-        const moverMatrix = plugWorldMatrix(state, moverPlug);
-        const moverPos = matrixTranslation(moverMatrix);
+      for (const moverRow of moverPlugRows) {
         for (const candidatePlug of candidateSnaps.plugs) {
-          if (!plugsCompatible(moverPlug, candidatePlug)) continue;
+          if (!plugsCompatible(moverRow.plug, candidatePlug)) continue;
           const candidateMatrix = plugWorldMatrix(candidate.state, candidatePlug);
           const candidatePos = matrixTranslation(candidateMatrix);
-          const d2 = distanceSquared(moverPos, candidatePos);
+          const d2 = distanceSquared(moverRow.pos, candidatePos);
           if (d2 > SNAP_MAX_DISTANCE_CM * SNAP_MAX_DISTANCE_CM) continue;
           if (!best || d2 < best.d2) {
-            best = { d2, moverPos, candidatePos };
+            best = { d2, moverPos: moverRow.pos, candidatePos };
           }
         }
       }
@@ -3025,7 +3439,7 @@ import {
       }
       entries.push({
         target,
-        transform: row,
+        transform: editorTransformFromJson(row),
         metadata: {
           piece_id: Number(row.piece_id || 0),
           stability: Number(row.stability || target.export.default_stability || 3000),
@@ -3042,7 +3456,7 @@ import {
       }
       entries.push({
         target,
-        transform: row,
+        transform: editorTransformFromJson(row),
         metadata: {
           actor_name: row.actor_name || "",
           actor_class: row.actor_class || ITEM_ACTOR_CLASS,
@@ -3059,7 +3473,7 @@ import {
       }
       entries.push({
         target,
-        transform: row,
+        transform: editorTransformFromJson(row),
         metadata: {
           actor_name: row.actor_name || "",
         },
@@ -3082,15 +3496,18 @@ import {
         await nextFrame();
       }
     }
+    updateGroundGrid();
   }
 
   async function importBuildingJson(file) {
     setLoading(true);
     try {
+      els.assetStatus.textContent = "Parsing import";
       const data = JSON.parse(await file.text());
       pushUndoSnapshot();
       const rows = [...(data.pieces || []), ...(data.items || []), ...(data.actors || [])];
       const importedAnchor = importedAnchorPiece(data);
+      els.assetStatus.textContent = "Resolving import targets";
       const { entries, skipped } = buildImportPlacementEntries(data);
       await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading import models" });
       viewOffset = importViewOffset(rows, importedAnchor);
@@ -3101,6 +3518,7 @@ import {
       anchorPieceId = Number(importedAnchor?.piece_id || data.anchor_piece_id || 0);
       await createPlacementsBulk(entries);
       bulkMutationActive = false;
+      els.assetStatus.textContent = "Finalizing import";
       setSelection([], { render: false });
       renderInspector();
       renderPlacedList();
@@ -3115,6 +3533,98 @@ import {
       bulkMutationActive = false;
       setLoading(false);
     }
+  }
+
+  async function debugGenerateSyntheticBuild(options = {}) {
+    const count = Math.max(1, Math.min(Number(options.count || 1000), 20000));
+    const kind = options.kind || "building_piece";
+    const target = targetLookup.byId.get(options.targetId || "") ||
+      index.targets.find((row) => row.asset_kind === kind) ||
+      index.targets.find((row) => row.asset_kind === "building_piece");
+    if (!target) throw new Error("No target available for synthetic build.");
+    const spacing = Number(options.spacing || 400);
+    const columns = Math.max(1, Math.ceil(Math.sqrt(count)));
+    const entries = [];
+    for (let i = 0; i < count; i += 1) {
+      const col = i % columns;
+      const row = Math.floor(i / columns);
+      entries.push({
+        id: `bench_${i + 1}`,
+        target,
+        transform: {
+          x: roundValue((col - columns / 2) * spacing),
+          y: roundValue(row * spacing),
+          z: 0,
+          pitch: 0,
+          yaw: 0,
+          roll: 0,
+          scale_x: 1,
+          scale_y: 1,
+          scale_z: 1,
+        },
+        metadata: target.asset_kind === "building_piece" ? { piece_id: i + 1 } : {},
+      });
+    }
+
+    const started = performance.now();
+    const previousAutosaveReady = autosaveReady;
+    const persistAutosave = options.persist === true;
+    setLoading(true);
+    bulkMutationActive = true;
+    if (!persistAutosave) autosaveReady = false;
+    try {
+      els.assetStatus.textContent = `Preparing ${count.toLocaleString()} synthetic placements`;
+      await preloadGltfsForTargets([target], { statusPrefix: "Preloading benchmark model" });
+      clearBuild({ resetOffset: true, render: false });
+      buildName = `Synthetic ${count.toLocaleString()} ${target.display_name}`;
+      buildSchema = "rsdwtools.buildings.v1";
+      anchorPieceId = 0;
+      await createPlacementsBulk(entries, { statusPrefix: "Benchmark importing" });
+    } finally {
+      bulkMutationActive = false;
+      setLoading(false);
+      autosaveReady = previousAutosaveReady;
+    }
+    setSelection([], { render: false });
+    renderInspector();
+    renderPlacedList();
+    const autosaveReadyForCounters = autosaveReady;
+    if (!persistAutosave) autosaveReady = false;
+    updateCounters();
+    autosaveReady = autosaveReadyForCounters;
+    focusCameraOnBuild({ notify: false });
+    const elapsedMs = Math.round(performance.now() - started);
+    els.assetStatus.textContent = `Synthetic ${count.toLocaleString()} placements in ${elapsedMs.toLocaleString()} ms`;
+    return {
+      count,
+      target_id: target.target_id,
+      elapsed_ms: elapsedMs,
+      spatial_cells: spatialIndex.cells.size,
+    };
+  }
+
+  function installDebugHelpers() {
+    window.__RSDW_BASE_BUILDER_DEBUG__ = {
+      objectCount: () => placements.size,
+      selectedName: () => selectedPlacement()?.target.display_name || "",
+      dragActive: () => Boolean(dragSession),
+      spatialCells: () => spatialIndex.cells.size,
+      visualTemplateCount: () => targetVisualTemplateCache.size,
+      generateSyntheticBuild: debugGenerateSyntheticBuild,
+    };
+  }
+
+  function debugBenchmarkOptionsFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const count = Number(params.get("benchmark") || params.get("bench") || 0);
+    if (!count) return null;
+    return {
+      count,
+      kind: params.get("kind") || "building_piece",
+      targetId: params.get("target") || "",
+      spacing: Number(params.get("spacing") || 400),
+      persist: params.get("persist") === "1" || params.get("autosave") === "1",
+    };
   }
 
   function importViewOffset(rows, anchorPiece) {
@@ -3144,6 +3654,24 @@ import {
     return null;
   }
 
+  function editorTransformFromJson(row) {
+    const transform = normalizeTransform(row);
+    return {
+      ...transform,
+      pitch: -transform.pitch,
+      roll: -transform.roll,
+    };
+  }
+
+  function jsonTransformFromEditorState(state) {
+    const transform = exportTransform(state);
+    return {
+      ...transform,
+      pitch: roundValue(-transform.pitch),
+      roll: roundValue(-transform.roll),
+    };
+  }
+
   function medianOffset(rows) {
     if (!rows.length) return { x: 0, y: 0, z: 0 };
     const xs = rows.map((row) => Number(row.x || 0)).sort((a, b) => a - b);
@@ -3170,7 +3698,7 @@ import {
 
     for (const placement of placements.values()) {
       const target = placement.target;
-      const transform = exportTransform(placement.state);
+      const transform = jsonTransformFromEditorState(placement.state);
       if (target.asset_kind === "building_piece") {
         pieces.push({
           piece_id: Number(placement.metadata.piece_id || allocatePieceId()),
@@ -3270,16 +3798,18 @@ import {
     const maxSize = Math.max(size.x, size.y, size.z, selectedOnly ? 1 : 3);
     const offset = camera.position.clone().sub(controls.target);
     if (offset.lengthSq() < 0.0001) offset.set(0.85, 0.7, 0.85).normalize();
-    const distance = Math.max(maxSize * 1.45, CAMERA_DEFAULT_DISTANCE / 2);
+    const distance = camera.isPerspectiveCamera
+      ? perspectiveFitDistance(box)
+      : Math.max(maxSize * 1.45, CAMERA_DEFAULT_DISTANCE / 2);
     controls.target.copy(center);
     camera.position.copy(center).add(offset.normalize().multiplyScalar(distance));
-    camera.near = Math.max(0.01, maxSize / 1000);
-    camera.far = Math.max(1500, maxSize * 20);
+    syncCameraRangeWithBox(box, { distance });
     if (camera.isOrthographicCamera) {
-      orthographicViewSize = Math.max(maxSize * ORTHOGRAPHIC_PADDING, 1);
+      const radius = Math.max(box.getBoundingSphere(new THREE.Sphere()).radius, 1);
+      orthographicViewSize = Math.max(radius * 2 * ORTHOGRAPHIC_PADDING, 1);
       camera.zoom = 1;
+      updateCameraProjection();
     }
-    updateCameraProjection();
     controls.update();
     if (notify) showViewportNotice(selectedOnly ? "Frame Selected" : "Frame All");
     return true;
@@ -3288,17 +3818,13 @@ import {
   function focusCameraOnSelected({ notify = true } = {}) {
     const selected = selectedPlacements();
     if (!selected.length) return false;
-    const box = new THREE.Box3();
-    for (const placement of selected) box.expandByObject(placement.group);
+    const box = buildPlacementsWorldBox(selected);
     return focusCameraOnBox(box, { selectedOnly: true, notify });
   }
 
   function focusCameraOnBuild({ notify = true } = {}) {
     if (!placements.size) return;
-    const box = new THREE.Box3();
-    for (const placement of placements.values()) {
-      box.expandByObject(placement.group);
-    }
+    const box = buildPlacementsWorldBox();
     focusCameraOnBox(box, { notify });
   }
 
@@ -3492,16 +4018,17 @@ import {
     renderCategoryButtons();
     renderAssets();
     renderControlsHud();
-    await restoreAutosavedBuild();
+    installDebugHelpers();
+    const benchmarkOptions = debugBenchmarkOptionsFromUrl();
+    if (benchmarkOptions) {
+      await debugGenerateSyntheticBuild(benchmarkOptions);
+    } else {
+      await restoreAutosavedBuild();
+    }
     renderInspector();
     updateCounters();
     autosaveReady = true;
     setLoading(false);
-    window.__RSDW_BASE_BUILDER_DEBUG__ = {
-      objectCount: () => placements.size,
-      selectedName: () => selectedPlacement()?.target.display_name || "",
-      dragActive: () => Boolean(dragSession),
-    };
   }
 
   init().catch((error) => {
