@@ -1876,6 +1876,19 @@ import {
     return selectedPlacedIds.has(id);
   }
 
+  function selectionModifierFromEvent(event) {
+    if (event.ctrlKey || event.metaKey) return "subtract";
+    if (event.shiftKey) return "add";
+    return "replace";
+  }
+
+  function subtractSelection(id) {
+    if (!selectedPlacedIds.has(id)) return;
+    const next = new Set(selectedPlacedIds);
+    next.delete(id);
+    setSelection(next);
+  }
+
   function selectPlacement(id, options = {}) {
     const next = new Set(selectedPlacedIds);
     let nextActiveId = options.activeId || id || activePlacementId;
@@ -2366,7 +2379,12 @@ import {
       button.querySelector(".placed-meta").textContent =
         `${roundValue(placement.state.x)}, ${roundValue(placement.state.y)}, ${roundValue(placement.state.z)}`;
       button.addEventListener("click", (event) => {
-        selectPlacement(placement.id, { toggle: event.shiftKey });
+        const mode = selectionModifierFromEvent(event);
+        if (mode === "subtract") {
+          subtractSelection(placement.id);
+          return;
+        }
+        selectPlacement(placement.id, { toggle: mode === "add" });
       });
       els.placedList.appendChild(button);
       shown += 1;
@@ -2400,13 +2418,16 @@ import {
     if (transformControls.dragging) return;
     if (event.button !== 0) return;
     if (transformControls.axis) return;
+    const selectionMode = selectionModifierFromEvent(event);
     selectionGesture = {
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
       currentX: event.clientX,
       currentY: event.clientY,
-      additive: event.shiftKey,
+      mode: selectionMode,
+      additive: selectionMode === "add",
+      subtract: selectionMode === "subtract",
       dragging: false,
       hitId: hitPlacementId(event),
     };
@@ -2423,7 +2444,7 @@ import {
     const dx = event.clientX - selectionGesture.startX;
     const dy = event.clientY - selectionGesture.startY;
     if (!selectionGesture.dragging && Math.hypot(dx, dy) < DRAG_START_DISTANCE_PX) return;
-    if (!selectionGesture.dragging && selectionGesture.hitId && !selectionGesture.additive) {
+    if (!selectionGesture.dragging && selectionGesture.hitId && !selectionGesture.additive && !selectionGesture.subtract) {
       const placement = placements.get(selectionGesture.hitId);
       endSelectionGesture();
       beginMovePreviewPlacement(placement, event);
@@ -2441,8 +2462,12 @@ import {
     if (selectionGesture.dragging) {
       selectByMarquee(selectionGesture);
     } else if (selectionGesture.hitId) {
-      selectPlacement(selectionGesture.hitId, { toggle: selectionGesture.additive });
-    } else if (!selectionGesture.additive) {
+      if (selectionGesture.subtract) {
+        subtractSelection(selectionGesture.hitId);
+      } else {
+        selectPlacement(selectionGesture.hitId, { toggle: selectionGesture.additive });
+      }
+    } else if (!selectionGesture.additive && !selectionGesture.subtract) {
       selectPlacement("");
     }
     endSelectionGesture();
@@ -2514,8 +2539,12 @@ import {
       const screenBox = placementScreenBounds(placement);
       if (screenBox && rectsIntersect(rect, screenBox)) ids.push(placement.id);
     }
-    const next = gesture.additive ? new Set(selectedPlacedIds) : new Set();
-    for (const id of ids) next.add(id);
+    const next = gesture.additive || gesture.subtract ? new Set(selectedPlacedIds) : new Set();
+    if (gesture.subtract) {
+      for (const id of ids) next.delete(id);
+    } else {
+      for (const id of ids) next.add(id);
+    }
     setSelection(next);
   }
 
