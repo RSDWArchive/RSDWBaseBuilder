@@ -43,6 +43,13 @@ import {
   const SPATIAL_PICK_RADIUS_CM = 2500;
   const SPATIAL_SURFACE_RADIUS_CM = 3500;
   const SPATIAL_SNAP_RADIUS_CM = SNAP_MAX_DISTANCE_CM + 250;
+  const MOVE_PREVIEW_START_MIN_PX = 12;
+  const MOVE_PREVIEW_START_MAX_PX = 30;
+  const MARQUEE_FROM_HIT_NEAR_PX = 36;
+  const MARQUEE_FROM_HIT_FAR_PX = 16;
+  const MARQUEE_FROM_HIT_MIN_AXIS_PX = 8;
+  const MARQUEE_SPATIAL_PADDING_RATIO = 0.08;
+  const MARQUEE_SPATIAL_MAX_PADDING_CM = 12000;
   const FAVORITES_STORAGE_KEY = "RSDWBaseBuilder.favoriteTargetIds.v1";
   const ASSET_VIEW_STORAGE_KEY = "RSDWBaseBuilder.assetViewMode.v1";
   const SCALE_OVERRIDE_STORAGE_KEY = "RSDWBaseBuilder.scaleRestrictionOverride.v1";
@@ -822,6 +829,34 @@ import {
     if (camera.isOrthographicCamera) return orthographicViewSize / Math.max(camera.zoom || 1, 0.001);
     const distance = Math.max(camera.position.distanceTo(controls.target), 1);
     return 2 * distance * Math.tan(THREE.MathUtils.degToRad((camera.fov || CAMERA_FOV_DEGREES) / 2));
+  }
+
+  function viewportSpanCm() {
+    return Math.max(matchingOrthographicSize() / UNIT_SCALE, 1);
+  }
+
+  function selectionZoomOutFactor() {
+    return THREE.MathUtils.clamp((viewportSpanCm() - 8000) / 40000, 0, 1);
+  }
+
+  function movePreviewStartDistancePx() {
+    return THREE.MathUtils.lerp(MOVE_PREVIEW_START_MIN_PX, MOVE_PREVIEW_START_MAX_PX, selectionZoomOutFactor());
+  }
+
+  function shouldMarqueeFromHitDrag(dx, dy) {
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    if (Math.min(absX, absY) < MARQUEE_FROM_HIT_MIN_AXIS_PX) return false;
+    const threshold = THREE.MathUtils.lerp(MARQUEE_FROM_HIT_NEAR_PX, MARQUEE_FROM_HIT_FAR_PX, selectionZoomOutFactor());
+    return Math.hypot(dx, dy) >= threshold;
+  }
+
+  function marqueeSpatialPaddingCm() {
+    return THREE.MathUtils.clamp(
+      viewportSpanCm() * MARQUEE_SPATIAL_PADDING_RATIO,
+      SPATIAL_CELL_SIZE_CM,
+      MARQUEE_SPATIAL_MAX_PADDING_CM,
+    );
   }
 
   function switchCameraProjection(mode, { notify = true } = {}) {
@@ -2579,11 +2614,12 @@ import {
     const maxX = Math.max(...points.map((point) => point.x));
     const minY = Math.min(...points.map((point) => point.y));
     const maxY = Math.max(...points.map((point) => point.y));
+    const padding = marqueeSpatialPaddingCm();
     return queryBounds({
-      minX: minX - SPATIAL_CELL_SIZE_CM,
-      maxX: maxX + SPATIAL_CELL_SIZE_CM,
-      minY: minY - SPATIAL_CELL_SIZE_CM,
-      maxY: maxY + SPATIAL_CELL_SIZE_CM,
+      minX: minX - padding,
+      maxX: maxX + padding,
+      minY: minY - padding,
+      maxY: maxY + padding,
     });
   }
 
@@ -2794,15 +2830,29 @@ import {
       }
     }
     for (const placement of selectedPlacements()) {
-      if (selectionBoxes.has(placement.id)) continue;
+      const visual = ensurePlacementVisualState(placement);
       const root = getVisualRoot(placement);
-      if (!root) continue;
-      const helper = new THREE.BoxHelper(root, 0xf3cf89);
+      const helperType = root ? "root" : "bounds";
+      const bounds = root ? null : getWorldBounds(placement).clone();
+      if (!root && (!bounds || bounds.isEmpty())) continue;
+      const existing = selectionBoxes.get(placement.id);
+      if (existing?.userData.selectionHelperType === helperType) continue;
+      if (existing) {
+        scene.remove(existing);
+        existing.geometry?.dispose?.();
+        existing.material?.dispose?.();
+        selectionBoxes.delete(placement.id);
+      }
+      const helper = root
+        ? new THREE.BoxHelper(root, 0xf3cf89)
+        : new THREE.Box3Helper(bounds, 0xf3cf89);
       helper.name = `Selection Box ${placement.id}`;
       helper.material.depthTest = false;
       helper.material.transparent = true;
       helper.material.opacity = 0.96;
       helper.renderOrder = 999;
+      helper.userData.selectionHelperType = helperType;
+      helper.visible = visual.visible !== false;
       selectionBoxes.set(placement.id, helper);
       scene.add(helper);
     }
@@ -2812,7 +2862,14 @@ import {
   function updateSelectionBoxes() {
     for (const [id, helper] of selectionBoxes) {
       const placement = placements.get(id);
-      if (placement) helper.update();
+      if (!placement) continue;
+      const root = getVisualRoot(placement);
+      if (root && helper.userData.selectionHelperType === "root") {
+        helper.update();
+      } else if (helper.userData.selectionHelperType === "bounds" && helper.box) {
+        helper.box.copy(getWorldBounds(placement));
+        helper.updateMatrixWorld(true);
+      }
     }
   }
 
@@ -3225,7 +3282,7 @@ import {
       additive: selectionMode === "add",
       subtract: selectionMode === "subtract",
       dragging: false,
-      hitId: hitPlacementId(event),
+      hitId: hitPlacementId(event, { allowScreenFallback: false }),
     };
     renderer.domElement.setPointerCapture?.(event.pointerId);
     window.addEventListener("pointermove", onSelectionPointerMove);
@@ -3239,12 +3296,19 @@ import {
     selectionGesture.currentY = event.clientY;
     const dx = event.clientX - selectionGesture.startX;
     const dy = event.clientY - selectionGesture.startY;
-    if (!selectionGesture.dragging && Math.hypot(dx, dy) < DRAG_START_DISTANCE_PX) return;
+    const distance = Math.hypot(dx, dy);
+    if (!selectionGesture.dragging && distance < DRAG_START_DISTANCE_PX) return;
     if (!selectionGesture.dragging && selectionGesture.hitId && !selectionGesture.additive && !selectionGesture.subtract) {
-      const placement = placements.get(selectionGesture.hitId);
-      endSelectionGesture();
-      beginMovePreviewPlacement(placement, event);
-      return;
+      if (shouldMarqueeFromHitDrag(dx, dy)) {
+        selectionGesture.hitId = "";
+      } else if (distance < movePreviewStartDistancePx()) {
+        return;
+      } else {
+        const placement = placements.get(selectionGesture.hitId);
+        endSelectionGesture();
+        beginMovePreviewPlacement(placement, event);
+        return;
+      }
     }
     selectionGesture.dragging = true;
     controls.enabled = false;
@@ -3257,14 +3321,18 @@ import {
     selectionGesture.currentY = event.clientY;
     if (selectionGesture.dragging) {
       selectByMarquee(selectionGesture);
-    } else if (selectionGesture.hitId) {
-      if (selectionGesture.subtract) {
-        subtractSelection(selectionGesture.hitId);
-      } else {
-        selectPlacement(selectionGesture.hitId, { toggle: selectionGesture.additive });
+    } else {
+      const hitId = selectionGesture.hitId || hitPlacementId(event);
+      if (!hitId) {
+        if (!selectionGesture.additive && !selectionGesture.subtract) selectPlacement("");
+        endSelectionGesture();
+        return;
       }
-    } else if (!selectionGesture.additive && !selectionGesture.subtract) {
-      selectPlacement("");
+      if (selectionGesture.subtract) {
+        subtractSelection(hitId);
+      } else {
+        selectPlacement(hitId, { toggle: selectionGesture.additive });
+      }
     }
     endSelectionGesture();
   }
@@ -3285,16 +3353,23 @@ import {
     window.removeEventListener("pointercancel", onSelectionPointerCancel);
   }
 
-  function hitPlacementId(event) {
+  function hitPlacementId(event, { allowScreenFallback = true } = {}) {
     const rect = renderer.domElement.getBoundingClientRect();
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
     const candidates = raycastPlacementCandidates(raycaster.ray);
+    const candidateIds = new Set(candidates.map((placement) => placement.id));
     const roots = candidates.map((placement) => getVisualRoot(placement)).filter(Boolean);
-    const hits = raycaster.intersectObjects(roots, true);
-    const hit = hits.find((row) => row.object.userData.placedId);
-    return hit?.object.userData.placedId || screenBoundsHitPlacementId(event, candidates);
+    const instanceMeshes = instanceBatchMeshesForPlacements(candidates);
+    const hits = raycaster.intersectObjects([...roots, ...instanceMeshes], true);
+    for (const hit of hits) {
+      const id = hit.object.userData.placedId || placementIdFromInstanceHit(hit);
+      if (!id || !candidateIds.has(id)) continue;
+      const placement = placements.get(id);
+      if (placement && ensurePlacementVisualState(placement).visible !== false) return id;
+    }
+    return allowScreenFallback ? screenBoundsHitPlacementId(event, candidates) : "";
   }
 
   function screenBoundsHitPlacementId(event, candidates = Array.from(placements.values())) {
