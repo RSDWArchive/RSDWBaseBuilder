@@ -2570,6 +2570,32 @@ import {
     });
   }
 
+  function querySegmentRadius(start, end, radius) {
+    if (!start || !end) return [];
+    const dx = Number(end.x || 0) - Number(start.x || 0);
+    const dy = Number(end.y || 0) - Number(start.y || 0);
+    const length = Math.hypot(dx, dy);
+    const stepSize = Math.max(SPATIAL_CELL_SIZE_CM * 0.75, 1);
+    const steps = Math.max(1, Math.ceil(length / stepSize));
+    const ids = new Set();
+    for (let i = 0; i <= steps; i += 1) {
+      const t = i / steps;
+      const x = Number(start.x || 0) + dx * t;
+      const y = Number(start.y || 0) + dy * t;
+      for (const id of spatialCandidateIdsForBounds({
+        minX: x - radius,
+        maxX: x + radius,
+        minY: y - radius,
+        maxY: y + radius,
+      })) {
+        ids.add(id);
+      }
+    }
+    return Array.from(ids)
+      .map((id) => placements.get(id))
+      .filter(Boolean);
+  }
+
   function uePointFromThreePoint(point) {
     const ue = threeVectorToUe(point, viewOffset);
     return { x: ue.x, y: ue.y };
@@ -2583,8 +2609,19 @@ import {
     return candidates;
   }
 
-  function raycastPlacementCandidates(ray, { radius = SPATIAL_PICK_RADIUS_CM, excludeIds = new Set() } = {}) {
-    return placementQueryCandidatesFromRay(ray, radius)
+  function placementPickCandidatesFromRay(ray, radius = SPATIAL_PICK_RADIUS_CM) {
+    if (!spatialIndex.placementCells.size && placements.size) return Array.from(placements.values());
+    const groundPoint = new THREE.Vector3();
+    if (!ray.intersectPlane(dragPlane, groundPoint)) return placementQueryCandidatesFromRay(ray, radius);
+    const candidates = querySegmentRadius(uePointFromThreePoint(ray.origin), uePointFromThreePoint(groundPoint), radius);
+    return candidates.length ? candidates : placementQueryCandidatesFromRay(ray, radius);
+  }
+
+  function raycastPlacementCandidates(ray, { radius = SPATIAL_PICK_RADIUS_CM, excludeIds = new Set(), useRayPath = false } = {}) {
+    const source = useRayPath
+      ? placementPickCandidatesFromRay(ray, radius)
+      : placementQueryCandidatesFromRay(ray, radius);
+    return source
       .filter((placement) => !excludeIds.has(placement.id) && ensurePlacementVisualState(placement).visible !== false);
   }
 
@@ -3358,7 +3395,7 @@ import {
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const candidates = raycastPlacementCandidates(raycaster.ray);
+    const candidates = raycastPlacementCandidates(raycaster.ray, { useRayPath: true });
     const candidateIds = new Set(candidates.map((placement) => placement.id));
     const roots = candidates.map((placement) => getVisualRoot(placement)).filter(Boolean);
     const instanceMeshes = instanceBatchMeshesForPlacements(candidates);
@@ -3369,10 +3406,10 @@ import {
       const placement = placements.get(id);
       if (placement && ensurePlacementVisualState(placement).visible !== false) return id;
     }
-    return allowScreenFallback ? screenBoundsHitPlacementId(event, candidates) : "";
+    return allowScreenFallback ? screenBoundsHitPlacementId(event, candidates, raycaster.ray) : "";
   }
 
-  function screenBoundsHitPlacementId(event, candidates = Array.from(placements.values())) {
+  function screenBoundsHitPlacementId(event, candidates = Array.from(placements.values()), ray = null) {
     const point = {
       left: event.clientX - 6,
       right: event.clientX + 6,
@@ -3380,12 +3417,16 @@ import {
       bottom: event.clientY + 6,
     };
     let best = null;
+    const boxHit = new THREE.Vector3();
     for (const placement of candidates) {
       const bounds = placementScreenBounds(placement);
       if (!bounds || !rectsIntersect(point, bounds)) continue;
       const area = Math.max(1, bounds.right - bounds.left) * Math.max(1, bounds.bottom - bounds.top);
-      const selectedBias = selectedPlacedIds.has(placement.id) ? -1_000_000_000 : 0;
-      const score = selectedBias + area;
+      const worldBounds = ray ? getWorldBounds(placement) : null;
+      const hit = ray && worldBounds && !worldBounds.isEmpty() ? ray.intersectBox(worldBounds, boxHit) : null;
+      const distanceScore = hit ? ray.origin.distanceToSquared(hit) : Number.MAX_SAFE_INTEGER;
+      const selectedBias = selectedPlacedIds.has(placement.id) ? -0.001 : 0;
+      const score = distanceScore + area * 0.000001 + selectedBias;
       if (!best || score < best.score) best = { id: placement.id, score };
     }
     return best?.id || "";

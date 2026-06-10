@@ -300,7 +300,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Generate procedural RSDW Base Builder JSON files from math-based presets.",
     )
-    parser.add_argument("--preset", choices=("maze", "platform", "elevation-demo", "room-maze"), default="maze")
+    parser.add_argument(
+        "--preset",
+        choices=("maze", "platform", "elevation-demo", "room-maze", "jumping-puzzle"),
+        default="maze",
+    )
     parser.add_argument("--width", type=positive_int, default=16)
     parser.add_argument("--height", type=positive_int, default=16)
     parser.add_argument("--levels", type=positive_int, default=2)
@@ -345,6 +349,8 @@ def generate_build(
         generate_platform(generator, width=args.width, height=args.height)
     elif args.preset == "elevation-demo":
         generate_elevation_demo(generator, width=args.width, height=args.height, levels=args.levels)
+    elif args.preset == "jumping-puzzle":
+        generate_jumping_puzzle(generator, width=args.width, height=args.height, seed=args.seed)
     elif args.preset == "room-maze":
         report = generate_room_maze(
             generator,
@@ -446,6 +452,132 @@ def is_elevation_stair_connector_edge(
     incoming_opening = level > 0 and a == 0
     outgoing_opening = level + 1 < levels and a == platform_width
     return incoming_opening or outgoing_opening
+
+
+def generate_jumping_puzzle(generator: BuildingGenerator, width: int, height: int, seed: int) -> None:
+    rng = random.Random(seed)
+    width = max(5, width)
+    height = max(5, height)
+    wall_height = 3
+    entry_col = width // 2
+    exit_col = width // 2
+
+    for row in range(height):
+        for col in range(width):
+            generator.add_cell_surface(col, row)
+
+    platform_cells = jumping_puzzle_platform_cells(width, height, rng)
+    blocked_support_edges = {
+        (level, edge)
+        for level in range(wall_height)
+        for edge in perimeter_edges(width, height)
+    }
+    for col, row, level, role in platform_cells:
+        generator.add_cell_surface(col, row, level=level, role=role)
+        add_platform_supports(generator, col, row, level, role, blocked_edges=blocked_support_edges)
+
+    blocked_rail_edges: set[tuple[int, tuple[str, int, int]]] = set()
+    for col, row, level, _role in platform_cells:
+        for edge in cell_edges(col, row):
+            blocked_rail_edges.add((level, edge))
+
+    for level in range(wall_height):
+        for edge in perimeter_edges(width, height):
+            if edge == ("h", entry_col, 0) and level == 0:
+                generator.add_wall_edge(edge, role="doorframe", level=level)
+                continue
+            if edge == ("h", exit_col, height) and level == 2:
+                generator.add_wall_edge(edge, role="doorframe", level=level)
+                continue
+            generator.add_wall_edge(edge, role=jumping_puzzle_wall_role(edge, level), level=level)
+
+    rail_edges = {
+        (1, ("h", 1, 1)),
+        (1, ("h", width - 2, 1)),
+        (2, ("v", width // 2, height // 2)),
+        (2, ("h", 1, height - 2)),
+        (2, ("h", width - 2, height - 2)),
+    }
+    for level, edge in sorted(rail_edges):
+        if (level, edge) in blocked_rail_edges:
+            continue
+        generator.add_wall_edge(edge, role="narrow_wall", level=level)
+
+
+def jumping_puzzle_platform_cells(
+    width: int,
+    height: int,
+    rng: random.Random,
+) -> list[tuple[int, int, int, str]]:
+    left_first = rng.random() < 0.5
+    low_a = (1, 1) if left_first else (width - 2, 1)
+    low_b = (width - 2, 1) if left_first else (1, 1)
+    mid = (width // 2, height // 2)
+    high_a = (1, height - 2) if left_first else (width - 2, height - 2)
+    high_b = (width - 2, height - 2) if left_first else (1, height - 2)
+    exit_landing = (width // 2, height - 1)
+    candidates = [
+        (*low_a, 1, "floor_medium"),
+        (*low_b, 1, "floor_small"),
+        (*mid, 2, "floor_small"),
+        (*high_a, 2, "floor_medium"),
+        (*high_b, 2, "floor_small"),
+        (*exit_landing, 2, "floor_medium"),
+    ]
+    seen: set[tuple[int, int, int]] = set()
+    out = []
+    for col, row, level, role in candidates:
+        key = (col, row, level)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append((col, row, level, role))
+    return out
+
+
+def add_platform_supports(
+    generator: BuildingGenerator,
+    col: int,
+    row: int,
+    platform_level: int,
+    floor_role: str,
+    base_level: int = 0,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
+    support_role, half_size, support_height, support_faces = platform_support_spec(generator, floor_role)
+    center_x = col * generator.cell_size
+    center_y = row * generator.cell_size
+    z = base_level * generator.cell_size
+    top_z = platform_level * generator.cell_size
+    while z < top_z:
+        faces = (
+            (center_x, center_y - half_size, 0),
+            (center_x, center_y + half_size, 0),
+            (center_x - half_size, center_y, 90),
+            (center_x + half_size, center_y, 90),
+        )
+        for x, y, yaw in faces[:support_faces]:
+            generator.add_piece(support_role, x=x, y=y, z=z, yaw=yaw)
+        z += support_height
+
+
+def platform_support_spec(generator: BuildingGenerator, floor_role: str) -> tuple[str, float, float, int]:
+    if floor_role == "floor_small":
+        return "small_wall", generator.cell_size / 8, generator.cell_size / 4, 2
+    if floor_role == "floor_medium":
+        return "narrow_wall", generator.cell_size / 4, generator.cell_size, 2
+    return "narrow_wall", generator.cell_size / 2, generator.cell_size, 4
+
+
+def jumping_puzzle_wall_role(edge: tuple[str, int, int], level: int) -> str:
+    return "window_wall" if level > 0 and deterministic_jump_wall_pick(edge, level) == 0 else "wall"
+
+
+def deterministic_jump_wall_pick(edge: tuple[str, int, int], level: int) -> int:
+    axis, a, b = edge
+    axis_value = 1 if axis == "v" else 2
+    return abs((level + 1) * 79 + a * 17 + b * 31 + axis_value) % 4
 
 
 def generate_room_maze(
@@ -581,16 +713,23 @@ def assign_room_templates(
             room.width, room.height = 5, 3
         elif room.room_id in vertical_rooms:
             room.room_type = rng.choice(["stair_core", "tower", "atrium"])
-            room.width, room.height = (5, 5) if room.room_type == "atrium" else (4, 4)
+            room.width, room.height = (6, 5) if room.room_type == "atrium" else (5, 4)
         elif degrees[room.room_id] >= 3:
             room.room_type = "crossroad"
             room.width, room.height = 4, 4
         elif degrees[room.room_id] == 1:
-            room.room_type = "dead_end"
-            room.width, room.height = rng.choice([(2, 3), (3, 2), (3, 3)])
+            if rng.random() < 0.3:
+                room.room_type = "jumping_puzzle"
+                room.width, room.height = rng.choice([(5, 5), (6, 5), (5, 6)])
+            else:
+                room.room_type = "dead_end"
+                room.width, room.height = rng.choice([(2, 3), (3, 2), (3, 3)])
         elif rng.random() < 0.35:
             room.room_type = "gallery"
             room.width, room.height = rng.choice([(6, 3), (3, 6), (5, 3)])
+        elif rng.random() < 0.15:
+            room.room_type = "jumping_puzzle"
+            room.width, room.height = rng.choice([(5, 5), (6, 5), (5, 6)])
         else:
             room.room_type = "chamber"
             room.width, room.height = rng.choice([(3, 3), (4, 3), (4, 4), (5, 4)])
@@ -613,6 +752,14 @@ def apply_room_architecture_flags(
         room.has_columns = room.room_type == "atrium"
         room.has_windows = rng.random() < window_rate
         return
+    if room.room_type == "jumping_puzzle":
+        room.mask_kind = "rect"
+        room.wall_height = 3
+        room.has_balcony = False
+        room.has_divider = False
+        room.has_columns = False
+        room.has_windows = rng.random() < max(window_rate, 0.65)
+        return
     if room.room_type == "entry":
         room.mask_kind = "rect"
     elif room.room_type == "crossroad":
@@ -628,7 +775,7 @@ def apply_room_architecture_flags(
     room.wall_height = rng.choice([2, 3]) if rng.random() < tall_room_rate else 1
     room.has_balcony = room.wall_height >= 2 and room.width >= 4 and room.height >= 4 and rng.random() < balcony_rate
     room.has_divider = room.width >= 4 and room.height >= 3 and rng.random() < 0.45
-    room.has_columns = room.width >= 4 and room.height >= 4 and rng.random() < 0.35
+    room.has_columns = False
     room.has_windows = rng.random() < window_rate
 
 
@@ -767,25 +914,43 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
     corridor_cells: dict[int, set[tuple[int, int]]] = {}
     stair_bay_cells: dict[int, set[tuple[int, int]]] = {}
     wall_roles: dict[tuple[int, tuple[str, int, int]], str] = {}
+    open_wall_edges: set[tuple[int, tuple[str, int, int]]] = set()
     connection_records: dict[tuple[int, int], list[tuple[int, tuple[str, int, int]]]] = {}
     stair_specs: list[tuple[RoomNode, RoomNode, int]] = []
+    upper_stair_shaft_cells: dict[int, set[tuple[int, int]]] = {}
+
+    for edge in build.edges:
+        if not edge.vertical:
+            continue
+        lower, upper = vertical_edge_rooms(build.rooms, edge)
+        stair_row = vertical_connection_row(lower, upper)
+        upper_stair_shaft_cells.setdefault(upper.room_id, set()).update(
+            vertical_stair_shaft_cells(upper, stair_row, generator)
+        )
+        open_wall_edges.add((upper.level, vertical_stair_top_edge(upper, stair_row, generator)))
 
     for room in build.rooms:
         cells = set(cells_for_room(room))
+        cells -= upper_stair_shaft_cells.get(room.room_id, set())
+        if not cells:
+            raise GeneratorError(f"Room {room.room_id} has no floor cells after stair shaft reservation.")
         room_cells[room.room_id] = cells
         occupied.setdefault(room.level, set()).update(cells)
 
     for edge in build.edges:
         if edge.vertical:
             lower, upper = vertical_edge_rooms(build.rooms, edge)
-            door_edges, stair_row, lower_path = vertical_door_edges(lower, upper)
+            door_edges, stair_row, lower_path = vertical_door_edges(lower, upper, generator)
             bay_cells = lower_stair_bay_cells(upper, stair_row, generator)
             occupied.setdefault(lower.level, set()).update(lower_path)
             corridor_cells.setdefault(lower.level, set()).update(lower_path)
             stair_bay_cells.setdefault(lower.level, set()).update(bay_cells)
             occupied.setdefault(lower.level, set()).update(bay_cells)
             for door in door_edges:
-                wall_roles[(door[0], door[1])] = "doorframe"
+                if door[0] == upper.level:
+                    open_wall_edges.add(door)
+                else:
+                    wall_roles[(door[0], door[1])] = "doorframe"
             stair_specs.append((lower, upper, stair_row))
             connection_records[normalized_edge(edge.a, edge.b)] = door_edges
             continue
@@ -808,13 +973,18 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
 
     for room in build.rooms:
         for height_index in range(room.wall_height):
-            for edge in room_perimeter_edges(room):
+            for edge in perimeter_edges_for_cells(room_cells[room.room_id]):
                 key = (room.level + height_index, edge)
+                if key in open_wall_edges:
+                    continue
                 wall_roles.setdefault(key, room_wall_role(room, edge, height_index))
 
     for level, cells in stair_bay_cells.items():
-        for edge in perimeter_edges_for_cells(cells):
-            wall_roles.setdefault((level, edge), "wall")
+        for col, row in cells:
+            for edge in cell_edges(col, row):
+                neighbor = cell_neighbor_across_edge(edge, col, row)
+                if neighbor not in occupied.get(level, set()):
+                    wall_roles.setdefault((level, edge), "wall")
 
     for level, cells in corridor_cells.items():
         for col, row in cells:
@@ -824,9 +994,12 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
                     wall_roles.setdefault((level, edge), "wall")
 
     for level, edge in sorted(wall_roles):
+        if (level, edge) in open_wall_edges:
+            continue
         generator.add_wall_edge(edge, role=wall_roles[(level, edge)], level=level)
 
-    emit_room_architecture_features(generator, build)
+    blocked_feature_edges = set(wall_roles) | open_wall_edges
+    emit_room_architecture_features(generator, build, blocked_feature_edges)
 
     for lower, upper, stair_row in stair_specs:
         add_vertical_stairs(generator, lower, upper, stair_row)
@@ -847,13 +1020,14 @@ def horizontal_corridor(room_a: RoomNode, room_b: RoomNode) -> tuple[set[tuple[i
 def vertical_door_edges(
     lower: RoomNode,
     upper: RoomNode,
+    generator: BuildingGenerator,
 ) -> tuple[list[tuple[int, tuple[str, int, int]]], int, set[tuple[int, int]]]:
     if upper.level != lower.level + 1:
         raise GeneratorError("Vertical room-maze connections currently require exactly one level of rise.")
     stair_row = vertical_connection_row(lower, upper)
     _inside_lower, outside_lower, lower_edge = doorway_for_side(lower, "east", row_offset=stair_row - lower.y_value)
     lower_path = manhattan_path(outside_lower, (upper.x_value, stair_row))
-    upper_internal_edge = ("v", upper.x_value + min(2, upper.width - 1), stair_row)
+    upper_internal_edge = vertical_upper_landing_edge(upper, stair_row, generator)
     return [(lower.level, lower_edge), (upper.level, upper_internal_edge)], stair_row, lower_path
 
 
@@ -874,6 +1048,43 @@ def add_vertical_stairs(generator: BuildingGenerator, lower: RoomNode, upper: Ro
         generator.add_piece("stairs", stair_x, stair_y, stair_z, yaw=STRAIGHT_STAIR_YAW)
 
 
+def vertical_stair_segment_count(generator: BuildingGenerator) -> int:
+    return max(1, round(generator.cell_size / generator.stair_rise))
+
+
+def vertical_stair_shaft_cells(upper: RoomNode, stair_row: int, generator: BuildingGenerator) -> set[tuple[int, int]]:
+    stairs_needed = vertical_stair_segment_count(generator)
+    room_cells = set(cells_for_room(upper))
+    shaft = {(upper.x_value + offset, stair_row) for offset in range(max(0, stairs_needed - 1))}
+    if not shaft <= room_cells:
+        raise GeneratorError(f"Room {upper.room_id} cannot fit an internal stair shaft.")
+    landing = vertical_stair_landing_cell(upper, stair_row, generator)
+    if landing not in room_cells:
+        raise GeneratorError(f"Room {upper.room_id} cannot fit an upper stair landing.")
+    return shaft
+
+
+def vertical_stair_landing_cell(upper: RoomNode, stair_row: int, generator: BuildingGenerator) -> tuple[int, int]:
+    return upper.x_value + max(0, vertical_stair_segment_count(generator) - 1), stair_row
+
+
+def vertical_stair_top_edge(upper: RoomNode, stair_row: int, generator: BuildingGenerator) -> tuple[str, int, int]:
+    landing_col, landing_row = vertical_stair_landing_cell(upper, stair_row, generator)
+    return ("v", landing_col, landing_row)
+
+
+def vertical_upper_landing_edge(
+    upper: RoomNode,
+    stair_row: int,
+    generator: BuildingGenerator,
+) -> tuple[str, int, int]:
+    landing_col, landing_row = vertical_stair_landing_cell(upper, stair_row, generator)
+    interior_cell = (landing_col + 1, landing_row)
+    if interior_cell not in set(cells_for_room(upper)):
+        raise GeneratorError(f"Room {upper.room_id} needs one interior cell beyond the upper stair landing.")
+    return ("v", landing_col + 1, landing_row)
+
+
 def vertical_connection_row(lower: RoomNode, upper: RoomNode) -> int:
     lower_rows = {row for _col, row in cells_for_room(lower)}
     upper_rows = {row for _col, row in cells_for_room(upper)}
@@ -885,12 +1096,21 @@ def vertical_connection_row(lower: RoomNode, upper: RoomNode) -> int:
 
 
 def lower_stair_bay_cells(upper: RoomNode, stair_row: int, generator: BuildingGenerator) -> set[tuple[int, int]]:
-    stairs_needed = max(1, round(generator.cell_size / generator.stair_rise))
-    width = min(upper.width, stairs_needed + 1)
-    cells = {(upper.x_value + offset, stair_row) for offset in range(width)}
+    stairs_needed = vertical_stair_segment_count(generator)
+    width = min(upper.width, stairs_needed + 2)
+    rows = [stair_row]
+    if stair_row + 1 < upper.y_value + upper.height:
+        rows.append(stair_row + 1)
+    elif stair_row - 1 >= upper.y_value:
+        rows.append(stair_row - 1)
+    cells = {
+        (upper.x_value + offset, row)
+        for offset in range(width)
+        for row in rows
+    }
     room_cells = set(cells_for_room(upper))
     cells &= room_cells
-    if len(cells) < stairs_needed:
+    if len({cell for cell in cells if cell[1] == stair_row}) < stairs_needed + 1:
         raise GeneratorError(f"Upper room {upper.room_id} has no internal space for a stair bay.")
     return cells
 
@@ -1136,17 +1356,64 @@ def deterministic_edge_pick(room: RoomNode, edge: tuple[str, int, int], modulo: 
     return abs((room.room_id + 1) * 131 + a * 17 + b * 31 + axis_value) % modulo
 
 
-def emit_room_architecture_features(generator: BuildingGenerator, build: RoomMazeBuild) -> None:
+def emit_room_architecture_features(
+    generator: BuildingGenerator,
+    build: RoomMazeBuild,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
     for room in build.rooms:
+        if room.room_type == "jumping_puzzle":
+            emit_jumping_puzzle_room(generator, room, blocked_edges)
         if room.has_balcony:
-            emit_room_balcony(generator, room)
+            emit_room_balcony(generator, room, blocked_edges)
         if room.has_divider:
-            emit_room_divider(generator, room)
+            emit_room_divider(generator, room, blocked_edges)
         if room.has_columns:
-            emit_room_columns(generator, room)
+            emit_room_columns(generator, room, blocked_edges)
 
 
-def emit_room_balcony(generator: BuildingGenerator, room: RoomNode) -> None:
+def emit_jumping_puzzle_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
+    cells = set(cells_for_room(room))
+    if room.width < 5 or room.height < 5:
+        return
+    candidates = [
+        (room.x_value + 1, room.y_value + 1, room.level + 1, "floor_medium"),
+        (room.x_value + room.width - 2, room.y_value + 1, room.level + 1, "floor_small"),
+        (room.x_value + room.width // 2, room.y_value + room.height // 2, room.level + 2, "floor_small"),
+        (room.x_value + 1, room.y_value + room.height - 2, room.level + 2, "floor_medium"),
+        (room.x_value + room.width - 2, room.y_value + room.height - 2, room.level + 2, "floor_medium"),
+    ]
+    used: set[tuple[int, int, int]] = set()
+    for col, row, level, role in candidates:
+        if (col, row) not in cells or (col, row, level) in used:
+            continue
+        used.add((col, row, level))
+        generator.add_cell_surface(col, row, level=level, role=role)
+        add_platform_supports(generator, col, row, level, role, base_level=room.level, blocked_edges=blocked_edges)
+
+    rail_edges = [
+        ("h", room.x_value + 1, room.y_value + 1),
+        ("v", room.x_value + room.width - 1, room.y_value + 1),
+        ("h", room.x_value + room.width - 2, room.y_value + room.height - 1),
+    ]
+    for edge in rail_edges:
+        if feature_edge_blocked(edge, room.level + 1, blocked_edges):
+            continue
+        generator.add_wall_edge(edge, role="narrow_wall", level=room.level + 1)
+
+
+def emit_room_balcony(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
     cells = balcony_cells(room)
     if not cells:
         return
@@ -1155,6 +1422,8 @@ def emit_room_balcony(generator: BuildingGenerator, room: RoomNode) -> None:
     for edge in perimeter_edges_for_cells(cells):
         a, b = cells_across_edge(edge)
         if a in cells and b in cells:
+            continue
+        if feature_edge_blocked(edge, room.level + 1, blocked_edges):
             continue
         generator.add_wall_edge(edge, role="narrow_wall", level=room.level + 1)
 
@@ -1171,7 +1440,12 @@ def balcony_cells(room: RoomNode) -> set[tuple[int, int]]:
     return cells
 
 
-def emit_room_divider(generator: BuildingGenerator, room: RoomNode) -> None:
+def emit_room_divider(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
     cells = set(cells_for_room(room))
     if room.width < 4 or room.height < 3:
         return
@@ -1182,7 +1456,10 @@ def emit_room_divider(generator: BuildingGenerator, room: RoomNode) -> None:
         for row in rows:
             if row == gap:
                 continue
-            generator.add_wall_edge(("v", col, row), role="narrow_wall", level=room.level)
+            edge = ("v", col, row)
+            if feature_edge_blocked(edge, room.level, blocked_edges):
+                continue
+            generator.add_wall_edge(edge, role="narrow_wall", level=room.level)
     else:
         row = room.y_value + room.height // 2
         cols = [col for col in range(room.x_value + 1, room.x_value + room.width - 1) if (col, row - 1) in cells and (col, row) in cells]
@@ -1190,10 +1467,18 @@ def emit_room_divider(generator: BuildingGenerator, room: RoomNode) -> None:
         for col in cols:
             if col == gap:
                 continue
-            generator.add_wall_edge(("h", col, row), role="narrow_wall", level=room.level)
+            edge = ("h", col, row)
+            if feature_edge_blocked(edge, room.level, blocked_edges):
+                continue
+            generator.add_wall_edge(edge, role="narrow_wall", level=room.level)
 
 
-def emit_room_columns(generator: BuildingGenerator, room: RoomNode) -> None:
+def emit_room_columns(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+) -> None:
+    blocked_edges = blocked_edges or set()
     cells = set(cells_for_room(room))
     candidates = [
         (room.x_value + 1, room.y_value + 1),
@@ -1206,7 +1491,24 @@ def emit_room_columns(generator: BuildingGenerator, room: RoomNode) -> None:
             continue
         axis = "h" if index % 2 else "v"
         edge = (axis, col, row)
+        if feature_edge_blocked(edge, room.level, blocked_edges):
+            continue
         generator.add_wall_edge(edge, role="small_wall", level=room.level)
+
+
+def feature_edge_blocked(
+    edge: tuple[str, int, int],
+    level: int,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+) -> bool:
+    if (level, edge) in blocked_edges:
+        return True
+    a, b = cells_across_edge(edge)
+    for cell in (a, b):
+        for candidate in cell_edges(cell[0], cell[1]):
+            if (level, candidate) in blocked_edges:
+                return True
+    return False
 
 
 def cells_across_edge(edge: tuple[str, int, int]) -> tuple[tuple[int, int], tuple[int, int]]:
@@ -1478,6 +1780,8 @@ def default_build_name(args: argparse.Namespace) -> str:
         return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}x{args.levels}"
     if args.preset == "room-maze":
         return f"procedural_{args.preset}_t{args.tier}_{args.rooms}_rooms_s{args.seed}"
+    if args.preset == "jumping-puzzle":
+        return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}_s{args.seed}"
     return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}_s{args.seed}"
 
 
