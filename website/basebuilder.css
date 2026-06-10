@@ -1309,13 +1309,120 @@ button:focus-visible {
   padding: 0 0.55rem 0.8rem;
 }
 
+.placed-group {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.placed-group-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 42px;
+  border: 1px solid rgba(243, 207, 137, 0.18);
+  border-radius: 8px;
+  background: rgba(224, 200, 150, 0.08);
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.placed-group-toggle {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 0.42rem;
+  align-items: center;
+  min-width: 0;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0 0.35rem;
+  text-align: left;
+}
+
+.placed-group-caret::before {
+  content: "›";
+  display: block;
+  color: var(--rsdw-accent);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+.placed-group.is-open .placed-group-caret::before {
+  transform: rotate(90deg);
+}
+
+.placed-group-body {
+  display: grid;
+  gap: 0.32rem;
+  padding-left: 0.45rem;
+}
+
 .placed-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) 32px auto;
+  gap: 0.35rem;
   align-items: center;
   min-height: 52px;
-  padding: 0.5rem 0.55rem;
+  padding: 0.25rem;
+}
+
+.placed-row.is-hidden {
+  opacity: 0.64;
+}
+
+.placed-select {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0.25rem 0.35rem;
+  text-align: left;
+}
+
+.placed-select:hover,
+.placed-select:focus-visible,
+.placed-group-toggle:hover,
+.placed-group-toggle:focus-visible {
+  border-color: transparent;
+  background: transparent;
+  transform: none;
+}
+
+.placed-visibility {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 0;
+}
+
+.placed-visibility img {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.placed-row:hover .placed-visibility,
+.placed-row.is-active .placed-visibility,
+.placed-group-header:hover .placed-visibility,
+.placed-visibility:focus-visible {
+  border-color: rgba(236, 215, 158, 0.35);
+  background: rgba(236, 215, 158, 0.1);
+  transform: none;
 }
 
 .placed-summary {

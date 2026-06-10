@@ -68,6 +68,8 @@ import {
   const GROUND_GRID_Y = -0.001;
   const INSTANCE_INITIAL_CAPACITY = 64;
   const SELECTION_PROMOTION_LIMIT = 250;
+  const SHOW_ICON_URL = "./shared/assets/ShowHide/Show.png";
+  const HIDE_ICON_URL = "./shared/assets/ShowHide/Hide.png";
   const VIEW_HELPER_SIZE = 128;
   const VIEW_HELPER_TOP = 86;
   const VIEW_HELPER_RIGHT = 14;
@@ -158,6 +160,7 @@ import {
   let selectedPlacedIds = new Set();
   let activePlacementId = "";
   let orientationMode = "world";
+  let closedPlacedGroupIds = new Set();
   let favoriteTargetIds = new Set();
   let viewOffset = { x: 0, y: 0, z: 0 };
   let buildName = "Browser Base";
@@ -728,7 +731,10 @@ import {
 
   function buildPlacementsWorldBox(rows = placements.values()) {
     const box = new THREE.Box3();
-    for (const placement of rows) box.union(getWorldBounds(placement));
+    for (const placement of rows) {
+      if (placement.hidden) continue;
+      box.union(getWorldBounds(placement));
+    }
     return box;
   }
 
@@ -1425,7 +1431,7 @@ import {
     if (!batch) return;
     const slot = batch.placementSlots.get(placement.id);
     if (slot === undefined) return;
-    const rootMatrix = visual.visible === false ? createHiddenInstanceMatrix() : placementRootMatrix(placement);
+    const rootMatrix = placementVisualRenderable(placement) ? placementRootMatrix(placement) : createHiddenInstanceMatrix();
     const matrix = new THREE.Matrix4();
     batch.template.descriptors.forEach((descriptor, index) => {
       matrix.copy(rootMatrix).multiply(descriptor.localMatrix);
@@ -2197,8 +2203,7 @@ import {
     const point = new THREE.Vector3();
     for (const placement of candidates) {
       if (excludedIds.has(placement.id)) continue;
-      const visual = ensurePlacementVisualState(placement);
-      if (visual.visible === false) continue;
+      if (!placementPickable(placement)) continue;
       const box = getWorldBounds(placement);
       if (!box || box.isEmpty()) continue;
       const hit = raycaster.ray.intersectBox(box, point);
@@ -2437,6 +2442,7 @@ import {
     if (!root) return;
     updateObjectFromState(root, placement.state, viewOffset);
     root.updateMatrixWorld(true);
+    root.visible = placementVisualRenderable(placement);
     markPlacementBoundsDirty(placement);
     if (updateIndex) updatePlacementSpatialIndex(placement);
   }
@@ -2449,7 +2455,34 @@ import {
       return;
     }
     const root = getVisualRoot(placement);
-    if (root) root.visible = visible;
+    if (root) root.visible = placementVisualRenderable(placement);
+  }
+
+  function placementVisualRenderable(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    return visual.visible !== false && !placement.hidden;
+  }
+
+  function placementPickable(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    return visual.visible !== false && !placement.hidden;
+  }
+
+  function applyPlacementRenderVisibility(placement) {
+    const visual = ensurePlacementVisualState(placement);
+    if (visual.backend === "instanced") {
+      updateInstancePlacementTransform(placement);
+      return;
+    }
+    const root = getVisualRoot(placement);
+    if (root) root.visible = placementVisualRenderable(placement);
+  }
+
+  function setPlacementHidden(placement, hidden) {
+    if (!placement) return;
+    placement.hidden = Boolean(hidden);
+    applyPlacementRenderVisibility(placement);
+    syncSelectionBoxes();
   }
 
   function markPlacementBoundsDirty(placement) {
@@ -2658,7 +2691,7 @@ import {
       ? placementPickCandidatesFromRay(ray, radius)
       : placementQueryCandidatesFromRay(ray, radius);
     return source
-      .filter((placement) => !excludeIds.has(placement.id) && ensurePlacementVisualState(placement).visible !== false);
+      .filter((placement) => !excludeIds.has(placement.id) && placementPickable(placement));
   }
 
   function clientPointOnDragPlane(x, y, localRaycaster = new THREE.Raycaster()) {
@@ -2703,6 +2736,7 @@ import {
       target,
       state: normalizeTransform(transform),
       metadata: { ...metadata },
+      hidden: Boolean(options.hidden),
       group: null,
       visual: null,
     };
@@ -2925,7 +2959,7 @@ import {
       helper.material.opacity = 0.96;
       helper.renderOrder = 999;
       helper.userData.selectionHelperType = helperType;
-      helper.visible = visual.visible !== false;
+      helper.visible = placementPickable(placement);
       selectionBoxes.set(placement.id, helper);
       scene.add(helper);
     }
@@ -3286,49 +3320,203 @@ import {
     els.selectionMeta.textContent = `${kindLabel(placement.target.asset_kind)} | ${placement.target.catalog_path}`;
   }
 
+  function placedGroupId(placement) {
+    return placement.target.target_id || placement.target.asset_stem || placement.target.display_name;
+  }
+
+  function placedGroups() {
+    const groups = new Map();
+    for (const placement of placements.values()) {
+      const id = placedGroupId(placement);
+      if (!groups.has(id)) {
+        groups.set(id, {
+          id,
+          target: placement.target,
+          placements: [],
+          selectedCount: 0,
+          hiddenCount: 0,
+        });
+      }
+      const group = groups.get(id);
+      group.placements.push(placement);
+      if (selectedPlacedIds.has(placement.id)) group.selectedCount += 1;
+      if (placement.hidden) group.hiddenCount += 1;
+    }
+    return Array.from(groups.values())
+      .sort((a, b) => a.target.display_name.localeCompare(b.target.display_name, undefined, { numeric: true }));
+  }
+
+  function createPlacedVisibilityButton({ hidden, label, onClick }) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `placed-visibility${hidden ? " is-hidden" : ""}`;
+    button.title = hidden ? `Hidden, click to show ${label}` : `Visible, click to hide ${label}`;
+    button.setAttribute("aria-label", button.title);
+    const img = document.createElement("img");
+    img.src = hidden ? HIDE_ICON_URL : SHOW_ICON_URL;
+    img.alt = "";
+    img.draggable = false;
+    button.appendChild(img);
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onClick();
+    });
+    return button;
+  }
+
+  function setPlacementsHidden(rows, hidden, { recordUndo = true } = {}) {
+    const affected = rows.filter((placement) => placement && placement.hidden !== Boolean(hidden));
+    if (!affected.length) return;
+    if (recordUndo) pushUndoSnapshot();
+    for (const placement of affected) setPlacementHidden(placement, hidden);
+    renderInspector();
+    renderPlacedList();
+    scheduleGroundGridUpdate();
+    updateCounters();
+    scheduleAutosave();
+    const action = hidden ? "Hidden" : "Shown";
+    showViewportNotice(affected.length === 1 ? action : `${action} ${affected.length}`);
+  }
+
+  function togglePlacementHidden(placement) {
+    if (!placement) return;
+    setPlacementsHidden([placement], !placement.hidden);
+  }
+
+  function toggleSelectedHidden() {
+    const selected = selectedPlacements();
+    if (!selected.length) return;
+    const shouldHide = selected.some((placement) => !placement.hidden);
+    setPlacementsHidden(selected, shouldHide);
+  }
+
+  function renderPlacedRow(placement) {
+    const row = document.createElement("div");
+    row.className = `placed-row${hasSelection(placement.id) ? " is-active" : ""}${placement.hidden ? " is-hidden" : ""}`;
+
+    const selectButton = document.createElement("button");
+    selectButton.type = "button";
+    selectButton.className = "placed-select";
+    selectButton.innerHTML = `
+      <span>
+        <span class="placed-name"></span>
+        <span class="placed-meta"></span>
+      </span>
+    `;
+    selectButton.querySelector(".placed-name").textContent = placement.target.display_name;
+    selectButton.querySelector(".placed-meta").textContent =
+      `${roundValue(placement.state.x)}, ${roundValue(placement.state.y)}, ${roundValue(placement.state.z)}`;
+    selectButton.addEventListener("click", (event) => {
+      const mode = selectionModifierFromEvent(event);
+      if (mode === "subtract") {
+        subtractSelection(placement.id);
+        return;
+      }
+      selectPlacement(placement.id, { toggle: mode === "add" });
+    });
+
+    const visibilityButton = createPlacedVisibilityButton({
+      hidden: placement.hidden,
+      label: placement.target.display_name,
+      onClick: () => togglePlacementHidden(placement),
+    });
+    const kind = document.createElement("span");
+    kind.className = "asset-kind";
+    kind.textContent = kindLabel(placement.target.asset_kind);
+    row.append(selectButton, visibilityButton, kind);
+    return row;
+  }
+
   function renderPlacedList() {
     els.placedList.textContent = "";
-    let shown = 0;
-    for (const placement of placements.values()) {
-      if (shown >= PLACED_LIST_LIMIT) break;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = `placed-row${hasSelection(placement.id) ? " is-active" : ""}`;
-      button.innerHTML = `
-        <span>
-          <span class="placed-name"></span>
-          <span class="placed-meta"></span>
-        </span>
-        <span class="asset-kind">${kindLabel(placement.target.asset_kind)}</span>
-      `;
-      button.querySelector(".placed-name").textContent = placement.target.display_name;
-      button.querySelector(".placed-meta").textContent =
-        `${roundValue(placement.state.x)}, ${roundValue(placement.state.y)}, ${roundValue(placement.state.z)}`;
-      button.addEventListener("click", (event) => {
-        const mode = selectionModifierFromEvent(event);
-        if (mode === "subtract") {
-          subtractSelection(placement.id);
-          return;
+    let shownRows = 0;
+    let capped = false;
+    for (const group of placedGroups()) {
+      const hasGroupHeader = group.placements.length > 1;
+      let groupBody = els.placedList;
+      let isOpen = true;
+      if (hasGroupHeader) {
+        isOpen = !closedPlacedGroupIds.has(group.id);
+        const wrapper = document.createElement("section");
+        wrapper.className = `placed-group${isOpen ? " is-open" : ""}`;
+        const header = document.createElement("div");
+        header.className = "placed-group-header";
+
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "placed-group-toggle";
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        const hiddenText = group.hiddenCount ? `, ${group.hiddenCount.toLocaleString()} hidden` : "";
+        const toggleGroupOpen = () => {
+          if (isOpen) closedPlacedGroupIds.add(group.id);
+          else closedPlacedGroupIds.delete(group.id);
+          renderPlacedList();
+        };
+        toggle.innerHTML = `
+          <span class="placed-group-caret" aria-hidden="true"></span>
+          <span>
+            <span class="placed-name"></span>
+            <span class="placed-meta"></span>
+          </span>
+        `;
+        toggle.querySelector(".placed-name").textContent = group.target.display_name;
+        toggle.querySelector(".placed-meta").textContent =
+          `${group.placements.length.toLocaleString()} ${kindPluralLabel(group.target.asset_kind)}${hiddenText}`;
+        toggle.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleGroupOpen();
+        });
+        header.addEventListener("click", (event) => {
+          if (event.target?.closest?.(".placed-visibility")) return;
+          event.preventDefault();
+          event.stopPropagation();
+          toggleGroupOpen();
+        });
+
+        const allHidden = group.hiddenCount === group.placements.length;
+        const visibilityButton = createPlacedVisibilityButton({
+          hidden: allHidden,
+          label: `${group.target.display_name} group`,
+          onClick: () => setPlacementsHidden(group.placements, !allHidden),
+        });
+        header.append(toggle, visibilityButton);
+        groupBody = document.createElement("div");
+        groupBody.className = "placed-group-body";
+        wrapper.append(header, groupBody);
+        els.placedList.appendChild(wrapper);
+      }
+
+      if (!isOpen) continue;
+      for (const placement of group.placements) {
+        if (shownRows >= PLACED_LIST_LIMIT) {
+          capped = true;
+          break;
         }
-        selectPlacement(placement.id, { toggle: mode === "add" });
-      });
-      els.placedList.appendChild(button);
-      shown += 1;
+        groupBody.appendChild(renderPlacedRow(placement));
+        shownRows += 1;
+      }
     }
-    if (placements.size > PLACED_LIST_LIMIT) {
+    if (capped || placements.size > shownRows) {
       const summary = document.createElement("div");
       summary.className = "placed-row placed-summary";
-      summary.textContent = `Showing ${PLACED_LIST_LIMIT.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
+      summary.textContent = `Showing row details for ${shownRows.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
       els.placedList.appendChild(summary);
     }
   }
 
   function updateCounters() {
     const total = placements.size;
-    els.buildCount.textContent = `${total} placed`;
+    const hiddenTotal = Array.from(placements.values()).filter((placement) => placement.hidden).length;
+    els.buildCount.textContent = hiddenTotal
+      ? `${total.toLocaleString()} placed, ${hiddenTotal.toLocaleString()} hidden`
+      : `${total.toLocaleString()} placed`;
     if (anchorPieceId) {
       const anchor = Array.from(placements.values()).find((placement) => Number(placement.metadata.piece_id) === anchorPieceId);
-      els.anchorStatus.textContent = anchor ? anchor.target.display_name : "Anchor missing";
+      els.anchorStatus.textContent = anchor
+        ? `${anchor.target.display_name}${anchor.hidden ? " (hidden)" : ""}`
+        : "Anchor missing";
     } else {
       els.anchorStatus.textContent = "No anchor";
     }
@@ -3486,6 +3674,7 @@ import {
     const rect = normalizedClientRect(gesture.startX, gesture.startY, gesture.currentX, gesture.currentY);
     const ids = [];
     for (const placement of marqueePlacementCandidates(rect)) {
+      if (!placementPickable(placement)) continue;
       const screenBox = placementScreenBounds(placement);
       if (screenBox && rectsIntersect(rect, screenBox)) ids.push(placement.id);
     }
@@ -3526,6 +3715,7 @@ import {
         target_id: placement.target.target_id,
         state: { ...placement.state },
         metadata: { ...placement.metadata },
+        hidden: Boolean(placement.hidden),
       })),
       selected_ids: Array.from(selectedPlacedIds),
       view_offset: { ...viewOffset },
@@ -3586,6 +3776,7 @@ import {
         target,
         transform: row.state,
         metadata: row.metadata,
+        hidden: Boolean(row.hidden),
       });
     }
     await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading restored models" });
@@ -3808,6 +3999,7 @@ import {
     selectedPlacedIds.clear();
     activePlacementId = "";
     activeGizmoMode = "";
+    closedPlacedGroupIds.clear();
     anchorPieceId = 0;
     nextPieceId = 1;
     if (resetOffset) viewOffset = { x: 0, y: 0, z: 0 };
@@ -3918,7 +4110,7 @@ import {
 
     let best = null;
     for (const candidate of candidates) {
-      if (excludedIds.has(candidate.id) || candidate.target.asset_kind !== "building_piece") continue;
+      if (excludedIds.has(candidate.id) || candidate.hidden || candidate.target.asset_kind !== "building_piece") continue;
       const candidateSnaps = index.snaps[candidate.target.snap_class];
       if (!candidateSnaps || !Array.isArray(candidateSnaps.plugs)) continue;
       for (const moverRow of moverPlugRows) {
@@ -4016,6 +4208,7 @@ import {
       const entry = entries[index];
       await createPlacement(entry.target, entry.transform, entry.metadata, {
         id: entry.id,
+        hidden: entry.hidden,
         select: false,
         render: false,
       });
@@ -4217,6 +4410,7 @@ import {
     const actors = [];
     const usedPieceIds = new Set();
     for (const placement of placements.values()) {
+      if (placement.hidden) continue;
       if (placement.target.asset_kind !== "building_piece") continue;
       let pid = Number(placement.metadata.piece_id || 0);
       if (pid <= 0 || usedPieceIds.has(pid)) {
@@ -4227,6 +4421,7 @@ import {
     }
 
     for (const placement of placements.values()) {
+      if (placement.hidden) continue;
       const target = placement.target;
       const transform = jsonTransformFromEditorState(placement.state);
       if (target.asset_kind === "building_piece") {
@@ -4493,6 +4688,9 @@ import {
       } else if (event.key === "Delete" || event.key === "Backspace" || key === "x") {
         event.preventDefault();
         deleteSelected();
+      } else if (key === "h") {
+        event.preventDefault();
+        toggleSelectedHidden();
       } else if (key === "d" && (event.ctrlKey || event.metaKey || event.shiftKey)) {
         event.preventDefault();
         duplicateSelected();
