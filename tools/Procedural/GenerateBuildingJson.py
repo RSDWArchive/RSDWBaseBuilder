@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 import sys
 from dataclasses import dataclass
@@ -30,7 +31,22 @@ TIER_TARGETS = {
         "medium_wall": "429_DA_T1_Wall_Medium",
         "floor_small": "527_DA_T1_Floor_Small",
         "floor_medium": "529_DA_T1_Floor_Medium",
+        "foundation_triangle": "525_DA_T1_Foundation_Large_Triangle",
+        "foundation_medium_triangle": "523_DA_T1_Foundation_Medium_Triangle",
+        "floor_triangle": "530_DA_T1_Floor_Large_Triangle",
+        "floor_medium_triangle": "528_DA_T1_Floor_Medium_Triangle",
         "shallow_stairs": "443_DA_T1_Stairs_Straight_Shallow",
+        "outer_corner_stairs": "445_DA_T1_Stairs_OuterCorner",
+        "inner_corner_stairs": "446_DA_T1_Stairs_InnerCorner",
+        "narrow_doorframe": "435_DA_T1_Wall_Large_Narrow_Doorframe",
+        "narrow_window_wall": "434_DA_T1_Wall_Large_Narrow_Windowframe",
+        "wall_large_diagonal": "440_DA_T1_Wall_Large_Diagonal",
+        "wall_large_diagonal_inverted": "439_DA_T1_Wall_Large_Diagonal_Inverted",
+        "wall_large_shallow": "433_DA_T1_Wall_Large_Shallow",
+        "wall_large_shallow_inverted": "432_DA_T1_Wall_Large_Shallow_Inverted",
+        "wall_medium_diagonal": "428_DA_T1_Wall_Medium_Diagonal",
+        "wall_medium_diagonal_inverted": "427_DA_T1_Wall_Medium_Diagonal_Inverted",
+        "pillar": "550_DA_T1_Beam_Thick_Large_Vertical",
     },
     2: {
         "foundation": "368_DA_T2_Foundation_Large",
@@ -45,28 +61,70 @@ TIER_TARGETS = {
         "medium_wall": "282_DA_T2_Wall_Medium",
         "floor_small": "369_DA_T2_Floor_Small",
         "floor_medium": "386_DA_T2_Floor_Medium",
+        "foundation_triangle": "367_DA_T2_Foundation_Large_Triangle",
+        "foundation_medium_triangle": "365_DA_T2_Foundation_Medium_Triangle",
+        "floor_triangle": "387_DA_T2_Floor_Large_Triangle",
+        "floor_medium_triangle": "385_DA_T2_Floor_Medium_Triangle",
         "shallow_stairs": "298_DA_T2_Stairs_Straight_Shallow",
+        "outer_corner_stairs": "300_DA_T2_Stairs_OuterCorner",
+        "inner_corner_stairs": "301_DA_T2_Stairs_InnerCorner",
+        "narrow_doorframe": "290_DA_T2_Wall_Large_Narrow_Doorframe",
+        "narrow_window_wall": "289_DA_T2_Wall_Large_Narrow_Windowframe",
+        "wall_large_diagonal": "295_DA_T2_Wall_Large_Diagonal",
+        "wall_large_diagonal_inverted": "294_DA_T2_Wall_Large_Diagonal_Inverted",
+        "wall_large_shallow": "288_DA_T2_Wall_Large_Shallow",
+        "wall_large_shallow_inverted": "287_DA_T2_Wall_Large_Shallow_Inverted",
+        "wall_medium_diagonal": "272_DA_T2_Wall_Medium_Diagonal",
+        "wall_medium_diagonal_inverted": "271_DA_T2_Wall_Medium_Diagonal_Inverted",
+        "pillar": "404_DA_T2_Beam_Thick_Large_Vertical",
     },
     3: {
         "foundation": "187_DA_T3_Foundation_Large",
         "floor": "203_DA_T3_Floor_Large",
         "wall": "122_DA_T3_Wall_Large",
         "doorframe": "118_DA_T3_Wall_Large_Doorframe",
+        "double_doorframe": "117_DA_T3_Wall_Large_Doorframe_Double",
         "stairs": "127_DA_T3_Stairs_Straight",
         "window_wall": "101_DA_T3_Wall_Large_Windowframe",
         "double_window_wall": "106_DA_T3_Wall_Large_Special_Windowed_1",
+        "stained_glass_wall": "090_DA_T3_Wall_StainedGlass_6",
+        "cross_slit_wall": "102_DA_T3_Wall_Large_Special_Windowed_5",
+        "dual_tall_slit_wall": "103_DA_T3_Wall_Large_Special_Windowed_4",
+        "tall_slit_wall": "104_DA_T3_Wall_Large_Special_Windowed_3",
+        "stone_inset_wall": "105_DA_T3_Wall_Large_Special_Windowed_2",
+        "arched_window_wall": "106_DA_T3_Wall_Large_Special_Windowed_1",
         "narrow_wall": "116_DA_T3_Wall_Large_Narrow",
         "small_wall": "091_DA_T3_Wall_Small",
         "medium_wall": "123_DA_T3_Wall_CurvedWindow_Medium",
         "floor_small": "190_DA_T3_Floor_Small",
         "floor_medium": "201_DA_T3_Floor_Medium",
+        "foundation_triangle": "186_DA_T3_Foundation_Large_Triangle",
+        "foundation_medium_triangle": "184_DA_T3_Foundation_Medium_Triangle",
+        "floor_triangle": "202_DA_T3_Floor_Large_Triangle",
+        "floor_medium_triangle": "191_DA_T3_Floor_Medium_Triangle",
         "shallow_stairs": "126_DA_T3_Stairs_Straight_Shallow",
+        "outer_corner_stairs": "128_DA_T3_Stairs_OuterCorner",
+        "inner_corner_stairs": "145_DA_T3_Stairs_InnerCorner",
+        "narrow_doorframe": "115_DA_T3_Wall_Large_Narrow_Doorframe",
+        "narrow_window_wall": "109_DA_T3_Wall_Large_Narrow_Windowframe",
+        "wall_large_diagonal": "120_DA_T3_Wall_Large_Diagonal",
+        "wall_large_diagonal_inverted": "119_DA_T3_Wall_Large_Diagonal_Inverted",
+        "wall_large_shallow": "108_DA_T3_Wall_Large_Shallow",
+        "wall_large_shallow_inverted": "107_DA_T3_Wall_Large_Shallow_Inverted",
+        "wall_medium_diagonal": "098_DA_T3_Wall_Medium_Diagonal",
+        "wall_medium_diagonal_inverted": "096_DA_T3_Wall_Medium_Diagonal_Inverted",
+        "pillar": "260_DA_T3_Beam_Thick_Large_Vertical",
     },
 }
 
 STRAIGHT_STAIR_YAW = 180
 STRAIGHT_STAIR_ALIGNMENT_OFFSET_X = -64.749
 STRAIGHT_STAIR_ALIGNMENT_OFFSET_Z = 77.135
+TRIANGLE_SIDE = 300.0
+TRIANGLE_HEIGHT = 259.80762
+TRIANGLE_BASE_OFFSET = 86.60254
+TRIANGLE_APEX_OFFSET = TRIANGLE_HEIGHT - TRIANGLE_BASE_OFFSET
+TRIANGLE_CENTER_EDGE_OFFSET = 236.60254
 
 REQUIRED_EXPORT_FIELDS = ("piece_data_index", "piece_data_name", "class_name")
 REQUIRED_TRANSFORM_FIELDS = (
@@ -79,6 +137,43 @@ REQUIRED_TRANSFORM_FIELDS = (
     "scale_x",
     "scale_y",
     "scale_z",
+)
+
+ROOM_TYPES = (
+    "entry",
+    "chamber",
+    "gallery",
+    "crossroad",
+    "dead_end",
+    "overlook",
+    "stair_core",
+    "tower",
+    "atrium",
+    "jumping_puzzle",
+)
+DETAIL_BUDGETS = ("balanced", "low-piece-count", "max-variety")
+JUMPING_PUZZLE_VARIANTS = ("stepping_stones", "ledge_climb", "spiral_ascent", "gap_crossing")
+SHAPE_LAB_STYLES = (
+    "chamfered-hall",
+    "diamond-hall",
+    "split-gallery",
+    "hex-cluster",
+    "faceted-room",
+    "obtuse-hex-room",
+)
+SHAPE_LAB_WALL_PATTERN = (
+    "wall",
+    "cross_slit_wall",
+    "wall",
+    "dual_tall_slit_wall",
+    "wall",
+    "arched_window_wall",
+    "wall",
+    "stained_glass_wall",
+    "wall",
+    "stone_inset_wall",
+    "wall",
+    "tall_slit_wall",
 )
 
 
@@ -109,6 +204,10 @@ class RoomNode:
     has_divider: bool = False
     has_columns: bool = False
     has_windows: bool = False
+    detail_budget: str = "balanced"
+    jumping_variant: str = "stepping_stones"
+    blueprint_id: str = ""
+    features: tuple[str, ...] = ()
 
     @property
     def x_value(self) -> int:
@@ -139,6 +238,46 @@ class RoomMazeReport:
     branches: int
     loops: int
     levels_used: int
+
+
+@dataclass(frozen=True)
+class RoomBlueprint:
+    blueprint_id: str
+    room_type: str
+    width: int
+    height: int
+    mask_kind: str
+    wall_height: int
+    features: tuple[str, ...]
+    window_bias: float = 0.4
+
+
+ROOM_BLUEPRINTS: tuple[RoomBlueprint, ...] = (
+    RoomBlueprint("entry_clear_5x4", "entry", 5, 4, "rect", 1, ("corner_pillars",), 0.2),
+    RoomBlueprint("entry_chamfered_gate_6x4", "entry", 6, 4, "chamfered", 2, ("corner_pillars",), 0.35),
+    RoomBlueprint("chamber_loft_8x6", "chamber", 8, 6, "rect", 2, ("loft", "corner_pillars"), 0.5),
+    RoomBlueprint("chamber_stage_7x5", "chamber", 7, 5, "rect", 2, ("back_stage",), 0.35),
+    RoomBlueprint("chamber_nested_suite_7x6", "chamber", 7, 6, "chamfered", 2, ("inner_room", "back_stage", "corner_pillars"), 0.45),
+    RoomBlueprint("chamber_split_6x5", "chamber", 6, 5, "split", 2, ("side_walkway",), 0.35),
+    RoomBlueprint("gallery_side_walkway_8x4", "gallery", 8, 4, "rect", 2, ("side_walkway",), 0.65),
+    RoomBlueprint("gallery_chamfered_8x5", "gallery", 8, 5, "chamfered", 2, ("side_walkway",), 0.65),
+    RoomBlueprint("crossroad_open_hub_6x6", "crossroad", 6, 6, "cross", 2, ("corner_pillars",), 0.35),
+    RoomBlueprint("crossroad_chamfered_hub_7x7", "crossroad", 7, 7, "chamfered", 2, ("corner_pillars",), 0.4),
+    RoomBlueprint("dead_end_stage_5x4", "dead_end", 5, 4, "rect", 2, ("back_stage",), 0.5),
+    RoomBlueprint("dead_end_alcove_5x5", "dead_end", 5, 5, "l", 2, ("back_stage",), 0.45),
+    RoomBlueprint("overlook_balcony_6x4", "overlook", 6, 4, "u", 2, ("balcony",), 0.7),
+    RoomBlueprint("overlook_chamfered_6x5", "overlook", 6, 5, "chamfered", 2, ("balcony",), 0.65),
+    RoomBlueprint("stair_core_landing_6x5", "stair_core", 6, 5, "rect", 2, (), 0.45),
+    RoomBlueprint("tower_stacked_6x5", "tower", 6, 5, "rect", 3, ("corner_pillars", "divider"), 0.55),
+    RoomBlueprint("atrium_upper_ring_7x6", "atrium", 7, 6, "rect", 3, ("upper_ring", "corner_pillars"), 0.7),
+    RoomBlueprint("atrium_chamfered_ring_8x7", "atrium", 8, 7, "chamfered", 3, ("upper_ring", "corner_pillars"), 0.75),
+    RoomBlueprint("jumping_puzzle_supported_8x8", "jumping_puzzle", 8, 8, "rect", 3, ("jumping_platforms",), 0.7),
+)
+
+BLUEPRINTS_BY_ROOM_TYPE: dict[str, tuple[RoomBlueprint, ...]] = {
+    room_type: tuple(blueprint for blueprint in ROOM_BLUEPRINTS if blueprint.room_type == room_type)
+    for room_type in ROOM_TYPES
+}
 
 
 @dataclass
@@ -203,7 +342,7 @@ class BuildingGenerator:
             "stability": target.default_stability,
             "is_ghosted": False,
         }
-        if self.anchor_piece_id == 0 and role == "foundation":
+        if self.anchor_piece_id == 0 and role.startswith("foundation"):
             self.anchor_piece_id = piece_id
             self.anchor_piece_data_index = target.piece_data_index
         self.pieces.append(row)
@@ -216,6 +355,23 @@ class BuildingGenerator:
             x=col * self.cell_size,
             y=row * self.cell_size,
             z=level * self.cell_size,
+        )
+
+    def add_cell_triangle_surface(
+        self,
+        col: int,
+        row: int,
+        level: int = 0,
+        role: str | None = None,
+        yaw: float = 0,
+    ) -> dict[str, Any]:
+        surface_role = role or ("foundation_triangle" if level == 0 else "floor_triangle")
+        return self.add_piece(
+            surface_role,
+            x=col * self.cell_size,
+            y=row * self.cell_size,
+            z=level * self.cell_size,
+            yaw=yaw,
         )
 
     def add_wall_edge(self, edge: tuple[str, int, int], role: str = "wall", level: int = 0) -> dict[str, Any]:
@@ -237,6 +393,24 @@ class BuildingGenerator:
                 yaw=90,
             )
         raise GeneratorError(f"Unknown wall edge axis: {axis!r}")
+
+    def add_wall_segment(
+        self,
+        role: str,
+        p1: tuple[float, float],
+        p2: tuple[float, float],
+        level: int = 0,
+    ) -> dict[str, Any]:
+        x1, y1 = p1
+        x2, y2 = p2
+        yaw = math.degrees(math.atan2(y2 - y1, x2 - x1)) % 360
+        return self.add_piece(
+            role,
+            x=(x1 + x2) / 2,
+            y=(y1 + y2) / 2,
+            z=level * self.cell_size,
+            yaw=yaw,
+        )
 
     def document(self, name: str, generated_unix: int = 0) -> dict[str, Any]:
         if not self.anchor_piece_id:
@@ -261,6 +435,8 @@ class BuildingGenerator:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.preset == "shape-lab":
+        args.tier = 3
 
     try:
         if args.validate_only and args.input:
@@ -302,7 +478,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--preset",
-        choices=("maze", "platform", "elevation-demo", "room-maze", "jumping-puzzle"),
+        choices=("maze", "platform", "elevation-demo", "room-maze", "jumping-puzzle", "room-lab", "shape-lab"),
         default="maze",
     )
     parser.add_argument("--width", type=positive_int, default=16)
@@ -317,6 +493,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--tall-room-rate", type=rate_float, default=0.35)
     parser.add_argument("--balcony-rate", type=rate_float, default=0.25)
     parser.add_argument("--window-rate", type=rate_float, default=0.4)
+    parser.add_argument("--room-type", choices=ROOM_TYPES, default="chamber")
+    parser.add_argument("--detail-budget", choices=DETAIL_BUDGETS, default="balanced")
+    parser.add_argument("--jumping-variant", choices=JUMPING_PUZZLE_VARIANTS, default="stepping_stones")
+    parser.add_argument("--shape-style", choices=SHAPE_LAB_STYLES, default="chamfered-hall")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--tier", type=int, choices=sorted(TIER_TARGETS), default=2)
     parser.add_argument("--name", default="")
@@ -350,7 +530,26 @@ def generate_build(
     elif args.preset == "elevation-demo":
         generate_elevation_demo(generator, width=args.width, height=args.height, levels=args.levels)
     elif args.preset == "jumping-puzzle":
-        generate_jumping_puzzle(generator, width=args.width, height=args.height, seed=args.seed)
+        generate_jumping_puzzle(
+            generator,
+            width=args.width,
+            height=args.height,
+            seed=args.seed,
+            variant=args.jumping_variant,
+            detail_budget=args.detail_budget,
+        )
+    elif args.preset == "room-lab":
+        report = generate_room_lab(
+            generator,
+            room_type=args.room_type,
+            width=args.width,
+            height=args.height,
+            seed=args.seed,
+            detail_budget=args.detail_budget,
+            jumping_variant=args.jumping_variant,
+        )
+    elif args.preset == "shape-lab":
+        generate_shape_lab(generator, style=args.shape_style)
     elif args.preset == "room-maze":
         report = generate_room_maze(
             generator,
@@ -363,6 +562,7 @@ def generate_build(
             tall_room_rate=args.tall_room_rate,
             balcony_rate=args.balcony_rate,
             window_rate=args.window_rate,
+            detail_budget=args.detail_budget,
             seed=args.seed,
         )
     else:
@@ -454,7 +654,606 @@ def is_elevation_stair_connector_edge(
     return incoming_opening or outgoing_opening
 
 
-def generate_jumping_puzzle(generator: BuildingGenerator, width: int, height: int, seed: int) -> None:
+def generate_shape_lab(generator: BuildingGenerator, style: str) -> None:
+    if style == "chamfered-hall":
+        square_cells = {
+            (col, row)
+            for row in range(6)
+            for col in range(8)
+        }
+        triangle_attachments = [
+            (1, 0, "s"),
+            (6, 0, "s"),
+            (1, 5, "n"),
+            (6, 5, "n"),
+            (0, 1, "w"),
+            (0, 4, "w"),
+            (7, 1, "e"),
+            (7, 4, "e"),
+        ]
+        entry_edges = {("h", 3, 0): "double_doorframe", ("h", 4, 6): "double_doorframe"}
+    elif style == "diamond-hall":
+        square_cells = {
+            (3, 0),
+            (2, 1), (3, 1), (4, 1),
+            (1, 2), (2, 2), (3, 2), (4, 2), (5, 2),
+            (0, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3),
+            (1, 4), (2, 4), (3, 4), (4, 4), (5, 4),
+            (2, 5), (3, 5), (4, 5),
+            (3, 6),
+        }
+        triangle_attachments = [
+            (2, 1, "s"),
+            (4, 1, "s"),
+            (1, 2, "w"),
+            (5, 2, "e"),
+            (1, 4, "w"),
+            (5, 4, "e"),
+            (2, 5, "n"),
+            (4, 5, "n"),
+        ]
+        entry_edges = {("h", 3, 0): "doorframe", ("h", 3, 7): "doorframe"}
+    elif style == "split-gallery":
+        square_cells = {
+            (col, row)
+            for row in range(5)
+            for col in range(9)
+            if col in {0, 1, 2, 3, 5, 6, 7, 8} or row in {1, 2, 3}
+        }
+        triangle_attachments = [
+            (0, 0, "w"),
+            (8, 0, "e"),
+            (0, 4, "w"),
+            (8, 4, "e"),
+            (4, 1, "s"),
+            (4, 3, "n"),
+        ]
+        entry_edges = {("v", 0, 2): "double_doorframe", ("v", 9, 2): "double_doorframe"}
+    elif style == "hex-cluster":
+        emit_hex_cluster_shape_lab(generator)
+        return
+    elif style == "faceted-room":
+        emit_faceted_room_shape_lab(generator)
+        return
+    elif style == "obtuse-hex-room":
+        emit_obtuse_hex_room_shape_lab(generator)
+        return
+    else:
+        raise GeneratorError(f"Unsupported shape-lab style: {style}")
+
+    emit_shape_lab_room(generator, square_cells, triangle_attachments, entry_edges)
+
+
+def emit_hex_cluster_shape_lab(generator: BuildingGenerator) -> None:
+    triangle_tiles = triangle_hex_tiles(0, 0)
+    by_yaw = {round(yaw): (x, y, yaw) for x, y, yaw in triangle_tiles}
+
+    entry_square = square_tile_attached_to_triangle_base(by_yaw[0])
+    exit_square = square_tile_attached_to_triangle_base(by_yaw[180])
+    square_tiles = [
+        (entry_square[0], entry_square[1], entry_square[2]),
+        (exit_square[0], exit_square[1], exit_square[2]),
+    ]
+    entry_edge_roles = {
+        square_outer_edge_key(entry_square): "double_doorframe",
+        square_outer_edge_key(exit_square): "double_doorframe",
+    }
+    emit_polygon_shape_lab_room(generator, square_tiles, triangle_tiles, entry_edge_roles)
+
+
+def emit_faceted_room_shape_lab(generator: BuildingGenerator) -> None:
+    square_tiles: list[tuple[float, float, float]] = []
+    for col in range(4):
+        for row in range(4):
+            square_tiles.append(((col - 1.5) * generator.cell_size, (row - 1.5) * generator.cell_size, 0.0))
+
+    triangle_tiles: list[tuple[float, float, float]] = []
+    triangle_keys: set[tuple[float, float, float]] = set()
+    square_by_grid = {
+        (col, row): ((col - 1.5) * generator.cell_size, (row - 1.5) * generator.cell_size, 0.0)
+        for col in range(4)
+        for row in range(4)
+    }
+    bay_specs = [
+        ((1, 3), "n"),
+        ((2, 0), "s"),
+        ((0, 1), "w"),
+        ((3, 2), "e"),
+    ]
+    for grid_key, side in bay_specs:
+        add_triangle_bay_from_square_edge(
+            square_by_grid[grid_key],
+            side,
+            triangle_tiles,
+            triangle_keys,
+            include_wings=True,
+        )
+
+    entry_edge_roles = {
+        square_edge_key_by_side(square_by_grid[(1, 0)], "s"): "double_doorframe",
+        square_edge_key_by_side(square_by_grid[(2, 3)], "n"): "double_doorframe",
+    }
+    emit_polygon_shape_lab_room(generator, square_tiles, triangle_tiles, entry_edge_roles)
+
+
+def emit_obtuse_hex_room_shape_lab(generator: BuildingGenerator) -> None:
+    hex_centers = triangle_hex_room_centers()
+    triangle_tiles: list[tuple[float, float, float]] = []
+    triangle_keys: set[tuple[float, float, float]] = set()
+    for center_x, center_y in hex_centers:
+        for tile in triangle_hex_tiles(center_x, center_y):
+            append_triangle_tile(triangle_tiles, triangle_keys, tile)
+
+    boundary_edges = polygon_boundary_edges([], triangle_tiles)
+    entry_edge = boundary_edge_by_direction(boundary_edges, 240)
+    exit_edge = boundary_edge_by_direction(boundary_edges, 60)
+    entry_edge_roles = {
+        entry_edge[0]: "double_doorframe",
+        exit_edge[0]: "double_doorframe",
+    }
+    emit_polygon_shape_lab_room(generator, [], triangle_tiles, entry_edge_roles)
+
+
+def triangle_hex_room_centers() -> list[tuple[float, float]]:
+    centers: list[tuple[float, float]] = [(0.0, 0.0)]
+    center_keys: set[tuple[float, float]] = {(0.0, 0.0)}
+
+    for angle in (0, 60, 120, 180, 240, 300):
+        append_hex_center(centers, center_keys, hex_neighbor_center(0.0, 0.0, angle))
+
+    east = hex_neighbor_center(0.0, 0.0, 0)
+    northeast = hex_neighbor_center(0.0, 0.0, 60)
+    southwest = hex_neighbor_center(0.0, 0.0, 240)
+    for source, angle in (
+        (east, 0),
+        (east, 60),
+        (northeast, 60),
+        (southwest, 240),
+    ):
+        append_hex_center(centers, center_keys, hex_neighbor_center(source[0], source[1], angle))
+
+    return centers
+
+
+def append_hex_center(
+    centers: list[tuple[float, float]],
+    center_keys: set[tuple[float, float]],
+    center: tuple[float, float],
+) -> None:
+    key = (round(center[0], 3), round(center[1], 3))
+    if key in center_keys:
+        return
+    center_keys.add(key)
+    centers.append(center)
+
+
+def hex_neighbor_center(center_x: float, center_y: float, angle: float) -> tuple[float, float]:
+    edge_key, p1, p2 = boundary_edge_by_direction(hex_boundary_edges(center_x, center_y), angle)
+    return reflect_point_across_line((center_x, center_y), p1, p2)
+
+
+def hex_boundary_edges(center_x: float, center_y: float) -> list[
+    tuple[
+        tuple[tuple[float, float], tuple[float, float]],
+        tuple[float, float],
+        tuple[float, float],
+    ]
+]:
+    return polygon_boundary_edges([], triangle_hex_tiles(center_x, center_y))
+
+
+def add_triangle_bay_from_square_edge(
+    square_tile: tuple[float, float, float],
+    side: str,
+    triangle_tiles: list[tuple[float, float, float]],
+    triangle_keys: set[tuple[float, float, float]],
+    include_wings: bool = True,
+) -> None:
+    center_x, center_y, _yaw = square_tile
+    _label, p1, p2 = square_edge_by_side(square_tile, side)
+    root = triangle_tile_outside_edge(p1, p2, (center_x, center_y))
+    append_triangle_tile(triangle_tiles, triangle_keys, root)
+    if not include_wings:
+        return
+    for label, wing_p1, wing_p2 in triangle_edge_segments(root[0], root[1], root[2]):
+        if label == "base":
+            continue
+        append_triangle_tile(
+            triangle_tiles,
+            triangle_keys,
+            triangle_tile_outside_edge(wing_p1, wing_p2, (root[0], root[1])),
+        )
+
+
+def emit_polygon_shape_lab_room(
+    generator: BuildingGenerator,
+    square_tiles: list[tuple[float, float, float]],
+    triangle_tiles: list[tuple[float, float, float]],
+    entry_edge_roles: dict[tuple[tuple[float, float], tuple[float, float]], str],
+) -> None:
+    for x, y, yaw in square_tiles:
+        generator.add_piece("foundation", x=x, y=y, z=0, yaw=yaw)
+    for x, y, yaw in triangle_tiles:
+        generator.add_piece("foundation_triangle", x=x, y=y, z=0, yaw=yaw)
+
+    edge_records = polygon_edge_records(square_tiles, triangle_tiles)
+
+    wall_index = 0
+    for key in sorted(edge_records):
+        records = edge_records[key]
+        if len(records) > 2:
+            raise GeneratorError(f"Too many surfaces share edge {key}.")
+        if len(records) == 2:
+            continue
+        role = entry_edge_roles.get(key)
+        if role is None:
+            role = shape_wall_role(wall_index)
+            wall_index += 1
+        p1, p2 = records[0]
+        generator.add_wall_segment(role, p1, p2, level=0)
+
+
+def polygon_edge_records(
+    square_tiles: list[tuple[float, float, float]],
+    triangle_tiles: list[tuple[float, float, float]],
+) -> dict[
+    tuple[tuple[float, float], tuple[float, float]],
+    list[tuple[tuple[float, float], tuple[float, float]]],
+]:
+    edge_records: dict[
+        tuple[tuple[float, float], tuple[float, float]],
+        list[tuple[tuple[float, float], tuple[float, float]]],
+    ] = {}
+
+    for x, y, yaw in square_tiles:
+        for _label, p1, p2 in square_edge_segments(x, y, yaw):
+            edge_records.setdefault(surface_edge_key(p1, p2), []).append((p1, p2))
+
+    for x, y, yaw in triangle_tiles:
+        for _label, p1, p2 in triangle_edge_segments(x, y, yaw):
+            edge_records.setdefault(surface_edge_key(p1, p2), []).append((p1, p2))
+
+    return edge_records
+
+
+def polygon_boundary_edges(
+    square_tiles: list[tuple[float, float, float]],
+    triangle_tiles: list[tuple[float, float, float]],
+) -> list[
+    tuple[
+        tuple[tuple[float, float], tuple[float, float]],
+        tuple[float, float],
+        tuple[float, float],
+    ]
+]:
+    boundary = []
+    for key, records in polygon_edge_records(square_tiles, triangle_tiles).items():
+        if len(records) > 2:
+            raise GeneratorError(f"Too many surfaces share edge {key}.")
+        if len(records) == 1:
+            p1, p2 = records[0]
+            boundary.append((key, p1, p2))
+    return boundary
+
+
+def boundary_edge_by_direction(
+    boundary_edges: list[
+        tuple[
+            tuple[tuple[float, float], tuple[float, float]],
+            tuple[float, float],
+            tuple[float, float],
+        ]
+    ],
+    angle: float,
+) -> tuple[tuple[tuple[float, float], tuple[float, float]], tuple[float, float], tuple[float, float]]:
+    if not boundary_edges:
+        raise GeneratorError("Cannot pick a boundary edge from an empty polygon.")
+    direction_x, direction_y = rotate_vector(1.0, 0.0, angle)
+    return max(
+        boundary_edges,
+        key=lambda edge: (((edge[1][0] + edge[2][0]) / 2) * direction_x)
+        + (((edge[1][1] + edge[2][1]) / 2) * direction_y),
+    )
+
+
+def triangle_hex_tiles(center_x: float, center_y: float) -> list[tuple[float, float, float]]:
+    tiles = []
+    for yaw in (0, 60, 120, 180, 240, 300):
+        apex_x, apex_y = rotate_vector(0, TRIANGLE_APEX_OFFSET, yaw)
+        tiles.append((center_x - apex_x, center_y - apex_y, float(yaw)))
+    return tiles
+
+
+def square_tile_attached_to_triangle_base(
+    triangle_tile: tuple[float, float, float],
+) -> tuple[float, float, float, tuple[float, float]]:
+    center_x, center_y, yaw = triangle_tile
+    _label, p1, p2 = triangle_edge_segments(center_x, center_y, yaw)[0]
+    mid_x = (p1[0] + p2[0]) / 2
+    mid_y = (p1[1] + p2[1]) / 2
+    normal_x = mid_x - center_x
+    normal_y = mid_y - center_y
+    length = math.hypot(normal_x, normal_y)
+    if length == 0:
+        raise GeneratorError("Cannot attach square tile to zero-length triangle base normal.")
+    normal_x /= length
+    normal_y /= length
+    edge_yaw = math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0])) % 360
+    return (
+        mid_x + normal_x * (TRIANGLE_SIDE / 2),
+        mid_y + normal_y * (TRIANGLE_SIDE / 2),
+        edge_yaw,
+        (normal_x, normal_y),
+    )
+
+
+def triangle_tile_outside_edge(
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+    occupied_point: tuple[float, float],
+) -> tuple[float, float, float]:
+    edge_x = p2[0] - p1[0]
+    edge_y = p2[1] - p1[1]
+    edge_length = math.hypot(edge_x, edge_y)
+    if abs(edge_length - TRIANGLE_SIDE) > 0.01:
+        raise GeneratorError(f"Triangle edge length must be {TRIANGLE_SIDE}, got {edge_length:.3f}.")
+
+    occupied_side = edge_x * (occupied_point[1] - p1[1]) - edge_y * (occupied_point[0] - p1[0])
+    if abs(occupied_side) < 0.001:
+        raise GeneratorError("Cannot attach triangle because occupied point is on the source edge.")
+
+    base_start, base_end = (p2, p1) if occupied_side > 0 else (p1, p2)
+    base_x = base_end[0] - base_start[0]
+    base_y = base_end[1] - base_start[1]
+    yaw = math.degrees(math.atan2(base_y, base_x)) % 360
+    normal_x = -base_y / edge_length
+    normal_y = base_x / edge_length
+    mid_x = (base_start[0] + base_end[0]) / 2
+    mid_y = (base_start[1] + base_end[1]) / 2
+    return (
+        mid_x + normal_x * TRIANGLE_BASE_OFFSET,
+        mid_y + normal_y * TRIANGLE_BASE_OFFSET,
+        yaw,
+    )
+
+
+def append_triangle_tile(
+    triangle_tiles: list[tuple[float, float, float]],
+    triangle_keys: set[tuple[float, float, float]],
+    tile: tuple[float, float, float],
+) -> None:
+    key = (round(tile[0], 3), round(tile[1], 3), round(tile[2] % 360, 3))
+    if key in triangle_keys:
+        return
+    triangle_keys.add(key)
+    triangle_tiles.append(tile)
+
+
+def square_edge_by_side(
+    square_tile: tuple[float, float, float],
+    side: str,
+) -> tuple[str, tuple[float, float], tuple[float, float]]:
+    for edge in square_edge_segments(square_tile[0], square_tile[1], square_tile[2]):
+        if edge[0] == side:
+            return edge
+    raise GeneratorError(f"Unknown square edge side: {side}")
+
+
+def square_edge_key_by_side(
+    square_tile: tuple[float, float, float],
+    side: str,
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    _label, p1, p2 = square_edge_by_side(square_tile, side)
+    return surface_edge_key(p1, p2)
+
+
+def square_outer_edge_key(
+    square_tile: tuple[float, float, float, tuple[float, float]],
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    center_x, center_y, yaw, normal = square_tile
+    normal_x, normal_y = normal
+    best_edge = max(
+        square_edge_segments(center_x, center_y, yaw),
+        key=lambda edge: ((((edge[1][0] + edge[2][0]) / 2) - center_x) * normal_x)
+        + ((((edge[1][1] + edge[2][1]) / 2) - center_y) * normal_y),
+    )
+    return surface_edge_key(best_edge[1], best_edge[2])
+
+
+def square_edge_segments(
+    center_x: float,
+    center_y: float,
+    yaw: float,
+) -> list[tuple[str, tuple[float, float], tuple[float, float]]]:
+    local_vertices = (
+        (-TRIANGLE_SIDE / 2, -TRIANGLE_SIDE / 2),
+        (TRIANGLE_SIDE / 2, -TRIANGLE_SIDE / 2),
+        (TRIANGLE_SIDE / 2, TRIANGLE_SIDE / 2),
+        (-TRIANGLE_SIDE / 2, TRIANGLE_SIDE / 2),
+    )
+    vertices = [
+        (
+            center_x + rotate_vector(local_x, local_y, yaw)[0],
+            center_y + rotate_vector(local_x, local_y, yaw)[1],
+        )
+        for local_x, local_y in local_vertices
+    ]
+    return [
+        ("s", vertices[0], vertices[1]),
+        ("e", vertices[1], vertices[2]),
+        ("n", vertices[3], vertices[2]),
+        ("w", vertices[0], vertices[3]),
+    ]
+
+
+def triangle_edge_segments(
+    center_x: float,
+    center_y: float,
+    yaw: float,
+) -> list[tuple[str, tuple[float, float], tuple[float, float]]]:
+    base_left, base_right, apex = triangle_world_vertices(center_x, center_y, yaw)
+    return [
+        ("base", base_left, base_right),
+        ("left", base_left, apex),
+        ("right", apex, base_right),
+    ]
+
+
+def surface_edge_key(
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    a = canonical_surface_point(p1)
+    b = canonical_surface_point(p2)
+    return (a, b) if a <= b else (b, a)
+
+
+def canonical_surface_point(point: tuple[float, float]) -> tuple[float, float]:
+    return round(point[0], 3), round(point[1], 3)
+
+
+def rotate_vector(x: float, y: float, yaw: float) -> tuple[float, float]:
+    angle = math.radians(yaw)
+    cos_a = math.cos(angle)
+    sin_a = math.sin(angle)
+    return (x * cos_a) - (y * sin_a), (x * sin_a) + (y * cos_a)
+
+
+def reflect_point_across_line(
+    point: tuple[float, float],
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+) -> tuple[float, float]:
+    point_x, point_y = point
+    x1, y1 = p1
+    x2, y2 = p2
+    dx = x2 - x1
+    dy = y2 - y1
+    length_sq = (dx * dx) + (dy * dy)
+    if length_sq == 0:
+        raise GeneratorError("Cannot reflect across a zero-length edge.")
+    t = (((point_x - x1) * dx) + ((point_y - y1) * dy)) / length_sq
+    proj_x = x1 + t * dx
+    proj_y = y1 + t * dy
+    return (2 * proj_x) - point_x, (2 * proj_y) - point_y
+
+
+def emit_shape_lab_room(
+    generator: BuildingGenerator,
+    square_cells: set[tuple[int, int]],
+    triangle_attachments: list[tuple[int, int, str]],
+    entry_edges: dict[tuple[str, int, int], str],
+) -> None:
+    perimeter_edges = set(perimeter_edges_for_cells(square_cells))
+    triangle_base_edges: set[tuple[str, int, int]] = set()
+
+    for col, row, side in triangle_attachments:
+        if (col, row) not in square_cells:
+            raise GeneratorError(f"Triangle attachment {(col, row, side)} has no square floor to attach to.")
+        base_edge = triangle_attachment_base_edge(col, row, side)
+        if base_edge not in perimeter_edges:
+            raise GeneratorError(f"Triangle attachment {(col, row, side)} is not on an exposed room edge.")
+        if base_edge in entry_edges:
+            raise GeneratorError(f"Triangle attachment {(col, row, side)} overlaps a room entry edge.")
+        triangle_base_edges.add(base_edge)
+
+    for col, row in sorted(square_cells):
+        generator.add_cell_surface(col, row, level=0, role="foundation")
+    for col, row, side in triangle_attachments:
+        x, y, yaw = triangle_attachment_transform(generator, col, row, side)
+        generator.add_piece("foundation_triangle", x=x, y=y, z=0, yaw=yaw)
+
+    wall_index = 0
+    for edge in sorted(perimeter_edges):
+        if edge in triangle_base_edges:
+            continue
+        role = entry_edges.get(edge)
+        if role is None:
+            role = shape_wall_role(wall_index)
+            wall_index += 1
+        generator.add_wall_edge(edge, role=role, level=0)
+
+    for col, row, side in triangle_attachments:
+        x, y, yaw = triangle_attachment_transform(generator, col, row, side)
+        for p1, p2 in triangle_exposed_wall_segments(x, y, yaw):
+            generator.add_wall_segment(shape_wall_role(wall_index), p1, p2, level=0)
+            wall_index += 1
+
+
+def triangle_attachment_base_edge(col: int, row: int, side: str) -> tuple[str, int, int]:
+    if side == "n":
+        return "h", col, row + 1
+    if side == "s":
+        return "h", col, row
+    if side == "e":
+        return "v", col + 1, row
+    if side == "w":
+        return "v", col, row
+    raise GeneratorError(f"Unknown triangle attachment side: {side}")
+
+
+def triangle_attachment_transform(
+    generator: BuildingGenerator,
+    col: int,
+    row: int,
+    side: str,
+) -> tuple[float, float, float]:
+    center_x = col * generator.cell_size
+    center_y = row * generator.cell_size
+    if side == "n":
+        return center_x, center_y + TRIANGLE_CENTER_EDGE_OFFSET, 0
+    if side == "s":
+        return center_x, center_y - TRIANGLE_CENTER_EDGE_OFFSET, 180
+    if side == "e":
+        return center_x + TRIANGLE_CENTER_EDGE_OFFSET, center_y, 270
+    if side == "w":
+        return center_x - TRIANGLE_CENTER_EDGE_OFFSET, center_y, 90
+    raise GeneratorError(f"Unknown triangle attachment side: {side}")
+
+
+def triangle_exposed_wall_segments(
+    center_x: float,
+    center_y: float,
+    yaw: float,
+) -> list[tuple[tuple[float, float], tuple[float, float]]]:
+    base_left, base_right, apex = triangle_world_vertices(center_x, center_y, yaw)
+    return [(base_left, apex), (apex, base_right)]
+
+
+def triangle_world_vertices(center_x: float, center_y: float, yaw: float) -> tuple[
+    tuple[float, float],
+    tuple[float, float],
+    tuple[float, float],
+]:
+    angle = math.radians(yaw)
+    cos_a = math.cos(angle)
+    sin_a = math.sin(angle)
+    local_vertices = (
+        (-TRIANGLE_SIDE / 2, -TRIANGLE_BASE_OFFSET),
+        (TRIANGLE_SIDE / 2, -TRIANGLE_BASE_OFFSET),
+        (0.0, TRIANGLE_HEIGHT - TRIANGLE_BASE_OFFSET),
+    )
+    world_vertices = []
+    for local_x, local_y in local_vertices:
+        world_vertices.append((
+            center_x + (local_x * cos_a) - (local_y * sin_a),
+            center_y + (local_x * sin_a) + (local_y * cos_a),
+        ))
+    return world_vertices[0], world_vertices[1], world_vertices[2]
+
+
+def shape_wall_role(index: int) -> str:
+    return SHAPE_LAB_WALL_PATTERN[index % len(SHAPE_LAB_WALL_PATTERN)]
+
+
+def generate_jumping_puzzle(
+    generator: BuildingGenerator,
+    width: int,
+    height: int,
+    seed: int,
+    variant: str,
+    detail_budget: str,
+) -> None:
     rng = random.Random(seed)
     width = max(5, width)
     height = max(5, height)
@@ -466,7 +1265,7 @@ def generate_jumping_puzzle(generator: BuildingGenerator, width: int, height: in
         for col in range(width):
             generator.add_cell_surface(col, row)
 
-    platform_cells = jumping_puzzle_platform_cells(width, height, rng)
+    platform_cells = jumping_puzzle_platform_cells(width, height, rng, variant)
     blocked_support_edges = {
         (level, edge)
         for level in range(wall_height)
@@ -474,7 +1273,15 @@ def generate_jumping_puzzle(generator: BuildingGenerator, width: int, height: in
     }
     for col, row, level, role in platform_cells:
         generator.add_cell_surface(col, row, level=level, role=role)
-        add_platform_supports(generator, col, row, level, role, blocked_edges=blocked_support_edges)
+        add_platform_supports(
+            generator,
+            col,
+            row,
+            level,
+            role,
+            blocked_edges=blocked_support_edges,
+            detail_budget=detail_budget,
+        )
 
     blocked_rail_edges: set[tuple[int, tuple[str, int, int]]] = set()
     for col, row, level, _role in platform_cells:
@@ -508,7 +1315,35 @@ def jumping_puzzle_platform_cells(
     width: int,
     height: int,
     rng: random.Random,
+    variant: str,
 ) -> list[tuple[int, int, int, str]]:
+    if variant == "ledge_climb":
+        candidates = [
+            (1, 1, 1, "floor_medium"),
+            (1, max(2, height // 2), 1, "floor_medium"),
+            (2, height - 2, 2, "floor_small"),
+            (width // 2, height - 1, 2, "floor_medium"),
+            (width - 2, height - 2, 2, "floor_small"),
+        ]
+        return unique_platform_cells(candidates)
+    if variant == "spiral_ascent":
+        candidates = [
+            (1, 1, 1, "floor_medium"),
+            (width - 2, 1, 1, "floor_small"),
+            (width - 2, height // 2, 2, "floor_medium"),
+            (width - 2, height - 2, 2, "floor_small"),
+            (1, height - 2, 2, "floor_medium"),
+            (width // 2, height - 1, 2, "floor_medium"),
+        ]
+        return unique_platform_cells(candidates)
+    if variant == "gap_crossing":
+        candidates = [
+            (1, height // 2, 1, "floor_medium"),
+            (width // 2, height // 2, 1, "floor_small"),
+            (width - 2, height // 2, 2, "floor_medium"),
+            (width // 2, height - 1, 2, "floor_medium"),
+        ]
+        return unique_platform_cells(candidates)
     left_first = rng.random() < 0.5
     low_a = (1, 1) if left_first else (width - 2, 1)
     low_b = (width - 2, 1) if left_first else (1, 1)
@@ -524,6 +1359,10 @@ def jumping_puzzle_platform_cells(
         (*high_b, 2, "floor_small"),
         (*exit_landing, 2, "floor_medium"),
     ]
+    return unique_platform_cells(candidates)
+
+
+def unique_platform_cells(candidates: list[tuple[int, int, int, str]]) -> list[tuple[int, int, int, str]]:
     seen: set[tuple[int, int, int]] = set()
     out = []
     for col, row, level, role in candidates:
@@ -543,14 +1382,19 @@ def add_platform_supports(
     floor_role: str,
     base_level: int = 0,
     blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    detail_budget: str = "balanced",
 ) -> None:
     blocked_edges = blocked_edges or set()
-    support_role, half_size, support_height, support_faces = platform_support_spec(generator, floor_role)
+    support_role, half_size, support_height, support_faces = platform_support_spec(generator, floor_role, detail_budget)
     center_x = col * generator.cell_size
     center_y = row * generator.cell_size
     z = base_level * generator.cell_size
     top_z = platform_level * generator.cell_size
     while z < top_z:
+        if support_role == "pillar":
+            generator.add_piece(support_role, x=center_x, y=center_y, z=z)
+            z += support_height
+            continue
         faces = (
             (center_x, center_y - half_size, 0),
             (center_x, center_y + half_size, 0),
@@ -562,12 +1406,14 @@ def add_platform_supports(
         z += support_height
 
 
-def platform_support_spec(generator: BuildingGenerator, floor_role: str) -> tuple[str, float, float, int]:
+def platform_support_spec(generator: BuildingGenerator, floor_role: str, detail_budget: str) -> tuple[str, float, float, int]:
     if floor_role == "floor_small":
-        return "small_wall", generator.cell_size / 8, generator.cell_size / 4, 2
-    if floor_role == "floor_medium":
-        return "narrow_wall", generator.cell_size / 4, generator.cell_size, 2
-    return "narrow_wall", generator.cell_size / 2, generator.cell_size, 4
+        faces = 1 if detail_budget == "low-piece-count" else 4 if detail_budget == "max-variety" else 2
+        return "small_wall", generator.cell_size / 8, generator.cell_size / 4, faces
+    if floor_role in {"floor_medium", "floor_medium_triangle"}:
+        faces = 1 if detail_budget == "low-piece-count" else 4 if detail_budget == "max-variety" else 2
+        return "narrow_wall", generator.cell_size / 4, generator.cell_size, faces
+    return "pillar", 0, generator.cell_size, 1
 
 
 def jumping_puzzle_wall_role(edge: tuple[str, int, int], level: int) -> str:
@@ -591,6 +1437,7 @@ def generate_room_maze(
     tall_room_rate: float,
     balcony_rate: float,
     window_rate: float,
+    detail_budget: str,
     seed: int,
 ) -> RoomMazeReport:
     rng = random.Random(seed)
@@ -609,9 +1456,10 @@ def generate_room_maze(
         tall_room_rate=tall_room_rate,
         balcony_rate=balcony_rate,
         window_rate=window_rate,
+        detail_budget=detail_budget,
     )
     layout_room_maze(build, rng)
-    room_maze_to_pieces(generator, build)
+    room_maze_to_pieces(generator, build, detail_budget=detail_budget)
     validate_room_maze_build(build)
     return RoomMazeReport(
         rooms=len(build.rooms),
@@ -620,6 +1468,146 @@ def generate_room_maze(
         loops=build.loops,
         levels_used=build.levels_used,
     )
+
+
+def generate_room_lab(
+    generator: BuildingGenerator,
+    room_type: str,
+    width: int,
+    height: int,
+    seed: int,
+    detail_budget: str,
+    jumping_variant: str,
+) -> RoomMazeReport:
+    rng = random.Random(seed)
+    build = build_room_lab(room_type, width, height, rng, detail_budget, jumping_variant)
+    room_maze_to_pieces(generator, build, detail_budget=detail_budget)
+    validate_room_maze_build(build)
+    return RoomMazeReport(
+        rooms=len(build.rooms),
+        critical_path_length=build.critical_path_length,
+        branches=build.branches,
+        loops=build.loops,
+        levels_used=build.levels_used,
+    )
+
+
+def build_room_lab(
+    room_type: str,
+    width: int,
+    height: int,
+    rng: random.Random,
+    detail_budget: str,
+    jumping_variant: str,
+) -> RoomMazeBuild:
+    if room_type in {"stair_core", "atrium"}:
+        lower = lab_room_node(0, "entry", 0, 0, 0, 4, 4, rng, detail_budget, jumping_variant)
+        upper_w, upper_h = room_lab_dimensions(room_type, width, height)
+        upper = lab_room_node(1, room_type, 1, lower.x_value + lower.width, lower.y_value, upper_w, upper_h, rng, detail_budget, jumping_variant)
+        return RoomMazeBuild(
+            rooms=[lower, upper],
+            edges=[RoomGraphEdge(0, 1, vertical=True, critical=True)],
+            critical_path_length=2,
+            branches=0,
+            loops=0,
+            levels_used=2,
+        )
+
+    if room_type == "tower":
+        lower = lab_room_node(0, "entry", 0, 0, 0, 4, 4, rng, detail_budget, jumping_variant)
+        tower_w, tower_h = room_lab_dimensions(room_type, width, height)
+        tower = lab_room_node(1, "tower", 1, lower.x_value + lower.width, lower.y_value, tower_w, tower_h, rng, detail_budget, jumping_variant)
+        top = lab_room_node(2, "chamber", 2, tower.x_value + tower.width, tower.y_value, 4, 4, rng, detail_budget, jumping_variant)
+        top.mask_kind = "rect"
+        return RoomMazeBuild(
+            rooms=[lower, tower, top],
+            edges=[
+                RoomGraphEdge(0, 1, vertical=True, critical=True),
+                RoomGraphEdge(1, 2, vertical=True, critical=True),
+            ],
+            critical_path_length=3,
+            branches=0,
+            loops=0,
+            levels_used=3,
+        )
+
+    room_w, room_h = room_lab_dimensions(room_type, width, height)
+    primary = lab_room_node(0, room_type, 0, 4, 4, room_w, room_h, rng, detail_budget, jumping_variant)
+    rooms = [primary]
+    edges: list[RoomGraphEdge] = []
+    if room_type == "crossroad":
+        connector_specs = [
+            (1, primary.x_value + primary.width // 2 - 1, primary.y_value + primary.height + 2),
+            (2, primary.x_value + primary.width // 2 - 1, primary.y_value - 4),
+            (3, primary.x_value + primary.width + 2, primary.y_value + primary.height // 2 - 1),
+            (4, primary.x_value - 4, primary.y_value + primary.height // 2 - 1),
+        ]
+    else:
+        connector_specs = [(1, primary.x_value + primary.width // 2 - 1, primary.y_value + primary.height + 2)]
+    for room_id, x, y in connector_specs:
+        connector = RoomNode(
+            room_id=room_id,
+            room_type="chamber",
+            level=0,
+            width=2,
+            height=2,
+            x=x,
+            y=y,
+            mask_kind="rect",
+            wall_height=1,
+            detail_budget=detail_budget,
+            blueprint_id="lab_connector_2x2",
+        )
+        rooms.append(connector)
+        edges.append(RoomGraphEdge(0, room_id, critical=True))
+    return RoomMazeBuild(
+        rooms=rooms,
+        edges=edges,
+        critical_path_length=max(2, len(rooms)),
+        branches=max(0, len(rooms) - 2),
+        loops=0,
+        levels_used=1,
+    )
+
+
+def lab_room_node(
+    room_id: int,
+    room_type: str,
+    level: int,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+    rng: random.Random,
+    detail_budget: str,
+    jumping_variant: str,
+) -> RoomNode:
+    room = RoomNode(room_id=room_id, room_type=room_type, level=level, width=width, height=height, x=x, y=y)
+    apply_room_architecture_flags(
+        room,
+        rng,
+        irregular_room_rate=1.0,
+        tall_room_rate=0.7,
+        balcony_rate=0.6,
+        window_rate=0.7,
+        detail_budget=detail_budget,
+        jumping_variant=jumping_variant,
+    )
+    return room
+
+
+def room_lab_dimensions(room_type: str, width: int, height: int) -> tuple[int, int]:
+    default_w, default_h = default_room_blueprint(room_type).width, default_room_blueprint(room_type).height
+    if width == 16 and height == 16:
+        return default_w, default_h
+    return max(default_w, min(width, 10)), max(default_h, min(height, 10))
+
+
+def default_room_blueprint(room_type: str) -> RoomBlueprint:
+    blueprints = BLUEPRINTS_BY_ROOM_TYPE.get(room_type) or ()
+    if not blueprints:
+        raise GeneratorError(f"No room blueprints registered for room type {room_type!r}.")
+    return blueprints[0]
 
 
 def build_room_maze_graph(
@@ -695,6 +1683,7 @@ def assign_room_templates(
     tall_room_rate: float,
     balcony_rate: float,
     window_rate: float,
+    detail_budget: str,
 ) -> None:
     degrees = room_degrees(build.edges, len(build.rooms))
     vertical_rooms = {
@@ -707,33 +1696,35 @@ def assign_room_templates(
     for room in build.rooms:
         if room.room_id == 0:
             room.room_type = "entry"
-            room.width, room.height = 4, 4
         elif room.room_id == end_room_id:
             room.room_type = "overlook" if room.level > 0 else "gallery"
-            room.width, room.height = 5, 3
         elif room.room_id in vertical_rooms:
             room.room_type = rng.choice(["stair_core", "tower", "atrium"])
-            room.width, room.height = (6, 5) if room.room_type == "atrium" else (5, 4)
         elif degrees[room.room_id] >= 3:
             room.room_type = "crossroad"
-            room.width, room.height = 4, 4
         elif degrees[room.room_id] == 1:
             if rng.random() < 0.3:
                 room.room_type = "jumping_puzzle"
-                room.width, room.height = rng.choice([(5, 5), (6, 5), (5, 6)])
             else:
                 room.room_type = "dead_end"
-                room.width, room.height = rng.choice([(2, 3), (3, 2), (3, 3)])
         elif rng.random() < 0.35:
             room.room_type = "gallery"
-            room.width, room.height = rng.choice([(6, 3), (3, 6), (5, 3)])
         elif rng.random() < 0.15:
             room.room_type = "jumping_puzzle"
-            room.width, room.height = rng.choice([(5, 5), (6, 5), (5, 6)])
         else:
             room.room_type = "chamber"
-            room.width, room.height = rng.choice([(3, 3), (4, 3), (4, 4), (5, 4)])
-        apply_room_architecture_flags(room, rng, irregular_room_rate, tall_room_rate, balcony_rate, window_rate)
+        if room.room_type == "jumping_puzzle":
+            room.jumping_variant = JUMPING_PUZZLE_VARIANTS[room.room_id % len(JUMPING_PUZZLE_VARIANTS)]
+        apply_room_architecture_flags(
+            room,
+            rng,
+            irregular_room_rate,
+            tall_room_rate,
+            balcony_rate,
+            window_rate,
+            detail_budget,
+            room.jumping_variant,
+        )
 
 
 def apply_room_architecture_flags(
@@ -743,40 +1734,71 @@ def apply_room_architecture_flags(
     tall_room_rate: float,
     balcony_rate: float,
     window_rate: float,
+    detail_budget: str,
+    jumping_variant: str,
 ) -> None:
-    if room.room_type in {"stair_core", "tower", "atrium"}:
-        room.mask_kind = "rect"
-        room.wall_height = 2 if room.room_type == "stair_core" else rng.choice([2, 3])
-        room.has_balcony = room.room_type == "atrium"
-        room.has_divider = room.room_type == "tower"
-        room.has_columns = room.room_type == "atrium"
-        room.has_windows = rng.random() < window_rate
-        return
-    if room.room_type == "jumping_puzzle":
-        room.mask_kind = "rect"
-        room.wall_height = 3
-        room.has_balcony = False
-        room.has_divider = False
-        room.has_columns = False
-        room.has_windows = rng.random() < max(window_rate, 0.65)
-        return
-    if room.room_type == "entry":
-        room.mask_kind = "rect"
-    elif room.room_type == "crossroad":
-        room.mask_kind = "cross" if rng.random() < irregular_room_rate else "rect"
-    elif room.room_type == "gallery":
-        room.mask_kind = "split" if rng.random() < irregular_room_rate else "rect"
-    elif room.room_type == "overlook":
-        room.mask_kind = "u" if rng.random() < irregular_room_rate else "rect"
-    elif room.room_type == "dead_end":
-        room.mask_kind = "l" if rng.random() < irregular_room_rate else "rect"
+    room.detail_budget = detail_budget
+    room.jumping_variant = jumping_variant
+    blueprint = choose_room_blueprint(room.room_type, rng, irregular_room_rate, detail_budget)
+    apply_room_blueprint(room, blueprint, detail_budget, tall_room_rate, balcony_rate, window_rate, rng)
+
+
+def choose_room_blueprint(
+    room_type: str,
+    rng: random.Random,
+    irregular_room_rate: float,
+    detail_budget: str,
+) -> RoomBlueprint:
+    choices = list(BLUEPRINTS_BY_ROOM_TYPE.get(room_type) or ())
+    if not choices:
+        raise GeneratorError(f"No room blueprints registered for room type {room_type!r}.")
+    if detail_budget == "low-piece-count":
+        choices.sort(key=lambda blueprint: (len(blueprint.features), blueprint.width * blueprint.height))
+        return choices[0]
+    if rng.random() > irregular_room_rate:
+        simple = [
+            blueprint
+            for blueprint in choices
+            if blueprint.mask_kind in {"rect", "cross", "u"} and "inner_room" not in blueprint.features
+        ]
+        if simple:
+            choices = simple
+    return rng.choice(choices)
+
+
+def apply_room_blueprint(
+    room: RoomNode,
+    blueprint: RoomBlueprint,
+    detail_budget: str,
+    tall_room_rate: float,
+    balcony_rate: float,
+    window_rate: float,
+    rng: random.Random,
+) -> None:
+    room.blueprint_id = blueprint.blueprint_id
+    room.width = blueprint.width
+    room.height = blueprint.height
+    room.mask_kind = blueprint.mask_kind
+    room.features = budgeted_blueprint_features(blueprint.features, detail_budget)
+    if detail_budget == "low-piece-count":
+        room.wall_height = min(blueprint.wall_height, 2)
+    elif detail_budget == "max-variety":
+        room.wall_height = max(blueprint.wall_height, 3 if room.room_type not in {"entry", "dead_end"} else blueprint.wall_height)
     else:
-        room.mask_kind = rng.choice(["l", "t", "u", "split"]) if rng.random() < irregular_room_rate else "rect"
-    room.wall_height = rng.choice([2, 3]) if rng.random() < tall_room_rate else 1
-    room.has_balcony = room.wall_height >= 2 and room.width >= 4 and room.height >= 4 and rng.random() < balcony_rate
-    room.has_divider = room.width >= 4 and room.height >= 3 and rng.random() < 0.45
-    room.has_columns = False
-    room.has_windows = rng.random() < window_rate
+        room.wall_height = blueprint.wall_height if rng.random() < tall_room_rate or blueprint.wall_height > 1 else 1
+    room.has_balcony = "balcony" in room.features or ("upper_ring" in room.features and rng.random() < balcony_rate)
+    room.has_divider = "divider" in room.features
+    room.has_columns = "corner_pillars" in room.features
+    room.has_windows = rng.random() < max(window_rate, blueprint.window_bias)
+
+
+def budgeted_blueprint_features(features: tuple[str, ...], detail_budget: str) -> tuple[str, ...]:
+    if detail_budget == "max-variety":
+        return features
+    if detail_budget == "low-piece-count":
+        expensive = {"inner_room", "corner_triangles", "diagonal_braces"}
+        return tuple(feature for feature in features if feature not in expensive)
+    return features
 
 
 def layout_room_maze(build: RoomMazeBuild, rng: random.Random) -> None:
@@ -838,7 +1860,7 @@ def place_child_room(
 def vertical_room_candidates(parent: RoomNode, child: RoomNode) -> list[tuple[int, int]]:
     assert parent.x is not None and parent.y is not None
     base_x = parent.x + parent.width
-    x_options = [base_x + offset for offset in (0, 2, 4, 6, 8, 12)]
+    x_options = [base_x + offset for offset in range(0, 42, 2)]
     parent_rows = sorted({row for _col, row in cells_for_room(parent)}, key=lambda row: abs(row - parent.y_value))
     y_options = []
     for row in parent_rows:
@@ -908,11 +1930,12 @@ def room_overlaps_any(room: RoomNode, rooms: list[RoomNode]) -> bool:
     return False
 
 
-def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> None:
+def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild, detail_budget: str = "balanced") -> None:
     occupied: dict[int, set[tuple[int, int]]] = {}
     room_cells: dict[int, set[tuple[int, int]]] = {}
     corridor_cells: dict[int, set[tuple[int, int]]] = {}
     stair_bay_cells: dict[int, set[tuple[int, int]]] = {}
+    protected_cells: dict[int, set[tuple[int, int]]] = {}
     wall_roles: dict[tuple[int, tuple[str, int, int]], str] = {}
     open_wall_edges: set[tuple[int, tuple[str, int, int]]] = set()
     connection_records: dict[tuple[int, int], list[tuple[int, tuple[str, int, int]]]] = {}
@@ -944,13 +1967,16 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
             bay_cells = lower_stair_bay_cells(upper, stair_row, generator)
             occupied.setdefault(lower.level, set()).update(lower_path)
             corridor_cells.setdefault(lower.level, set()).update(lower_path)
+            protect_cells(protected_cells, lower.level, lower_path)
             stair_bay_cells.setdefault(lower.level, set()).update(bay_cells)
             occupied.setdefault(lower.level, set()).update(bay_cells)
+            protect_cells(protected_cells, lower.level, bay_cells)
             for door in door_edges:
                 if door[0] == upper.level:
                     open_wall_edges.add(door)
                 else:
                     wall_roles[(door[0], door[1])] = "doorframe"
+                protect_cells(protected_cells, door[0], cells_across_edge(door[1]))
             stair_specs.append((lower, upper, stair_row))
             connection_records[normalized_edge(edge.a, edge.b)] = door_edges
             continue
@@ -960,8 +1986,10 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
         path, door_edges = horizontal_corridor(room_a, room_b)
         occupied.setdefault(room_a.level, set()).update(path)
         corridor_cells.setdefault(room_a.level, set()).update(path)
+        protect_cells(protected_cells, room_a.level, path)
         for door in door_edges:
             wall_roles[(door[0], door[1])] = "doorframe"
+            protect_cells(protected_cells, door[0], cells_across_edge(door[1]))
         connection_records[normalized_edge(edge.a, edge.b)] = door_edges
 
     validate_room_connections(build, connection_records)
@@ -999,7 +2027,7 @@ def room_maze_to_pieces(generator: BuildingGenerator, build: RoomMazeBuild) -> N
         generator.add_wall_edge(edge, role=wall_roles[(level, edge)], level=level)
 
     blocked_feature_edges = set(wall_roles) | open_wall_edges
-    emit_room_architecture_features(generator, build, blocked_feature_edges)
+    emit_room_architecture_features(generator, build, blocked_feature_edges, protected_cells, detail_budget)
 
     for lower, upper, stair_row in stair_specs:
         add_vertical_stairs(generator, lower, upper, stair_row)
@@ -1281,6 +2309,14 @@ def cells_for_room(room: RoomNode) -> list[tuple[int, int]]:
             for col, row in cells
             if abs(col - center_col) <= 1 or abs(row - center_row) <= 1
         }
+    elif room.mask_kind == "chamfered":
+        if room.width >= 5 and room.height >= 5:
+            cells -= {
+                (room.x_value, room.y_value),
+                (room.x_value + room.width - 1, room.y_value),
+                (room.x_value, room.y_value + room.height - 1),
+                (room.x_value + room.width - 1, room.y_value + room.height - 1),
+            }
     elif room.mask_kind == "split":
         return sorted(cells)
     if not cells:
@@ -1356,38 +2392,563 @@ def deterministic_edge_pick(room: RoomNode, edge: tuple[str, int, int], modulo: 
     return abs((room.room_id + 1) * 131 + a * 17 + b * 31 + axis_value) % modulo
 
 
+def room_cell_bounds(room: RoomNode) -> tuple[int, int, int, int]:
+    cells = set(cells_for_room(room))
+    if not cells:
+        raise GeneratorError(f"Room {room.room_id} has no floor cells.")
+    return (
+        min(col for col, _row in cells),
+        min(row for _col, row in cells),
+        max(col for col, _row in cells),
+        max(row for _col, row in cells),
+    )
+
+
+def protect_cells(
+    protected_cells: dict[int, set[tuple[int, int]]],
+    level: int,
+    cells: set[tuple[int, int]] | tuple[tuple[int, int], ...],
+) -> None:
+    protected_cells.setdefault(level, set()).update(cells)
+
+
+def room_protected_cells(
+    room: RoomNode,
+    protected_cells: dict[int, set[tuple[int, int]]],
+    feature_level: int | None = None,
+) -> set[tuple[int, int]]:
+    out = set(protected_cells.get(room.level, set()))
+    if feature_level is not None:
+        out.update(protected_cells.get(feature_level, set()))
+    return out
+
+
+def cell_is_protected(
+    room: RoomNode,
+    protected_cells: dict[int, set[tuple[int, int]]],
+    col: int,
+    row: int,
+    feature_level: int | None = None,
+) -> bool:
+    return (col, row) in room_protected_cells(room, protected_cells, feature_level)
+
+
 def emit_room_architecture_features(
     generator: BuildingGenerator,
     build: RoomMazeBuild,
     blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
+    detail_budget: str = "balanced",
 ) -> None:
     blocked_edges = blocked_edges or set()
+    protected_cells = protected_cells or {}
     for room in build.rooms:
-        if room.room_type == "jumping_puzzle":
-            emit_jumping_puzzle_room(generator, room, blocked_edges)
-        if room.has_balcony:
-            emit_room_balcony(generator, room, blocked_edges)
-        if room.has_divider:
-            emit_room_divider(generator, room, blocked_edges)
-        if room.has_columns:
-            emit_room_columns(generator, room, blocked_edges)
+        room.detail_budget = room.detail_budget or detail_budget
+        if room.room_type == "entry":
+            emit_entry_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "chamber":
+            emit_chamber_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "gallery":
+            emit_gallery_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "crossroad":
+            emit_crossroad_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "dead_end":
+            emit_dead_end_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "overlook":
+            emit_overlook_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "stair_core":
+            emit_stair_core_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "tower":
+            emit_tower_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "atrium":
+            emit_atrium_room(generator, room, blocked_edges, protected_cells)
+        elif room.room_type == "jumping_puzzle":
+            emit_jumping_puzzle_room(generator, room, blocked_edges, protected_cells)
+
+
+def emit_entry_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "corner_pillars"):
+        emit_corner_pillars(generator, room, blocked_edges, protected_cells, max_count=2)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
+
+
+def emit_chamber_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges)
+    if room_has_feature(room, "back_stage"):
+        emit_back_stage(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "loft"):
+        emit_loft_room(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "inner_room"):
+        emit_inner_partition_room(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "side_walkway"):
+        emit_side_walkway(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "balcony"):
+        emit_room_balcony(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "divider"):
+        emit_room_divider(generator, room, blocked_edges, protected_cells)
+
+
+def emit_gallery_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "side_walkway"):
+        emit_side_walkway(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "corner_triangles"):
+        emit_corner_triangle_platforms(generator, room, blocked_edges, max_count=2)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
+
+
+def emit_crossroad_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "corner_pillars"):
+        emit_corner_pillars(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "corner_triangles"):
+        emit_corner_triangle_platforms(generator, room, blocked_edges, max_count=2)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges)
+
+
+def emit_dead_end_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "back_stage"):
+        emit_back_stage(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
+
+
+def emit_overlook_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "balcony"):
+        emit_room_balcony(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "corner_triangles"):
+        emit_corner_triangle_platforms(generator, room, blocked_edges, max_count=2)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
+
+
+def emit_stair_core_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
+
+
+def emit_tower_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "corner_pillars"):
+        emit_corner_pillars(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "corner_triangles"):
+        emit_corner_triangle_platforms(generator, room, blocked_edges, max_count=2)
+    if room_has_feature(room, "divider"):
+        emit_room_divider(generator, room, blocked_edges, protected_cells)
+
+
+def emit_atrium_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room_has_feature(room, "upper_ring"):
+        emit_upper_ring(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "corner_pillars"):
+        emit_corner_pillars(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "inner_room"):
+        emit_inner_partition_room(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "diagonal_braces"):
+        emit_diagonal_corner_braces(generator, room, blocked_edges)
+
+
+def room_has_feature(room: RoomNode, feature: str) -> bool:
+    return feature in room.features
+
+
+def emit_back_stage(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+    include_triangles: bool = False,
+) -> None:
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    stage_rows = [max_y]
+    if room.height >= 6:
+        stage_rows.insert(0, max_y - 1)
+    stage_cells = {
+        (col, row)
+        for row in stage_rows
+        for col in range(min_x + 1, max_x)
+        if (col, row) in cells
+    }
+    emit_room_platform_cells(
+        generator,
+        room,
+        stage_cells,
+        room.level + 1,
+        "floor",
+        blocked_edges,
+        protected_cells,
+        rail_role="narrow_wall",
+    )
+
+
+def emit_loft_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    loft_rows = {max_y - 1, max_y}
+    loft_cells = {
+        (col, row)
+        for row in loft_rows
+        for col in range(min_x + 1, max_x)
+        if (col, row) in cells
+    }
+    emit_room_platform_cells(
+        generator,
+        room,
+        loft_cells,
+        room.level + 1,
+        "floor",
+        blocked_edges,
+        protected_cells,
+        rail_role="narrow_wall",
+    )
+    stair_col = min_x + 1
+    stair_row = max_y - 2
+    if (stair_col, stair_row) in cells and not cell_is_protected(room, protected_cells, stair_col, stair_row):
+        generator.add_piece(
+            "stairs",
+            x=(stair_col * generator.cell_size) + STRAIGHT_STAIR_ALIGNMENT_OFFSET_X,
+            y=stair_row * generator.cell_size,
+            z=(room.level * generator.cell_size) + STRAIGHT_STAIR_ALIGNMENT_OFFSET_Z,
+            yaw=STRAIGHT_STAIR_YAW,
+        )
+
+
+def emit_side_walkway(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    if (max_x - min_x) >= (max_y - min_y):
+        row = min_y + 1
+        walkway = {(col, row) for col in range(min_x + 1, max_x) if (col, row) in cells}
+    else:
+        col = min_x + 1
+        walkway = {(col, row) for row in range(min_y + 1, max_y) if (col, row) in cells}
+    emit_room_platform_cells(
+        generator,
+        room,
+        walkway,
+        room.level + 1,
+        "floor",
+        blocked_edges,
+        protected_cells,
+        rail_role="narrow_wall",
+    )
+
+
+def emit_upper_ring(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    if max_x - min_x < 4 or max_y - min_y < 4:
+        emit_room_balcony(generator, room, blocked_edges, protected_cells)
+        return
+    ring = {
+        (col, row)
+        for col, row in cells
+        if col in {min_x + 1, max_x - 1} or row in {min_y + 1, max_y - 1}
+    }
+    center_clear = {
+        (col, row)
+        for col in range(min_x + 2, max_x - 1)
+        for row in range(min_y + 2, max_y - 1)
+    }
+    ring -= center_clear
+    emit_room_platform_cells(
+        generator,
+        room,
+        ring,
+        room.level + 1,
+        "floor",
+        blocked_edges,
+        protected_cells,
+        rail_role="narrow_wall",
+    )
+
+
+def emit_inner_partition_room(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+) -> None:
+    if room.width < 6 or room.height < 5:
+        return
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    inner_width = 3 if room.width >= 7 else 2
+    inner_height = 2
+    inner_x = min_x + 1
+    inner_y = min_y + 1
+    if room.room_id % 2:
+        inner_x = max_x - inner_width
+    inner_cells = {
+        (col, row)
+        for col in range(inner_x, inner_x + inner_width)
+        for row in range(inner_y, inner_y + inner_height)
+    }
+    if not inner_cells <= cells:
+        return
+    if inner_cells & room_protected_cells(room, protected_cells):
+        return
+    door_edge = ("h", inner_x + inner_width // 2, inner_y + inner_height)
+    for edge in perimeter_edges_for_cells(inner_cells):
+        if feature_edge_blocked(edge, room.level, blocked_edges):
+            continue
+        role = "narrow_doorframe" if edge == door_edge else "narrow_wall"
+        generator.add_wall_edge(edge, role=role, level=room.level)
+
+
+def emit_corner_triangle_platforms(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    max_count: int = 4,
+) -> None:
+    return
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    candidates = [
+        (min_x + 1, min_y + 1, 0),
+        (max_x - 1, min_y + 1, 90),
+        (max_x - 1, max_y - 1, 180),
+        (min_x + 1, max_y - 1, 270),
+    ]
+    added = 0
+    for col, row, yaw in candidates:
+        if added >= max_count:
+            break
+        if (col, row) not in cells:
+            continue
+        add_room_feature_platform(generator, room, col, row, room.level + 1, "floor_triangle", blocked_edges, yaw=yaw)
+        added += 1
+
+
+def emit_diagonal_corner_braces(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    max_count: int = 4,
+) -> None:
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    candidates = [
+        (min_x, min_y, 45),
+        (max_x, min_y, 135),
+        (max_x, max_y, 225),
+        (min_x, max_y, 315),
+    ]
+    role = "wall_large_diagonal" if room.width >= 6 or room.height >= 6 else "wall_medium_diagonal"
+    z = room.level * generator.cell_size
+    added = 0
+    for col, row, yaw in candidates:
+        if added >= max_count:
+            break
+        adjacent = (
+            (col, row) in cells
+            or (col + (1 if col == min_x else -1), row) in cells
+            or (col, row + (1 if row == min_y else -1)) in cells
+        )
+        if not adjacent:
+            continue
+        x = col * generator.cell_size
+        y = row * generator.cell_size
+        generator.add_piece(role, x=x, y=y, z=z, yaw=yaw)
+        if room.wall_height >= 3 and room.detail_budget == "max-variety":
+            generator.add_piece("wall_large_diagonal_inverted", x=x, y=y, z=z + generator.cell_size, yaw=yaw)
+        added += 1
+
+
+def emit_corner_pillars(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
+    max_count: int = 4,
+) -> None:
+    protected_cells = protected_cells or {}
+    cells = set(cells_for_room(room))
+    min_x, min_y, max_x, max_y = room_cell_bounds(room)
+    candidates = [
+        (min_x + 1, min_y + 1),
+        (max_x - 1, min_y + 1),
+        (max_x - 1, max_y - 1),
+        (min_x + 1, max_y - 1),
+    ]
+    added = 0
+    for col, row in candidates:
+        if added >= max_count:
+            break
+        if (col, row) not in cells:
+            continue
+        if cell_is_protected(room, protected_cells, col, row):
+            continue
+        if any(feature_edge_blocked(edge, room.level, blocked_edges) for edge in cell_edges(col, row)):
+            continue
+        generator.add_piece("pillar", col * generator.cell_size, row * generator.cell_size, room.level * generator.cell_size)
+        added += 1
+
+
+def add_room_feature_platform(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    col: int,
+    row: int,
+    level: int,
+    role: str,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
+    yaw: float = 0,
+) -> None:
+    protected_cells = protected_cells or {}
+    if (col, row) not in set(cells_for_room(room)):
+        return
+    if cell_is_protected(room, protected_cells, col, row, level):
+        return
+    if "triangle" in role:
+        generator.add_cell_triangle_surface(col, row, level=level, role=role, yaw=yaw)
+    else:
+        generator.add_cell_surface(col, row, level=level, role=role)
+    add_platform_supports(
+        generator,
+        col,
+        row,
+        level,
+        role,
+        base_level=room.level,
+        blocked_edges=blocked_edges,
+        detail_budget=room.detail_budget,
+    )
+
+
+def emit_room_platform_cells(
+    generator: BuildingGenerator,
+    room: RoomNode,
+    cells: set[tuple[int, int]],
+    level: int,
+    role: str,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+    rail_role: str | None = None,
+) -> None:
+    room_cells = set(cells_for_room(room))
+    valid = sorted((cells & room_cells) - room_protected_cells(room, protected_cells, level))
+    if not valid:
+        return
+    for col, row in valid:
+        generator.add_cell_surface(col, row, level=level, role=role)
+    support_stride = 4 if room.detail_budget == "low-piece-count" else 2 if room.detail_budget == "max-variety" else 3
+    for index, (col, row) in enumerate(valid):
+        if index not in {0, len(valid) - 1} and index % support_stride:
+            continue
+        add_platform_supports(
+            generator,
+            col,
+            row,
+            level,
+            role,
+            base_level=room.level,
+            blocked_edges=blocked_edges,
+            detail_budget=room.detail_budget,
+        )
+    if rail_role:
+        emit_platform_rails(generator, valid, level, blocked_edges, protected_cells, rail_role)
+
+
+def emit_platform_rails(
+    generator: BuildingGenerator,
+    cells: list[tuple[int, int]],
+    level: int,
+    blocked_edges: set[tuple[int, tuple[str, int, int]]],
+    protected_cells: dict[int, set[tuple[int, int]]],
+    role: str,
+) -> None:
+    cell_set = set(cells)
+    for edge in perimeter_edges_for_cells(cell_set):
+        a, b = cells_across_edge(edge)
+        if a in cell_set and b in cell_set:
+            continue
+        if a in protected_cells.get(level, set()) or b in protected_cells.get(level, set()):
+            continue
+        if feature_edge_blocked(edge, level, blocked_edges):
+            continue
+        generator.add_wall_edge(edge, role=role, level=level)
 
 
 def emit_jumping_puzzle_room(
     generator: BuildingGenerator,
     room: RoomNode,
     blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
 ) -> None:
     blocked_edges = blocked_edges or set()
+    protected_cells = protected_cells or {}
     cells = set(cells_for_room(room))
     if room.width < 5 or room.height < 5:
         return
+    rng = random.Random((room.room_id + 1) * 1009 + len(room.jumping_variant) * 37)
     candidates = [
-        (room.x_value + 1, room.y_value + 1, room.level + 1, "floor_medium"),
-        (room.x_value + room.width - 2, room.y_value + 1, room.level + 1, "floor_small"),
-        (room.x_value + room.width // 2, room.y_value + room.height // 2, room.level + 2, "floor_small"),
-        (room.x_value + 1, room.y_value + room.height - 2, room.level + 2, "floor_medium"),
-        (room.x_value + room.width - 2, room.y_value + room.height - 2, room.level + 2, "floor_medium"),
+        (room.x_value + col, room.y_value + row, room.level + level, role)
+        for col, row, level, role in jumping_puzzle_platform_cells(room.width, room.height, rng, room.jumping_variant)
     ]
     used: set[tuple[int, int, int]] = set()
     for col, row, level, role in candidates:
@@ -1395,7 +2956,16 @@ def emit_jumping_puzzle_room(
             continue
         used.add((col, row, level))
         generator.add_cell_surface(col, row, level=level, role=role)
-        add_platform_supports(generator, col, row, level, role, base_level=room.level, blocked_edges=blocked_edges)
+        add_platform_supports(
+            generator,
+            col,
+            row,
+            level,
+            role,
+            base_level=room.level,
+            blocked_edges=blocked_edges,
+            detail_budget=room.detail_budget,
+        )
 
     rail_edges = [
         ("h", room.x_value + 1, room.y_value + 1),
@@ -1403,6 +2973,9 @@ def emit_jumping_puzzle_room(
         ("h", room.x_value + room.width - 2, room.y_value + room.height - 1),
     ]
     for edge in rail_edges:
+        a, b = cells_across_edge(edge)
+        if a in protected_cells.get(room.level + 1, set()) or b in protected_cells.get(room.level + 1, set()):
+            continue
         if feature_edge_blocked(edge, room.level + 1, blocked_edges):
             continue
         generator.add_wall_edge(edge, role="narrow_wall", level=room.level + 1)
@@ -1412,20 +2985,23 @@ def emit_room_balcony(
     generator: BuildingGenerator,
     room: RoomNode,
     blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
 ) -> None:
     blocked_edges = blocked_edges or set()
+    protected_cells = protected_cells or {}
     cells = balcony_cells(room)
     if not cells:
         return
-    for col, row in cells:
-        generator.add_cell_surface(col, row, level=room.level + 1, role="floor_medium")
-    for edge in perimeter_edges_for_cells(cells):
-        a, b = cells_across_edge(edge)
-        if a in cells and b in cells:
-            continue
-        if feature_edge_blocked(edge, room.level + 1, blocked_edges):
-            continue
-        generator.add_wall_edge(edge, role="narrow_wall", level=room.level + 1)
+    emit_room_platform_cells(
+        generator,
+        room,
+        cells,
+        room.level + 1,
+        "floor",
+        blocked_edges,
+        protected_cells,
+        rail_role="narrow_wall",
+    )
 
 
 def balcony_cells(room: RoomNode) -> set[tuple[int, int]]:
@@ -1444,8 +3020,10 @@ def emit_room_divider(
     generator: BuildingGenerator,
     room: RoomNode,
     blocked_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    protected_cells: dict[int, set[tuple[int, int]]] | None = None,
 ) -> None:
     blocked_edges = blocked_edges or set()
+    protected_cells = protected_cells or {}
     cells = set(cells_for_room(room))
     if room.width < 4 or room.height < 3:
         return
@@ -1455,6 +3033,8 @@ def emit_room_divider(
         gap = rows[len(rows) // 2] if rows else None
         for row in rows:
             if row == gap:
+                continue
+            if cell_is_protected(room, protected_cells, col - 1, row) or cell_is_protected(room, protected_cells, col, row):
                 continue
             edge = ("v", col, row)
             if feature_edge_blocked(edge, room.level, blocked_edges):
@@ -1466,6 +3046,8 @@ def emit_room_divider(
         gap = cols[len(cols) // 2] if cols else None
         for col in cols:
             if col == gap:
+                continue
+            if cell_is_protected(room, protected_cells, col, row - 1) or cell_is_protected(room, protected_cells, col, row):
                 continue
             edge = ("h", col, row)
             if feature_edge_blocked(edge, room.level, blocked_edges):
@@ -1779,9 +3361,15 @@ def default_build_name(args: argparse.Namespace) -> str:
     if args.preset == "elevation-demo":
         return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}x{args.levels}"
     if args.preset == "room-maze":
-        return f"procedural_{args.preset}_t{args.tier}_{args.rooms}_rooms_s{args.seed}"
+        return f"procedural_{args.preset}_t{args.tier}_{args.detail_budget}_{args.rooms}_rooms_s{args.seed}"
+    if args.preset == "room-lab":
+        if args.room_type == "jumping_puzzle":
+            return f"procedural_{args.preset}_{args.room_type}_{args.jumping_variant}_t{args.tier}_{args.detail_budget}_s{args.seed}"
+        return f"procedural_{args.preset}_{args.room_type}_t{args.tier}_{args.detail_budget}_s{args.seed}"
+    if args.preset == "shape-lab":
+        return f"procedural_{args.preset}_{args.shape_style}_t{args.tier}"
     if args.preset == "jumping-puzzle":
-        return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}_s{args.seed}"
+        return f"procedural_{args.preset}_{args.jumping_variant}_t{args.tier}_{args.detail_budget}_{args.width}x{args.height}_s{args.seed}"
     return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}_s{args.seed}"
 
 

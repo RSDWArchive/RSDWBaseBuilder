@@ -112,6 +112,8 @@ import {
     assetCategoryPrimary: document.getElementById("asset-category-primary"),
     assetCategoryChildren: document.getElementById("asset-category-children"),
     assetList: document.getElementById("asset-list"),
+    assetResultsFooter: document.getElementById("asset-results-footer"),
+    loadMoreAssets: document.getElementById("load-more-assets"),
     favoriteStrip: document.getElementById("favorite-strip"),
     kindButtons: Array.from(document.querySelectorAll("[data-kind]")),
     stage: document.getElementById("builder-stage"),
@@ -150,6 +152,7 @@ import {
   let index = null;
   let activeKind = "building_piece";
   let activeCategoryPath = "";
+  let visibleAssetResultCount = RESULT_LIMIT;
   let assetViewMode = "list";
   let selectedTargetId = "";
   let selectedPlacedIds = new Set();
@@ -566,9 +569,7 @@ import {
       activeCategoryPath = "";
       return;
     }
-    if (!activeCategoryPath || !findCategoryNode(nodes, activeCategoryPath)) {
-      activeCategoryPath = nodes[0].path || nodes[0].label || "";
-    }
+    if (activeCategoryPath && !findCategoryNode(nodes, activeCategoryPath)) activeCategoryPath = "";
   }
 
   function targetMatchesActiveCategory(target) {
@@ -1477,6 +1478,27 @@ import {
     els.stage.dataset.promotedPlacements = String(stats.promoted);
   }
 
+  function resetVisibleAssetResults() {
+    visibleAssetResultCount = RESULT_LIMIT;
+  }
+
+  function updateLoadMoreAssetsState(totalCount, shownCount) {
+    if (!els.assetResultsFooter || !els.loadMoreAssets) return;
+    const remaining = Math.max(0, totalCount - shownCount);
+    els.assetResultsFooter.hidden = remaining <= 0;
+    els.loadMoreAssets.hidden = remaining <= 0;
+    if (remaining > 0) {
+      const nextCount = Math.min(RESULT_LIMIT, remaining);
+      els.loadMoreAssets.textContent = `Load ${nextCount.toLocaleString()} More`;
+      els.loadMoreAssets.title = `${remaining.toLocaleString()} more matching assets available`;
+    }
+  }
+
+  function loadMoreAssets() {
+    visibleAssetResultCount += RESULT_LIMIT;
+    renderAssets();
+  }
+
   function renderAssets() {
     normalizeActiveCategory();
     const query = els.assetSearch.value.trim().toLowerCase();
@@ -1486,11 +1508,12 @@ import {
       .map((target) => ({ target, score: targetSearchScore(target, query) }))
       .filter((row) => row.score > 0)
       .sort((a, b) => b.score - a.score || a.target.display_name.localeCompare(b.target.display_name));
-    const visible = scored.slice(0, RESULT_LIMIT);
+    const visible = scored.slice(0, visibleAssetResultCount);
     els.assetList.textContent = "";
     for (const row of visible) {
       els.assetList.appendChild(createAssetRow(row.target));
     }
+    updateLoadMoreAssetsState(scored.length, visible.length);
     renderFavorites();
     const categorySuffix = activeCategoryPath ? ` in ${activeCategoryLabel()}` : "";
     const visibleText = visible.length < scored.length
@@ -1626,10 +1649,22 @@ import {
     const activeParts = categoryPathParts(activeCategoryPath);
 
     els.assetCategoryPrimary.textContent = "";
+    const allNode = {
+      label: "All",
+      path: "",
+      count: index.targets.filter((target) => target.asset_kind === activeKind).length,
+    };
+    els.assetCategoryPrimary.appendChild(createCategoryButton(allNode, !activeCategoryPath, () => {
+      activeCategoryPath = "";
+      resetVisibleAssetResults();
+      renderCategoryButtons();
+      renderAssets();
+    }));
     for (const node of nodes) {
       const isActive = activeParts[0] === node.label;
       els.assetCategoryPrimary.appendChild(createCategoryButton(node, isActive, () => {
         activeCategoryPath = node.path || node.label || "";
+        resetVisibleAssetResults();
         renderCategoryButtons();
         renderAssets();
       }));
@@ -1646,6 +1681,7 @@ import {
       for (const child of selected.children) {
         row.appendChild(createCategoryButton(child, selectedChild === child.label, () => {
           activeCategoryPath = child.path || child.label || "";
+          resetVisibleAssetResults();
           renderCategoryButtons();
           renderAssets();
         }));
@@ -4335,11 +4371,19 @@ import {
         closeAssetContextMenu();
       }
     });
-    els.assetSearch.addEventListener("input", renderAssets);
+    els.assetSearch.addEventListener("input", () => {
+      resetVisibleAssetResults();
+      renderAssets();
+    });
     els.assetViewToggle?.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       toggleAssetViewMode();
+    });
+    els.loadMoreAssets?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      loadMoreAssets();
     });
     document.addEventListener("dragstart", (event) => {
       if (event.target?.closest?.(".asset-row, .favorite-tile")) event.preventDefault();
@@ -4364,6 +4408,7 @@ import {
       button.addEventListener("click", () => {
         activeKind = button.dataset.kind;
         activeCategoryPath = "";
+        resetVisibleAssetResults();
         for (const other of els.kindButtons) other.classList.toggle("is-active", other === button);
         renderCategoryButtons();
         renderAssets();
