@@ -126,9 +126,11 @@ import {
     previewPlaceLabel: document.getElementById("preview-place-label"),
     gizmoHotkeys: document.getElementById("gizmo-hotkeys"),
     importJson: document.getElementById("import-json"),
+    importReference: document.getElementById("import-reference"),
     exportJson: document.getElementById("export-json"),
     clearBuild: document.getElementById("clear-build"),
     fileInput: document.getElementById("file-input"),
+    referenceFileInput: document.getElementById("reference-file-input"),
     setAnchor: document.getElementById("set-anchor"),
     clearAnchor: document.getElementById("clear-anchor"),
     buildCount: document.getElementById("build-count"),
@@ -156,6 +158,7 @@ import {
   let assetViewMode = "list";
   let selectedTargetId = "";
   let selectedPlacedIds = new Set();
+  let selectedReferenceIds = new Set();
   let activePlacementId = "";
   let orientationMode = "world";
   let closedPlacedGroupIds = new Set();
@@ -166,6 +169,7 @@ import {
   let anchorPieceId = 0;
   let nextObjectId = 1;
   let nextPieceId = 1;
+  let nextReferenceId = 1;
   let renderer = null;
   let scene = null;
   let camera = null;
@@ -176,10 +180,12 @@ import {
   let viewHelperDrag = null;
   let viewHelperClock = new THREE.Clock();
   let rootGroup = null;
+  let referenceGroup = null;
   let groundGrid = null;
   let groundGridSignature = "";
   let groundGridUpdateHandle = 0;
   let loader = null;
+  let dracoLoader = null;
   let raycaster = null;
   let pointer = null;
   let cameraProjectionMode = "perspective";
@@ -216,7 +222,9 @@ import {
   const instanceBatches = new Map();
   const promotedPlacementIds = new Set();
   const placements = new Map();
+  const referenceModels = new Map();
   const selectionBoxes = new Map();
+  const referenceSelectionBoxes = new Map();
   const undoStack = [];
   const spatialIndex = {
     cells: new Map(),
@@ -329,8 +337,9 @@ import {
   function syncSelectionHotkeys() {
     const previewActive = Boolean(dragSession);
     const selectionHidden = !selectedPlacedIds.size || previewActive;
+    const gizmoHidden = (!selectedPlacedIds.size && !selectedReferenceIds.size) || previewActive;
     if (els.selectionHotkeys) els.selectionHotkeys.hidden = selectionHidden;
-    if (els.gizmoHotkeys) els.gizmoHotkeys.hidden = selectionHidden;
+    if (els.gizmoHotkeys) els.gizmoHotkeys.hidden = gizmoHidden;
     if (els.previewHotkeys) els.previewHotkeys.hidden = !previewActive;
     if (els.previewPlaceLabel && previewActive) {
       els.previewPlaceLabel.textContent = dragSession?.moveExisting ? "Release Move" : "Place Preview";
@@ -1074,6 +1083,9 @@ import {
 
     rootGroup = new THREE.Group();
     scene.add(rootGroup);
+    referenceGroup = new THREE.Group();
+    referenceGroup.name = "Reference Models";
+    scene.add(referenceGroup);
 
     selectionPivot = new THREE.Object3D();
     selectionPivot.name = "Selection Pivot";
@@ -1092,10 +1104,10 @@ import {
     fill.position.set(-7, 5, -4);
     scene.add(fill);
 
-    const draco = new DRACOLoader();
-    draco.setDecoderPath("https://unpkg.com/three@0.184.0/examples/jsm/libs/draco/");
+    dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://unpkg.com/three@0.184.0/examples/jsm/libs/draco/");
     loader = new GLTFLoader();
-    loader.setDRACOLoader(draco);
+    loader.setDRACOLoader(dracoLoader);
 
     raycaster = new THREE.Raycaster();
     pointer = new THREE.Vector2();
@@ -2728,6 +2740,17 @@ import {
       .filter(Boolean);
   }
 
+  function selectedReferences() {
+    return Array.from(selectedReferenceIds)
+      .map((id) => referenceModels.get(id))
+      .filter(Boolean);
+  }
+
+  function selectedReference() {
+    const selected = selectedReferences();
+    return selected.length === 1 ? selected[0] : null;
+  }
+
   function selectedPlacement() {
     const selected = selectedPlacements();
     return selected.length === 1 ? selected[0] : null;
@@ -2781,6 +2804,7 @@ import {
   }
 
   function setSelection(ids, options = {}) {
+    selectedReferenceIds.clear();
     selectedPlacedIds = new Set(Array.from(ids || []).filter((id) => placements.has(id)));
     const requestedActive = options.activeId || activePlacementId;
     if (requestedActive && selectedPlacedIds.has(requestedActive)) {
@@ -2799,10 +2823,36 @@ import {
     }
   }
 
+  function setReferenceSelection(ids, options = {}) {
+    selectedPlacedIds.clear();
+    activePlacementId = "";
+    selectedReferenceIds = new Set(Array.from(ids || []).filter((id) => referenceModels.has(id)));
+    if (!selectedReferenceIds.size) activeGizmoMode = "";
+    syncVisualBackendsForSelection();
+    syncSelectionAttachment();
+    syncSelectionHotkeys();
+    if (options.render !== false) {
+      renderInspector();
+      renderPlacedList();
+      updateCounters();
+    }
+  }
+
+  function selectReference(id, options = {}) {
+    if (!id) {
+      setReferenceSelection([], options);
+      return;
+    }
+    setReferenceSelection([id], options);
+  }
+
   function syncSelectionAttachment() {
     if (!transformControls) return;
     const selected = selectedPlacements();
-    if (selected.length === 1) {
+    const selectedRefs = selectedReferences();
+    if (selectedRefs.length === 1) {
+      transformControls.attach(selectedRefs[0].root);
+    } else if (selected.length === 1) {
       transformControls.attach(getVisualRoot(selected[0]));
     } else if (selected.length > 1) {
       updateSelectionPivot();
@@ -2812,6 +2862,7 @@ import {
     }
     syncTransformControlMode();
     syncSelectionBoxes();
+    syncReferenceSelectionBoxes();
   }
 
   function updateSelectionPivot() {
@@ -2832,6 +2883,15 @@ import {
   }
 
   function handleTransformObjectChange() {
+    const refs = selectedReferences();
+    if (refs.length) {
+      pendingTransformChanged = true;
+      for (const ref of refs) ref.root.updateMatrixWorld(true);
+      syncReferenceSelectionBoxes();
+      renderInspector();
+      renderPlacedList();
+      return;
+    }
     const selected = selectedPlacements();
     if (!selected.length) return;
     pendingTransformChanged = true;
@@ -2923,6 +2983,39 @@ import {
       scene.add(helper);
     }
     updateSelectionBoxes();
+  }
+
+  function syncReferenceSelectionBoxes() {
+    for (const [id, helper] of referenceSelectionBoxes) {
+      if (!selectedReferenceIds.has(id) || !referenceModels.has(id)) {
+        scene.remove(helper);
+        helper.geometry?.dispose?.();
+        helper.material?.dispose?.();
+        referenceSelectionBoxes.delete(id);
+      }
+    }
+    for (const ref of selectedReferences()) {
+      if (referenceSelectionBoxes.has(ref.id)) continue;
+      const helper = new THREE.BoxHelper(ref.root, 0x9fd6ff);
+      helper.name = `Reference Selection Box ${ref.id}`;
+      helper.material.depthTest = false;
+      helper.material.transparent = true;
+      helper.material.opacity = 0.92;
+      helper.renderOrder = 998;
+      helper.visible = !ref.hidden;
+      referenceSelectionBoxes.set(ref.id, helper);
+      scene.add(helper);
+    }
+    updateReferenceSelectionBoxes();
+  }
+
+  function updateReferenceSelectionBoxes() {
+    for (const [id, helper] of referenceSelectionBoxes) {
+      const ref = referenceModels.get(id);
+      if (!ref) continue;
+      helper.visible = !ref.hidden;
+      helper.update();
+    }
   }
 
   function updateSelectionBoxes() {
@@ -3171,11 +3264,13 @@ import {
   function syncTransformControlMode() {
     if (!transformControls) return;
     const selected = selectedPlacements();
+    const selectedRefs = selectedReferences();
+    const hasSelection = selected.length > 0 || selectedRefs.length > 0;
     transformControls.setSpace(orientationMode);
     if (activeGizmoMode === "scale" && selected.length && !selected.every(canScalePlacement)) {
       activeGizmoMode = "";
     }
-    if (!activeGizmoMode || !selected.length) {
+    if (!activeGizmoMode || !hasSelection) {
       transformControls.detach();
       transformControls.showX = true;
       transformControls.showY = true;
@@ -3251,8 +3346,20 @@ import {
 
   function renderInspector() {
     const selected = selectedPlacements();
+    const ref = selectedReference();
     const placement = selectedPlacement();
     const hasSingleSelection = selected.length === 1;
+    if (ref) {
+      els.setAnchor.disabled = true;
+      els.clearAnchor.disabled = !anchorPieceId;
+      for (const input of els.transformInputs) {
+        input.disabled = true;
+        input.value = "";
+      }
+      els.selectionTitle.textContent = ref.name;
+      els.selectionMeta.textContent = `Reference Model | ${ref.hidden ? "Hidden" : "Visible"} | Not exported`;
+      return;
+    }
     els.setAnchor.disabled = !hasSingleSelection || placement.target.asset_kind !== "building_piece";
     els.clearAnchor.disabled = !anchorPieceId;
     for (const input of els.transformInputs) {
@@ -3305,6 +3412,215 @@ import {
       .sort((a, b) => a.target.display_name.localeCompare(b.target.display_name, undefined, { numeric: true }));
   }
 
+  function referenceNameFromFile(file) {
+    return String(file?.name || "Reference Model").replace(/\.(glb|gltf)$/i, "") || "Reference Model";
+  }
+
+  function normalizeReferencePath(path) {
+    return String(path || "").replace(/\\/g, "/").replace(/^\.?\//, "").toLowerCase();
+  }
+
+  function referenceObjectUrl(file, objectUrls) {
+    if (!objectUrls.has(file)) objectUrls.set(file, URL.createObjectURL(file));
+    return objectUrls.get(file);
+  }
+
+  function referenceLoadingManager(files, objectUrls) {
+    const manager = new THREE.LoadingManager();
+    const byPath = new Map();
+    for (const file of files) {
+      byPath.set(normalizeReferencePath(file.name), file);
+      if (file.webkitRelativePath) byPath.set(normalizeReferencePath(file.webkitRelativePath), file);
+    }
+    manager.setURLModifier((url) => {
+      if (/^(blob:|data:|https?:)/i.test(url)) return url;
+      const clean = normalizeReferencePath(decodeURIComponent(url.split(/[?#]/)[0] || ""));
+      const basename = clean.split("/").pop();
+      const file = byPath.get(clean) || byPath.get(basename);
+      return file ? referenceObjectUrl(file, objectUrls) : url;
+    });
+    return manager;
+  }
+
+  async function importReferenceFiles(fileList) {
+    const files = Array.from(fileList || []);
+    const primary = files.find((file) => /\.(glb|gltf)$/i.test(file.name));
+    if (!primary) {
+      els.assetStatus.textContent = "Select a .glb or .gltf reference model";
+      return;
+    }
+    const objectUrls = new Map();
+    setLoading(true);
+    try {
+      els.assetStatus.textContent = `Importing reference ${primary.name}`;
+      const refLoader = new GLTFLoader(referenceLoadingManager(files, objectUrls));
+      if (dracoLoader) refLoader.setDRACOLoader(dracoLoader);
+      const gltf = await refLoader.loadAsync(referenceObjectUrl(primary, objectUrls));
+      const id = `ref_${nextReferenceId++}`;
+      const name = referenceNameFromFile(primary);
+      const root = new THREE.Group();
+      root.name = name;
+      root.userData.referenceId = id;
+      const sceneRoot = gltf.scene || new THREE.Group();
+      sceneRoot.name = `${name} Source`;
+      root.add(sceneRoot);
+      root.position.copy(controls?.target || new THREE.Vector3());
+      root.traverse((child) => {
+        child.userData.referenceId = id;
+        if (child.isMesh) child.frustumCulled = false;
+      });
+      referenceGroup.add(root);
+      const ref = {
+        id,
+        name,
+        root,
+        hidden: false,
+        fileName: primary.name,
+        objectUrls: Array.from(objectUrls.values()),
+      };
+      referenceModels.set(id, ref);
+      selectReference(id);
+      focusCameraOnReference(ref, { notify: false });
+      showViewportNotice("Reference Imported");
+      els.assetStatus.textContent = `Imported reference ${primary.name}`;
+    } catch (error) {
+      for (const url of objectUrls.values()) URL.revokeObjectURL(url);
+      console.error(error);
+      els.assetStatus.textContent = `Reference import failed: ${error.message}`;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setReferenceHidden(ref, hidden) {
+    if (!ref) return;
+    ref.hidden = Boolean(hidden);
+    ref.root.visible = !ref.hidden;
+    syncReferenceSelectionBoxes();
+    renderInspector();
+    renderPlacedList();
+    showViewportNotice(ref.hidden ? "Reference Hidden" : "Reference Shown");
+  }
+
+  function setReferencesHidden(rows, hidden) {
+    const refs = rows.filter((ref) => ref && ref.hidden !== Boolean(hidden));
+    if (!refs.length) return;
+    for (const ref of refs) {
+      ref.hidden = Boolean(hidden);
+      ref.root.visible = !ref.hidden;
+    }
+    syncReferenceSelectionBoxes();
+    renderInspector();
+    renderPlacedList();
+    showViewportNotice(hidden ? `Hidden ${refs.length}` : `Shown ${refs.length}`);
+  }
+
+  function disposeReference(ref) {
+    if (!ref) return;
+    referenceGroup.remove(ref.root);
+    ref.root.traverse((obj) => {
+      obj.geometry?.dispose?.();
+      const materials = obj.material ? (Array.isArray(obj.material) ? obj.material : [obj.material]) : [];
+      for (const material of materials) material.dispose?.();
+    });
+    for (const url of ref.objectUrls || []) URL.revokeObjectURL(url);
+    referenceModels.delete(ref.id);
+    selectedReferenceIds.delete(ref.id);
+    const helper = referenceSelectionBoxes.get(ref.id);
+    if (helper) {
+      scene.remove(helper);
+      helper.geometry?.dispose?.();
+      helper.material?.dispose?.();
+      referenceSelectionBoxes.delete(ref.id);
+    }
+  }
+
+  function renderReferenceRow(ref) {
+    const row = document.createElement("div");
+    row.className = `placed-row placed-row--reference${selectedReferenceIds.has(ref.id) ? " is-active" : ""}${ref.hidden ? " is-hidden" : ""}`;
+    const selectButton = document.createElement("button");
+    selectButton.type = "button";
+    selectButton.className = "placed-select";
+    selectButton.innerHTML = `
+      <span>
+        <span class="placed-name"></span>
+        <span class="placed-meta"></span>
+      </span>
+    `;
+    selectButton.querySelector(".placed-name").textContent = ref.name;
+    selectButton.querySelector(".placed-meta").textContent = "Reference model | not exported";
+    selectButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      selectReference(ref.id);
+    });
+    const visibilityButton = createPlacedVisibilityButton({
+      hidden: ref.hidden,
+      label: ref.name,
+      onClick: () => setReferenceHidden(ref, !ref.hidden),
+    });
+    const kind = document.createElement("span");
+    kind.className = "asset-kind";
+    kind.textContent = "Ref";
+    row.append(selectButton, visibilityButton, kind);
+    return row;
+  }
+
+  function renderReferenceList() {
+    if (!referenceModels.size) return;
+    const refs = Array.from(referenceModels.values()).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    const groupId = "__references__";
+    const isOpen = !closedPlacedGroupIds.has(groupId);
+    const wrapper = document.createElement("section");
+    wrapper.className = `placed-group placed-group--references${isOpen ? " is-open" : ""}`;
+    const header = document.createElement("div");
+    header.className = "placed-group-header";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "placed-group-toggle";
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    const hiddenCount = refs.filter((ref) => ref.hidden).length;
+    const hiddenText = hiddenCount ? `, ${hiddenCount.toLocaleString()} hidden` : "";
+    toggle.innerHTML = `
+      <span class="placed-group-caret" aria-hidden="true"></span>
+      <span>
+        <span class="placed-name">Reference Models</span>
+        <span class="placed-meta">${refs.length.toLocaleString()} imported${hiddenText}</span>
+      </span>
+    `;
+    const toggleOpen = () => {
+      if (isOpen) closedPlacedGroupIds.add(groupId);
+      else closedPlacedGroupIds.delete(groupId);
+      renderPlacedList();
+    };
+    toggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleOpen();
+    });
+    header.addEventListener("click", (event) => {
+      if (event.target?.closest?.(".placed-visibility")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleOpen();
+    });
+    const allHidden = hiddenCount === refs.length;
+    const visibilityButton = createPlacedVisibilityButton({
+      hidden: allHidden,
+      label: "reference models",
+      onClick: () => setReferencesHidden(refs, !allHidden),
+    });
+    header.append(toggle, visibilityButton);
+    wrapper.appendChild(header);
+    if (isOpen) {
+      const body = document.createElement("div");
+      body.className = "placed-group-body";
+      for (const ref of refs) body.appendChild(renderReferenceRow(ref));
+      wrapper.appendChild(body);
+    }
+    els.placedList.appendChild(wrapper);
+  }
+
   function createPlacedVisibilityButton({ hidden, label, onClick }) {
     const button = document.createElement("button");
     button.type = "button";
@@ -3344,6 +3660,12 @@ import {
   }
 
   function toggleSelectedHidden() {
+    const refs = selectedReferences();
+    if (refs.length) {
+      const shouldHideRefs = refs.some((ref) => !ref.hidden);
+      setReferencesHidden(refs, shouldHideRefs);
+      return;
+    }
     const selected = selectedPlacements();
     if (!selected.length) return;
     const shouldHide = selected.some((placement) => !placement.hidden);
@@ -3389,6 +3711,7 @@ import {
 
   function renderPlacedList() {
     els.placedList.textContent = "";
+    renderReferenceList();
     let shownRows = 0;
     let capped = false;
     for (const group of placedGroups()) {
@@ -3921,7 +4244,9 @@ import {
       return true;
     }
     if (event.code === "NumpadDecimal" || event.code === "NumpadPeriod") {
-      if (!focusCameraOnSelected()) showViewportNotice("No selection to frame");
+      const ref = selectedReference();
+      if (ref) focusCameraOnReference(ref);
+      else if (!focusCameraOnSelected()) showViewportNotice("No selection to frame");
       return true;
     }
     if (event.code === "Home" || event.code === "Digit0" || event.code === "Numpad0") {
@@ -3933,6 +4258,17 @@ import {
   }
 
   function deleteSelected() {
+    const refs = selectedReferences();
+    if (refs.length) {
+      for (const ref of refs) disposeReference(ref);
+      activeGizmoMode = "";
+      syncSelectionAttachment();
+      renderInspector();
+      renderPlacedList();
+      updateCounters();
+      showViewportNotice(refs.length === 1 ? "Reference Removed" : `Removed ${refs.length} References`);
+      return;
+    }
     const selected = selectedPlacements();
     if (!selected.length) return;
     pushUndoSnapshot();
@@ -4506,6 +4842,13 @@ import {
     return focusCameraOnBox(box, { selectedOnly: true, notify });
   }
 
+  function focusCameraOnReference(ref, { notify = true } = {}) {
+    if (!ref?.root) return false;
+    ref.root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(ref.root);
+    return focusCameraOnBox(box, { selectedOnly: true, notify });
+  }
+
   function focusCameraOnBuild({ notify = true } = {}) {
     if (!placements.size) return;
     const box = buildPlacementsWorldBox();
@@ -4573,6 +4916,11 @@ import {
       const file = els.fileInput.files && els.fileInput.files[0];
       if (file) importBuildingJson(file);
       els.fileInput.value = "";
+    });
+    els.importReference?.addEventListener("click", () => els.referenceFileInput?.click());
+    els.referenceFileInput?.addEventListener("change", () => {
+      if (els.referenceFileInput.files?.length) importReferenceFiles(els.referenceFileInput.files);
+      els.referenceFileInput.value = "";
     });
     els.exportJson.addEventListener("click", exportBuildingJson);
     els.clearBuild.addEventListener("click", () => clearBuild({ recordUndo: true }));

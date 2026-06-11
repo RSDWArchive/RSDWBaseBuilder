@@ -125,6 +125,8 @@ TRIANGLE_HEIGHT = 259.80762
 TRIANGLE_BASE_OFFSET = 86.60254
 TRIANGLE_APEX_OFFSET = TRIANGLE_HEIGHT - TRIANGLE_BASE_OFFSET
 TRIANGLE_CENTER_EDGE_OFFSET = 236.60254
+EXIT_HALLWAY_LENGTH = 2
+EXIT_HALLWAY_WALL_HEIGHT = 2
 
 REQUIRED_EXPORT_FIELDS = ("piece_data_index", "piece_data_name", "class_name")
 REQUIRED_TRANSFORM_FIELDS = (
@@ -290,6 +292,19 @@ ROOM_BLUEPRINTS: tuple[RoomBlueprint, ...] = (
     RoomBlueprint("atrium_upper_ring_7x6", "atrium", 7, 6, "rect", 3, ("upper_ring", "corner_pillars"), 0.7),
     RoomBlueprint("atrium_chamfered_ring_8x7", "atrium", 8, 7, "chamfered", 3, ("upper_ring", "corner_pillars"), 0.75),
     RoomBlueprint("jumping_puzzle_supported_8x8", "jumping_puzzle", 8, 8, "rect", 3, ("jumping_platforms",), 0.7),
+    RoomBlueprint("approved_square_vertical_entry_6x5", "entry", 6, 5, "rect", 2, ("corner_pillars",), 0.35),
+    RoomBlueprint("approved_square_vertical_chamber_7x7", "chamber", 7, 7, "rect", 3, ("loft", "side_walkway"), 0.45),
+    RoomBlueprint("approved_l_shaped_tower_chamber_7x6", "chamber", 7, 6, "l", 3, ("loft", "side_walkway"), 0.45),
+    RoomBlueprint("approved_u_shaped_tower_chamber_8x7", "chamber", 8, 7, "u", 3, ("loft", "side_walkway"), 0.5),
+    RoomBlueprint("approved_split_level_gallery_9x5", "gallery", 9, 5, "rect", 3, ("side_walkway", "loft"), 0.65),
+    RoomBlueprint("approved_switchback_gallery_9x5", "gallery", 9, 5, "split", 3, ("side_walkway", "divider"), 0.55),
+    RoomBlueprint("approved_ring_balcony_crossroad_8x8", "crossroad", 8, 8, "cross", 3, ("upper_ring", "corner_pillars"), 0.55),
+    RoomBlueprint("approved_square_stage_dead_end_6x5", "dead_end", 6, 5, "rect", 2, ("back_stage",), 0.45),
+    RoomBlueprint("approved_square_vertical_stair_core_7x7", "stair_core", 7, 7, "rect", 3, ("side_walkway", "diagonal_braces"), 0.45),
+    RoomBlueprint("approved_square_tower_8x8", "tower", 8, 8, "rect", 3, ("divider", "corner_pillars"), 0.5),
+    RoomBlueprint("approved_switchback_tower_9x7", "tower", 9, 7, "rect", 3, ("side_walkway", "divider"), 0.5),
+    RoomBlueprint("approved_ring_balcony_atrium_8x8", "atrium", 8, 8, "rect", 3, ("upper_ring", "corner_pillars"), 0.7),
+    RoomBlueprint("approved_u_shaped_atrium_8x7", "atrium", 8, 7, "u", 3, ("upper_ring", "corner_pillars"), 0.65),
 )
 
 BLUEPRINTS_BY_ROOM_TYPE: dict[str, tuple[RoomBlueprint, ...]] = {
@@ -453,7 +468,7 @@ class BuildingGenerator:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.preset == "shape-lab":
+    if args.preset in {"shape-lab", "square-room-crawl"}:
         args.tier = 3
 
     try:
@@ -496,7 +511,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--preset",
-        choices=("maze", "platform", "elevation-demo", "room-maze", "jumping-puzzle", "room-lab", "shape-lab"),
+        choices=(
+            "maze",
+            "platform",
+            "elevation-demo",
+            "room-maze",
+            "jumping-puzzle",
+            "room-lab",
+            "shape-lab",
+            "square-room-crawl",
+        ),
         default="maze",
     )
     parser.add_argument("--width", type=positive_int, default=16)
@@ -568,6 +592,8 @@ def generate_build(
         )
     elif args.preset == "shape-lab":
         generate_shape_lab(generator, style=args.shape_style, seed=args.seed)
+    elif args.preset == "square-room-crawl":
+        report = generate_square_room_crawl(generator, room_count=args.rooms, seed=args.seed)
     elif args.preset == "room-maze":
         report = generate_room_maze(
             generator,
@@ -723,6 +749,155 @@ def generate_shape_lab(generator: BuildingGenerator, style: str, seed: int = 42)
         return
     else:
         raise GeneratorError(f"Unsupported shape-lab style: {style}")
+
+
+def generate_square_room_crawl(
+    generator: BuildingGenerator,
+    room_count: int,
+    seed: int,
+) -> RoomMazeReport:
+    rng = random.Random(seed)
+    build = build_room_maze_graph(
+        room_count=max(2, room_count),
+        branch_rate=0.35,
+        loop_rate=0.18,
+        elevation_rate=0.25,
+        max_levels=3,
+        rng=rng,
+    )
+    assign_square_crawl_templates(build, rng)
+    layout_room_maze_compact(build, rng)
+    room_maze_to_pieces(generator, build, detail_budget="balanced")
+    validate_room_maze_build(build)
+    return RoomMazeReport(
+        rooms=len(build.rooms),
+        critical_path_length=build.critical_path_length,
+        branches=build.branches,
+        loops=build.loops,
+        levels_used=build.levels_used,
+    )
+
+
+def assign_square_crawl_templates(
+    build: RoomMazeBuild,
+    rng: random.Random,
+) -> None:
+    degrees = room_degrees(build.edges, len(build.rooms))
+    vertical_rooms = {
+        room_id
+        for edge in build.edges
+        if edge.vertical
+        for room_id in (edge.a, edge.b)
+    }
+    end_room_id = build.critical_path_length - 1
+    for room in build.rooms:
+        if room.room_id == 0:
+            room.room_type = "entry"
+        elif room.room_id in vertical_rooms:
+            room.room_type = rng.choice(["stair_core", "tower", "atrium"])
+        elif room.room_id == end_room_id:
+            room.room_type = "gallery"
+        elif degrees[room.room_id] >= 3:
+            room.room_type = "crossroad"
+        elif degrees[room.room_id] == 1:
+            room.room_type = "dead_end"
+        elif rng.random() < 0.35:
+            room.room_type = "gallery"
+        else:
+            room.room_type = "chamber"
+
+        blueprint = choose_square_crawl_blueprint(room.room_type, rng)
+        apply_room_blueprint(
+            room,
+            blueprint,
+            detail_budget="balanced",
+            tall_room_rate=1.0,
+            balcony_rate=0.25,
+            window_rate=0.35,
+            rng=rng,
+        )
+
+
+def choose_square_crawl_blueprint(room_type: str, rng: random.Random) -> RoomBlueprint:
+    blueprint_ids_by_type = {
+        "entry": ("approved_square_vertical_entry_6x5",),
+        "chamber": (
+            "approved_square_vertical_chamber_7x7",
+            "approved_l_shaped_tower_chamber_7x6",
+            "approved_u_shaped_tower_chamber_8x7",
+        ),
+        "gallery": (
+            "approved_split_level_gallery_9x5",
+            "approved_switchback_gallery_9x5",
+        ),
+        "crossroad": ("approved_ring_balcony_crossroad_8x8",),
+        "dead_end": ("approved_square_stage_dead_end_6x5",),
+        "stair_core": ("approved_square_vertical_stair_core_7x7",),
+        "tower": (
+            "approved_square_tower_8x8",
+            "approved_switchback_tower_9x7",
+        ),
+        "atrium": (
+            "approved_ring_balcony_atrium_8x8",
+            "approved_u_shaped_atrium_8x7",
+        ),
+    }
+    by_id = {blueprint.blueprint_id: blueprint for blueprint in ROOM_BLUEPRINTS}
+    choices = [by_id[blueprint_id] for blueprint_id in blueprint_ids_by_type.get(room_type, ("chamber_stage_7x5",))]
+    return rng.choice(choices)
+
+
+def layout_room_maze_compact(build: RoomMazeBuild, rng: random.Random) -> None:
+    build.rooms[0].x = 0
+    build.rooms[0].y = 0
+    tree_edges = [edge for edge in build.edges if not edge.loop]
+    for edge in tree_edges:
+        parent = build.rooms[edge.a]
+        child = build.rooms[edge.b]
+        if parent.x is None or parent.y is None:
+            raise GeneratorError(f"Parent room {parent.room_id} is not placed before child {child.room_id}.")
+        if child.x is not None and child.y is not None:
+            continue
+        place_child_room_compact(build.rooms, parent, child, edge.vertical, rng)
+
+    for room in build.rooms:
+        if room.x is None or room.y is None:
+            raise GeneratorError(f"Room {room.room_id} was not placed.")
+
+
+def place_child_room_compact(
+    rooms: list[RoomNode],
+    parent: RoomNode,
+    child: RoomNode,
+    vertical: bool,
+    rng: random.Random,
+) -> None:
+    if vertical:
+        candidates = vertical_room_candidates(parent, child)
+    else:
+        directions = ["east", "west", "north", "south"]
+        rng.shuffle(directions)
+        candidates = []
+        for direction in directions:
+            distances = [1, 2]
+            rng.shuffle(distances)
+            for distance in distances:
+                candidates.extend(room_candidates_for_direction(parent, child, direction, distance))
+
+    for x, y in candidates:
+        child.x = x
+        child.y = y
+        if not room_overlaps_any(child, rooms):
+            return
+
+    if vertical:
+        raise GeneratorError(f"Could not place vertical room {child.room_id} next to room {parent.room_id}.")
+
+    fallback_x = max((room.x or 0) + room.width for room in rooms if room.x is not None) + 2
+    child.x = fallback_x
+    child.y = parent.y
+    while room_overlaps_any(child, rooms):
+        child.x += child.width + 2
 
 
 def emit_chamfered_hall_shape_lab(generator: BuildingGenerator, seed: int) -> None:
@@ -1106,13 +1281,31 @@ def emit_square_vertical_room_shape_lab(generator: BuildingGenerator, seed: int)
             occupied_wall_edges=occupied_wall_edges,
         )
 
+    room_footprint = {(col, row) for col in range(width) for row in range(height)}
+    entry_edge = ("h", width // 2, 0)
+    exit_edge = ("h", width // 2, height)
+    emit_exit_hallways_for_edges(
+        generator,
+        footprint=room_footprint,
+        floor_cells_by_level={
+            0: room_footprint,
+            1: level_one_mezzanine,
+            2: level_two_landing,
+        },
+        exit_edges_by_level={
+            0: {entry_edge},
+            2: {exit_edge},
+        },
+        occupied_wall_edges=occupied_wall_edges,
+    )
+
     emit_square_vertical_room_walls(
         generator,
         width=width,
         height=height,
         identity_role=identity_role,
-        entry_edge=("h", width // 2, 0),
-        exit_edge=("h", width // 2, height),
+        entry_edge=entry_edge,
+        exit_edge=exit_edge,
     )
 
 
@@ -1178,16 +1371,26 @@ def emit_square_tower_room_shape_lab(generator: BuildingGenerator, seed: int) ->
             occupied_wall_edges=occupied_wall_edges,
         )
 
+    room_footprint = {(col, row) for col in range(width) for row in range(height)}
+    exit_edges_by_level = {
+        0: {("h", 0, 0)},
+        2: {("v", width, 8)},
+        3: {("v", width, 6)},
+    }
+    emit_exit_hallways_for_edges(
+        generator,
+        footprint=room_footprint,
+        floor_cells_by_level={0: room_footprint, **upper_floor_cells_by_level},
+        exit_edges_by_level=exit_edges_by_level,
+        occupied_wall_edges=occupied_wall_edges,
+    )
+
     emit_square_tower_room_walls(
         generator,
         width=width,
         height=height,
         identity_role=identity_role,
-        exit_edges_by_level={
-            0: {("h", 0, 0)},
-            2: {("v", width, 8)},
-            3: {("v", width, 6)},
-        },
+        exit_edges_by_level=exit_edges_by_level,
     )
 
 
@@ -1505,6 +1708,14 @@ def emit_elevated_shape_lab_room(
             occupied_wall_edges=occupied_wall_edges,
         )
 
+    emit_exit_hallways_for_edges(
+        generator,
+        footprint=square_cells,
+        floor_cells_by_level=floor_cells_by_level,
+        exit_edges_by_level=exit_edges_by_level,
+        occupied_wall_edges=occupied_wall_edges,
+    )
+
     emit_elevated_shape_lab_room_walls(
         generator,
         square_tiles=square_tiles,
@@ -1624,16 +1835,18 @@ def triangle_tiles_for_square_attachments(
     triangle_keys: set[tuple[float, float, float]] = set()
     for col, row, side in triangle_attachments:
         root = triangle_attachment_transform(generator, col, row, side)
-        append_triangle_tile(triangle_tiles, triangle_keys, root)
-        for label, p1, p2 in triangle_edge_segments(root[0], root[1], root[2]):
-            if label == "base":
-                continue
-            append_triangle_tile(
-                triangle_tiles,
-                triangle_keys,
-                triangle_tile_outside_edge(p1, p2, (root[0], root[1])),
-            )
+        append_triangle_hex_cluster_for_root(triangle_tiles, triangle_keys, root)
     return triangle_tiles
+
+
+def append_triangle_hex_cluster_for_root(
+    triangle_tiles: list[tuple[float, float, float]],
+    triangle_keys: set[tuple[float, float, float]],
+    root: tuple[float, float, float],
+) -> None:
+    _base_left, _base_right, apex = triangle_world_vertices(root[0], root[1], root[2])
+    for tile in triangle_hex_tiles(apex[0], apex[1], start_yaw=root[2]):
+        append_triangle_tile(triangle_tiles, triangle_keys, tile)
 
 
 def validate_triangle_tiles_have_face_connections(
@@ -1641,11 +1854,14 @@ def validate_triangle_tiles_have_face_connections(
     triangle_tiles: list[tuple[float, float, float]],
 ) -> None:
     floor_edge_counts: dict[tuple[tuple[float, float], tuple[float, float]], int] = {}
+    square_edges: set[tuple[tuple[float, float], tuple[float, float]]] = set()
     triangle_edge_sets: list[set[tuple[tuple[float, float], tuple[float, float]]]] = []
+    triangle_groups: dict[tuple[float, float], list[set[tuple[tuple[float, float], tuple[float, float]]]]] = {}
 
     for x, y, yaw in square_tiles:
         for _label, p1, p2 in square_edge_segments(x, y, yaw):
             key = surface_edge_key(p1, p2)
+            square_edges.add(key)
             floor_edge_counts[key] = floor_edge_counts.get(key, 0) + 1
 
     for x, y, yaw in triangle_tiles:
@@ -1655,6 +1871,8 @@ def validate_triangle_tiles_have_face_connections(
             edge_set.add(key)
             floor_edge_counts[key] = floor_edge_counts.get(key, 0) + 1
         triangle_edge_sets.append(edge_set)
+        _base_left, _base_right, apex = triangle_world_vertices(x, y, yaw)
+        triangle_groups.setdefault(triangle_cluster_key(apex), []).append(edge_set)
 
     for index, edge_set in enumerate(triangle_edge_sets):
         if any(floor_edge_counts.get(key, 0) > 1 for key in edge_set):
@@ -1662,6 +1880,22 @@ def validate_triangle_tiles_have_face_connections(
         raise GeneratorError(
             f"Triangle floor {index + 1} has no full-face connection to another floor tile."
         )
+
+    for apex, group_edge_sets in sorted(triangle_groups.items()):
+        if len(group_edge_sets) != 6:
+            raise GeneratorError(
+                f"Triangle hex cluster at {apex} has {len(group_edge_sets)} pieces; expected 6."
+            )
+        group_edge_counts: dict[tuple[tuple[float, float], tuple[float, float]], int] = {}
+        for edge_set in group_edge_sets:
+            for key in edge_set:
+                group_edge_counts[key] = group_edge_counts.get(key, 0) + 1
+        if not any(key in square_edges for edge_set in group_edge_sets for key in edge_set):
+            raise GeneratorError(f"Triangle hex cluster at {apex} is not face-attached to a square floor.")
+        for edge_set in group_edge_sets:
+            shared_triangle_faces = sum(1 for key in edge_set if group_edge_counts.get(key, 0) > 1)
+            if shared_triangle_faces < 2:
+                raise GeneratorError(f"Triangle hex cluster at {apex} contains a tip-only or incomplete tile.")
 
 
 def grid_edge_key(
@@ -1724,6 +1958,14 @@ def emit_irregular_tower_room_shape_lab(
             base_level=base_level,
             occupied_wall_edges=occupied_wall_edges,
         )
+
+    emit_exit_hallways_for_edges(
+        generator,
+        footprint=footprint,
+        floor_cells_by_level=floor_cells_by_level,
+        exit_edges_by_level=exit_edges_by_level,
+        occupied_wall_edges=occupied_wall_edges,
+    )
 
     emit_irregular_tower_room_walls(
         generator,
@@ -1818,6 +2060,95 @@ def validate_exit_edges_for_floor_cells(
                 raise GeneratorError(f"Exit edge {edge} at level {level} is not on the room perimeter.")
             if not (cells_adjacent_to_edge(edge) & floor_cells):
                 raise GeneratorError(f"Exit edge {edge} at level {level} has no walkable floor.")
+
+
+def emit_exit_hallways_for_edges(
+    generator: BuildingGenerator,
+    footprint: set[tuple[int, int]],
+    floor_cells_by_level: dict[int, set[tuple[int, int]]],
+    exit_edges_by_level: dict[int, set[tuple[str, int, int]]],
+    occupied_wall_edges: set[tuple[int, tuple[str, int, int]]] | None = None,
+    hallway_length: int = EXIT_HALLWAY_LENGTH,
+) -> set[tuple[int, tuple[str, int, int]]]:
+    occupied_wall_edges = occupied_wall_edges or set()
+    emitted_floors = {level: set(cells) for level, cells in floor_cells_by_level.items()}
+    emitted_floors.setdefault(0, set(footprint))
+    room_perimeter = set(perimeter_edges_for_cells(footprint))
+
+    for level, edges in sorted(exit_edges_by_level.items()):
+        for exit_edge in sorted(edges):
+            hallway_cells, direction = exit_hallway_cells_for_edge(
+                footprint,
+                exit_edge,
+                hallway_length=hallway_length,
+            )
+            level_floors = emitted_floors.setdefault(level, set())
+            for col, row in hallway_cells:
+                if (col, row) in level_floors:
+                    continue
+                generator.add_cell_surface(col, row, level=level)
+                level_floors.add((col, row))
+
+            hallway_edges = set(perimeter_edges_for_cells(set(hallway_cells)))
+            far_edge = hallway_far_edge(hallway_cells[-1], direction)
+            for edge in sorted(hallway_edges):
+                if edge == exit_edge:
+                    continue
+                if edge in room_perimeter:
+                    continue
+                for support_level in range(level):
+                    key = (support_level, edge)
+                    if key in occupied_wall_edges:
+                        continue
+                    generator.add_wall_edge(edge, role="wall", level=support_level)
+                    occupied_wall_edges.add(key)
+
+                for wall_offset in range(EXIT_HALLWAY_WALL_HEIGHT):
+                    wall_level = level + wall_offset
+                    key = (wall_level, edge)
+                    if key in occupied_wall_edges:
+                        continue
+                    role = "double_doorframe" if edge == far_edge and wall_offset == 0 else "wall"
+                    generator.add_wall_edge(edge, role=role, level=wall_level)
+                    occupied_wall_edges.add(key)
+
+    return occupied_wall_edges
+
+
+def exit_hallway_cells_for_edge(
+    footprint: set[tuple[int, int]],
+    edge: tuple[str, int, int],
+    hallway_length: int,
+) -> tuple[list[tuple[int, int]], tuple[int, int]]:
+    adjacent = cells_adjacent_to_edge(edge)
+    inside_cells = sorted(adjacent & footprint)
+    outside_cells = sorted(adjacent - footprint)
+    if len(inside_cells) != 1 or len(outside_cells) != 1:
+        raise GeneratorError(f"Exit edge {edge} cannot resolve a single outward hallway direction.")
+    inside_col, inside_row = inside_cells[0]
+    outside_col, outside_row = outside_cells[0]
+    direction = outside_col - inside_col, outside_row - inside_row
+    return [
+        (outside_col + (direction[0] * offset), outside_row + (direction[1] * offset))
+        for offset in range(hallway_length)
+    ], direction
+
+
+def hallway_far_edge(
+    far_cell: tuple[int, int],
+    direction: tuple[int, int],
+) -> tuple[str, int, int]:
+    col, row = far_cell
+    dx, dy = direction
+    if dx == 1 and dy == 0:
+        return "v", col + 1, row
+    if dx == -1 and dy == 0:
+        return "v", col, row
+    if dx == 0 and dy == 1:
+        return "h", col, row + 1
+    if dx == 0 and dy == -1:
+        return "h", col, row
+    raise GeneratorError(f"Invalid hallway direction: {direction}.")
 
 
 def emit_elevated_floor_wall_supports(
@@ -2315,11 +2646,11 @@ def boundary_edge_by_room_direction(
     )
 
 
-def triangle_hex_tiles(center_x: float, center_y: float) -> list[tuple[float, float, float]]:
+def triangle_hex_tiles(center_x: float, center_y: float, start_yaw: float = 0.0) -> list[tuple[float, float, float]]:
     tiles = []
-    for yaw in (0, 60, 120, 180, 240, 300):
+    for yaw in (start_yaw + step for step in (0, 60, 120, 180, 240, 300)):
         apex_x, apex_y = rotate_vector(0, TRIANGLE_APEX_OFFSET, yaw)
-        tiles.append((center_x - apex_x, center_y - apex_y, float(yaw)))
+        tiles.append((center_x - apex_x, center_y - apex_y, float(yaw % 360)))
     return tiles
 
 
@@ -2469,6 +2800,10 @@ def surface_edge_key(
 
 def canonical_surface_point(point: tuple[float, float]) -> tuple[float, float]:
     return round(point[0], 3), round(point[1], 3)
+
+
+def triangle_cluster_key(point: tuple[float, float]) -> tuple[float, float]:
+    return round(point[0], 2), round(point[1], 2)
 
 
 def edge_midpoint(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
@@ -3881,6 +4216,12 @@ def emit_gallery_room(
 ) -> None:
     if room_has_feature(room, "side_walkway"):
         emit_side_walkway(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "loft"):
+        emit_loft_room(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "divider"):
+        emit_room_divider(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "balcony"):
+        emit_room_balcony(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "corner_triangles"):
         emit_corner_triangle_platforms(generator, room, blocked_edges, max_count=2)
     if room_has_feature(room, "diagonal_braces"):
@@ -3893,6 +4234,8 @@ def emit_crossroad_room(
     blocked_edges: set[tuple[int, tuple[str, int, int]]],
     protected_cells: dict[int, set[tuple[int, int]]],
 ) -> None:
+    if room_has_feature(room, "upper_ring"):
+        emit_upper_ring(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "corner_pillars"):
         emit_corner_pillars(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "corner_triangles"):
@@ -3933,6 +4276,10 @@ def emit_stair_core_room(
     blocked_edges: set[tuple[int, tuple[str, int, int]]],
     protected_cells: dict[int, set[tuple[int, int]]],
 ) -> None:
+    if room_has_feature(room, "side_walkway"):
+        emit_side_walkway(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "loft"):
+        emit_loft_room(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "diagonal_braces"):
         emit_diagonal_corner_braces(generator, room, blocked_edges, max_count=2)
 
@@ -3943,6 +4290,10 @@ def emit_tower_room(
     blocked_edges: set[tuple[int, tuple[str, int, int]]],
     protected_cells: dict[int, set[tuple[int, int]]],
 ) -> None:
+    if room_has_feature(room, "side_walkway"):
+        emit_side_walkway(generator, room, blocked_edges, protected_cells)
+    if room_has_feature(room, "loft"):
+        emit_loft_room(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "corner_pillars"):
         emit_corner_pillars(generator, room, blocked_edges, protected_cells)
     if room_has_feature(room, "corner_triangles"):
@@ -4237,6 +4588,8 @@ def add_room_feature_platform(
         return
     if cell_is_protected(room, protected_cells, col, row, level):
         return
+    if "triangle" not in role and square_surface_cell_occupied(generator, col, row, level):
+        return
     if "triangle" in role:
         generator.add_cell_triangle_surface(col, row, level=level, role=role, yaw=yaw)
     else:
@@ -4264,11 +4617,16 @@ def emit_room_platform_cells(
     rail_role: str | None = None,
 ) -> None:
     room_cells = set(cells_for_room(room))
-    valid = sorted((cells & room_cells) - room_protected_cells(room, protected_cells, level))
+    valid = sorted(
+        cell
+        for cell in ((cells & room_cells) - room_protected_cells(room, protected_cells, level))
+        if not square_surface_cell_occupied(generator, cell[0], cell[1], level)
+    )
     if not valid:
         return
     for col, row in valid:
         generator.add_cell_surface(col, row, level=level, role=role)
+    protect_cells(protected_cells, level, set(valid))
     support_stride = 4 if room.detail_budget == "low-piece-count" else 2 if room.detail_budget == "max-variety" else 3
     for index, (col, row) in enumerate(valid):
         if index not in {0, len(valid) - 1} and index % support_stride:
@@ -4285,6 +4643,33 @@ def emit_room_platform_cells(
         )
     if rail_role:
         emit_platform_rails(generator, valid, level, blocked_edges, protected_cells, rail_role)
+
+
+def square_surface_cell_occupied(
+    generator: BuildingGenerator,
+    col: int,
+    row: int,
+    level: int,
+) -> bool:
+    x = col * generator.cell_size
+    y = row * generator.cell_size
+    z = level * generator.cell_size
+    for piece in generator.pieces:
+        name = piece["piece_data_name"]
+        if "Stairs" in name or "Triangle" in name:
+            continue
+        if "Foundation" not in name and "Floor" not in name:
+            continue
+        if round(float(piece["yaw"]) % 360, 3) != 0:
+            continue
+        if abs(float(piece["x"]) - x) > 0.01:
+            continue
+        if abs(float(piece["y"]) - y) > 0.01:
+            continue
+        if abs(float(piece["z"]) - z) > 0.01:
+            continue
+        return True
+    return False
 
 
 def emit_platform_rails(
@@ -4744,6 +5129,8 @@ def default_build_name(args: argparse.Namespace) -> str:
         return f"procedural_{args.preset}_t{args.tier}_{args.width}x{args.height}x{args.levels}"
     if args.preset == "room-maze":
         return f"procedural_{args.preset}_t{args.tier}_{args.detail_budget}_{args.rooms}_rooms_s{args.seed}"
+    if args.preset == "square-room-crawl":
+        return f"procedural_{args.preset}_t{args.tier}_{args.rooms}_rooms_s{args.seed}"
     if args.preset == "room-lab":
         if args.room_type == "jumping_puzzle":
             return f"procedural_{args.preset}_{args.room_type}_{args.jumping_variant}_t{args.tier}_{args.detail_budget}_s{args.seed}"
@@ -4802,7 +5189,7 @@ def rate_float(value: str) -> float:
 
 
 def round_number(value: float) -> int | float:
-    rounded = round(float(value), 3)
+    rounded = round(float(value), 5)
     return int(rounded) if rounded.is_integer() else rounded
 
 

@@ -1375,6 +1375,16 @@ button:focus-visible {
   opacity: 0.64;
 }
 
+.placed-row--reference {
+  border-color: rgba(159, 214, 255, 0.22);
+  background: rgba(87, 156, 214, 0.08);
+}
+
+.placed-row--reference .asset-kind {
+  border-color: rgba(159, 214, 255, 0.42);
+  color: #bde4ff;
+}
+
 .placed-select {
   min-width: 0;
   min-height: 42px;
