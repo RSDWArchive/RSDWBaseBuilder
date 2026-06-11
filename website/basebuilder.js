@@ -48,8 +48,6 @@ import {
   const MARQUEE_FROM_HIT_NEAR_PX = 36;
   const MARQUEE_FROM_HIT_FAR_PX = 16;
   const MARQUEE_FROM_HIT_MIN_AXIS_PX = 8;
-  const MARQUEE_SPATIAL_PADDING_RATIO = 0.08;
-  const MARQUEE_SPATIAL_MAX_PADDING_CM = 12000;
   const FAVORITES_STORAGE_KEY = "RSDWBaseBuilder.favoriteTargetIds.v1";
   const ASSET_VIEW_STORAGE_KEY = "RSDWBaseBuilder.assetViewMode.v1";
   const SCALE_OVERRIDE_STORAGE_KEY = "RSDWBaseBuilder.scaleRestrictionOverride.v1";
@@ -856,14 +854,6 @@ import {
     if (Math.min(absX, absY) < MARQUEE_FROM_HIT_MIN_AXIS_PX) return false;
     const threshold = THREE.MathUtils.lerp(MARQUEE_FROM_HIT_NEAR_PX, MARQUEE_FROM_HIT_FAR_PX, selectionZoomOutFactor());
     return Math.hypot(dx, dy) >= threshold;
-  }
-
-  function marqueeSpatialPaddingCm() {
-    return THREE.MathUtils.clamp(
-      viewportSpanCm() * MARQUEE_SPATIAL_PADDING_RATIO,
-      SPATIAL_CELL_SIZE_CM,
-      MARQUEE_SPATIAL_MAX_PADDING_CM,
-    );
   }
 
   function switchCameraProjection(mode, { notify = true } = {}) {
@@ -2694,39 +2684,8 @@ import {
       .filter((placement) => !excludeIds.has(placement.id) && placementPickable(placement));
   }
 
-  function clientPointOnDragPlane(x, y, localRaycaster = new THREE.Raycaster()) {
-    const rect = els.stage.getBoundingClientRect();
-    if (!rect.width || !rect.height) return null;
-    const point = new THREE.Vector2(
-      ((x - rect.left) / rect.width) * 2 - 1,
-      -((y - rect.top) / rect.height) * 2 + 1,
-    );
-    localRaycaster.setFromCamera(point, camera);
-    const hit = new THREE.Vector3();
-    return localRaycaster.ray.intersectPlane(dragPlane, hit) ? uePointFromThreePoint(hit) : null;
-  }
-
   function marqueePlacementCandidates(rect) {
-    if (!spatialIndex.placementCells.size && placements.size) return Array.from(placements.values());
-    const localRaycaster = new THREE.Raycaster();
-    const points = [
-      clientPointOnDragPlane(rect.left, rect.top, localRaycaster),
-      clientPointOnDragPlane(rect.right, rect.top, localRaycaster),
-      clientPointOnDragPlane(rect.left, rect.bottom, localRaycaster),
-      clientPointOnDragPlane(rect.right, rect.bottom, localRaycaster),
-    ].filter(Boolean);
-    if (points.length < 2) return Array.from(placements.values());
-    const minX = Math.min(...points.map((point) => point.x));
-    const maxX = Math.max(...points.map((point) => point.x));
-    const minY = Math.min(...points.map((point) => point.y));
-    const maxY = Math.max(...points.map((point) => point.y));
-    const padding = marqueeSpatialPaddingCm();
-    return queryBounds({
-      minX: minX - padding,
-      maxX: maxX + padding,
-      minY: minY - padding,
-      maxY: maxY + padding,
-    });
+    return Array.from(placements.values());
   }
 
   async function createPlacement(target, transform, metadata = {}, options = {}) {
