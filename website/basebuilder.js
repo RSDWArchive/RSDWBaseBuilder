@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
@@ -68,6 +69,21 @@ import {
   const SELECTION_PROMOTION_LIMIT = 250;
   const SHOW_ICON_URL = "./shared/assets/ShowHide/Show.png";
   const HIDE_ICON_URL = "./shared/assets/ShowHide/Hide.png";
+  const SOLID_VIEW_ENV_URL = "shared/assets/hdr/ninomaru_teien_1k.hdr";
+  const SOLID_VIEW_ORIGINAL_MATERIAL_KEY = "rsdwSolidViewOriginalMaterial";
+  const SOLID_VIEW_MATERIAL = new THREE.MeshStandardMaterial({
+    name: "RSDW Solid View",
+    color: 0xa2a4a4,
+    roughness: 0.95,
+    metalness: 0,
+    side: THREE.DoubleSide,
+    envMapIntensity: 0.35,
+  });
+  const SOLID_VIEW_GHOST_MATERIAL = SOLID_VIEW_MATERIAL.clone();
+  SOLID_VIEW_GHOST_MATERIAL.name = "RSDW Solid View Ghost";
+  SOLID_VIEW_GHOST_MATERIAL.transparent = true;
+  SOLID_VIEW_GHOST_MATERIAL.opacity = 0.48;
+  SOLID_VIEW_GHOST_MATERIAL.depthWrite = false;
   const VIEW_HELPER_SIZE = 128;
   const VIEW_HELPER_TOP = 86;
   const VIEW_HELPER_RIGHT = 14;
@@ -171,6 +187,11 @@ import {
   let nextPieceId = 1;
   let nextReferenceId = 1;
   let renderer = null;
+  let defaultToneMapping = THREE.ACESFilmicToneMapping;
+  let defaultToneMappingExposure = 1.05;
+  let defaultEnvironmentTexture = null;
+  let solidEnvironmentTexture = null;
+  let solidEnvironmentPromise = null;
   let scene = null;
   let camera = null;
   let controls = null;
@@ -184,6 +205,10 @@ import {
   let groundGrid = null;
   let groundGridSignature = "";
   let groundGridUpdateHandle = 0;
+  const normalSceneLights = [];
+  const solidSceneLights = [];
+  let solidKeyLight = null;
+  let solidFillLight = null;
   let loader = null;
   let dracoLoader = null;
   let raycaster = null;
@@ -212,6 +237,7 @@ import {
   let restoringSnapshot = false;
   let bulkMutationActive = false;
   let controlsHudCollapsed = false;
+  let solidViewEnabled = false;
   let viewportNoticeTimer = 0;
   let screenBoundsRevision = 0;
   const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -1040,11 +1066,14 @@ import {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
+    defaultToneMapping = renderer.toneMapping;
+    defaultToneMappingExposure = renderer.toneMappingExposure;
     renderer.autoClear = false;
     els.stage.appendChild(renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(renderer);
-    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    defaultEnvironmentTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = defaultEnvironmentTexture;
     pmrem.dispose();
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -1103,6 +1132,18 @@ import {
     const fill = new THREE.DirectionalLight(0xb8d8ff, 0.85);
     fill.position.set(-7, 5, -4);
     scene.add(fill);
+    normalSceneLights.push(hemi, key, fill);
+
+    const solidHemi = new THREE.HemisphereLight(0xffffff, 0x747878, 1.85);
+    solidHemi.visible = false;
+    scene.add(solidHemi);
+    solidKeyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+    solidKeyLight.visible = false;
+    scene.add(solidKeyLight);
+    solidFillLight = new THREE.DirectionalLight(0xe8eeee, 0.45);
+    solidFillLight.visible = false;
+    scene.add(solidFillLight);
+    solidSceneLights.push(solidHemi, solidKeyLight, solidFillLight);
 
     dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath("https://unpkg.com/three@0.184.0/examples/jsm/libs/draco/");
@@ -1140,6 +1181,7 @@ import {
       viewHelper.update(delta);
     }
     controls.update();
+    syncSolidViewLights();
     updateOrientationNudgeOverlay();
     renderer.clear();
     renderer.render(scene, camera);
@@ -1202,6 +1244,96 @@ import {
     return cloned;
   }
 
+  function setMeshSolidView(mesh, enabled = solidViewEnabled) {
+    if (!mesh || (!mesh.isMesh && !mesh.isSkinnedMesh && !mesh.isInstancedMesh)) return;
+    if (enabled) {
+      if (!Object.prototype.hasOwnProperty.call(mesh.userData, SOLID_VIEW_ORIGINAL_MATERIAL_KEY)) {
+        mesh.userData[SOLID_VIEW_ORIGINAL_MATERIAL_KEY] = mesh.material;
+      }
+      mesh.material = mesh.userData.dragGhost ? SOLID_VIEW_GHOST_MATERIAL : SOLID_VIEW_MATERIAL;
+    } else if (Object.prototype.hasOwnProperty.call(mesh.userData, SOLID_VIEW_ORIGINAL_MATERIAL_KEY)) {
+      mesh.material = mesh.userData[SOLID_VIEW_ORIGINAL_MATERIAL_KEY];
+      delete mesh.userData[SOLID_VIEW_ORIGINAL_MATERIAL_KEY];
+    }
+  }
+
+  function setObjectSolidView(root, enabled = solidViewEnabled) {
+    root?.traverse?.((obj) => {
+      if (!obj.isMesh && !obj.isSkinnedMesh) return;
+      setMeshSolidView(obj, enabled);
+    });
+  }
+
+  function setLightGroupVisible(lights, visible) {
+    for (const light of lights) {
+      if (light) light.visible = visible;
+    }
+  }
+
+  function syncSolidViewLights() {
+    if (!solidViewEnabled || !camera || !solidKeyLight || !solidFillLight) return;
+    const view = new THREE.Vector3().copy(camera.position).normalize();
+    const right = new THREE.Vector3().crossVectors(WORLD_UP, view);
+    if (right.lengthSq() < 1e-6) right.set(1, 0, 0);
+    right.normalize();
+    const up = new THREE.Vector3().crossVectors(view, right).normalize();
+    solidKeyLight.position.copy(view).multiplyScalar(8).addScaledVector(right, -4).addScaledVector(up, 5);
+    solidFillLight.position.copy(view).multiplyScalar(7).addScaledVector(right, 5).addScaledVector(up, 1.5);
+  }
+
+  function applySolidViewLighting() {
+    if (!scene || !renderer) return;
+    setLightGroupVisible(normalSceneLights, !solidViewEnabled);
+    setLightGroupVisible(solidSceneLights, solidViewEnabled);
+    scene.environment = solidViewEnabled
+      ? (solidEnvironmentTexture || defaultEnvironmentTexture)
+      : defaultEnvironmentTexture;
+    renderer.toneMapping = solidViewEnabled
+      ? (THREE.NeutralToneMapping ?? THREE.NoToneMapping)
+      : defaultToneMapping;
+    renderer.toneMappingExposure = solidViewEnabled ? 0.95 : defaultToneMappingExposure;
+    syncSolidViewLights();
+  }
+
+  function ensureSolidEnvironment() {
+    if (solidEnvironmentTexture) return Promise.resolve(solidEnvironmentTexture);
+    if (solidEnvironmentPromise) return solidEnvironmentPromise;
+    if (!renderer) return Promise.resolve(null);
+
+    solidEnvironmentPromise = new RGBELoader()
+      .loadAsync(siteAssetUrl(SOLID_VIEW_ENV_URL))
+      .then((texture) => {
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        const envMap = pmrem.fromEquirectangular(texture).texture;
+        texture.dispose?.();
+        pmrem.dispose();
+        solidEnvironmentTexture = envMap;
+        if (solidViewEnabled) applySolidViewLighting();
+        return envMap;
+      })
+      .catch((error) => {
+        console.warn("Unable to load solid-view HDR environment", error);
+        solidEnvironmentPromise = null;
+        return null;
+      });
+    return solidEnvironmentPromise;
+  }
+
+  function refreshSceneSolidView() {
+    setObjectSolidView(rootGroup, solidViewEnabled);
+    setObjectSolidView(referenceGroup, solidViewEnabled);
+    setObjectSolidView(dragSession?.ghost, solidViewEnabled);
+    applySolidViewLighting();
+    if (els.stage) els.stage.dataset.solidView = solidViewEnabled ? "on" : "off";
+  }
+
+  function toggleSolidView() {
+    solidViewEnabled = !solidViewEnabled;
+    refreshSceneSolidView();
+    if (solidViewEnabled) ensureSolidEnvironment();
+    showViewportNotice(solidViewEnabled ? "Solid View" : "Textured View");
+  }
+
   function targetCacheKey(target) {
     return target?.target_id || target?.asset_stem || "";
   }
@@ -1259,6 +1391,7 @@ import {
     if (!template) return null;
     const visual = cloneScene(template);
     visual.name = target.asset_stem || target.target_id;
+    setObjectSolidView(visual, solidViewEnabled);
     return visual;
   }
 
@@ -1355,6 +1488,7 @@ import {
       }
       mesh.instanceMatrix.needsUpdate = true;
       rootGroup.add(mesh);
+      setMeshSolidView(mesh, solidViewEnabled);
       return mesh;
     });
     for (const mesh of previousMeshes) {
@@ -2005,7 +2139,9 @@ import {
         return clone;
       });
       obj.material = isMaterialArray ? clones : (clones[0] || obj.material);
+      delete obj.userData[SOLID_VIEW_ORIGINAL_MATERIAL_KEY];
     });
+    setObjectSolidView(ghost, solidViewEnabled);
   }
 
   function updateDragPlacement(event) {
@@ -3469,6 +3605,7 @@ import {
         child.userData.referenceId = id;
         if (child.isMesh) child.frustumCulled = false;
       });
+      setObjectSolidView(root, solidViewEnabled);
       referenceGroup.add(root);
       const ref = {
         id,
@@ -3518,6 +3655,7 @@ import {
   function disposeReference(ref) {
     if (!ref) return;
     referenceGroup.remove(ref.root);
+    setObjectSolidView(ref.root, false);
     ref.root.traverse((obj) => {
       obj.geometry?.dispose?.();
       const materials = obj.material ? (Array.isArray(obj.material) ? obj.material : [obj.material]) : [];
@@ -4998,6 +5136,9 @@ import {
       } else if (key === "h") {
         event.preventDefault();
         toggleSelectedHidden();
+      } else if (key === "t" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault();
+        toggleSolidView();
       } else if (key === "d" && (event.ctrlKey || event.metaKey || event.shiftKey)) {
         event.preventDefault();
         duplicateSelected();
