@@ -309,6 +309,86 @@ def _collection_objects_recursive(collection) -> list:
     return out
 
 
+def _scene_objects(context) -> list:
+    try:
+        return list(context.scene.objects)
+    except Exception:
+        return []
+
+
+def _collection_parent_map(scene) -> dict:
+    parents: dict = {}
+
+    def _walk(coll):
+        for child in coll.children:
+            parents[child] = coll
+            _walk(child)
+
+    try:
+        _walk(scene.collection)
+    except Exception:
+        pass
+    return parents
+
+
+def _collection_lineage(collection, parent_map: dict) -> list:
+    out = []
+    seen: set[int] = set()
+    cur = collection
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        out.append(cur)
+        cur = parent_map.get(cur)
+    return out
+
+
+def _collection_has_export_metadata(collection) -> bool:
+    if collection is None:
+        return False
+    return any(key in collection for key in (
+        "rsdw_recenter_offset_ue",
+        "rsdw_source_name",
+        "rsdw_source_schema",
+        "rsdw_anchor_piece_id",
+    ))
+
+
+def _export_metadata_collection_for_scope(context, objects: list, preferred=None):
+    parent_map = _collection_parent_map(context.scene)
+
+    def _nearest_metadata_collection(collection):
+        for candidate in _collection_lineage(collection, parent_map):
+            if _collection_has_export_metadata(candidate):
+                return candidate
+        return None
+
+    for seed in (preferred, getattr(context, "collection", None)):
+        candidate = _nearest_metadata_collection(seed)
+        if candidate is not None:
+            return candidate
+
+    candidates = []
+    seen_ids: set[int] = set()
+    for obj in objects:
+        for collection in getattr(obj, "users_collection", []) or []:
+            candidate = _nearest_metadata_collection(collection)
+            if candidate is not None and id(candidate) not in seen_ids:
+                seen_ids.add(id(candidate))
+                candidates.append(candidate)
+
+    if len(candidates) == 1:
+        return candidates[0]
+
+    build_collections = [
+        collection
+        for collection in _build_collections_in_scene(context.scene)
+        if _collection_has_export_metadata(collection)
+    ]
+    if len(build_collections) == 1:
+        return build_collections[0]
+    return preferred
+
+
 def _has_rsdw_metadata(obj) -> bool:
     return any(key in obj for key in (
         "rsdw_asset_kind",
@@ -378,11 +458,23 @@ def _context_build_collection(context):
     return None
 
 
-def _is_object_hidden_for_export(obj) -> bool:
+def _is_object_hidden_for_export(obj, context=None) -> bool:
     try:
-        return bool(obj.hide_get() or obj.hide_render)
+        if obj.hide_get() or obj.hide_render:
+            return True
     except Exception:
-        return False
+        pass
+    if context is not None:
+        try:
+            return not bool(obj.visible_get(view_layer=context.view_layer))
+        except TypeError:
+            try:
+                return not bool(obj.visible_get())
+            except Exception:
+                return False
+        except Exception:
+            return False
+    return False
 
 
 def _asset_kind_for_obj(obj) -> str:
@@ -963,9 +1055,8 @@ class RSDW_OT_ExportBuildingJson(Operator):
     bl_idname = "rsdw.export_building_json"
     bl_label = "Export Dragonwilds Building JSON..."
     bl_description = (
-        "Export the active collection back to building JSON. Each object's "
-        "name (after Blender's .001 suffix is stripped) is matched against "
-        "the BPMap to resolve its class_name."
+        "Export visible RSDW objects in the scene back to building JSON. "
+        "Objects in hidden collections are ignored."
     )
     bl_options = {"REGISTER"}
 
@@ -979,12 +1070,21 @@ class RSDW_OT_ExportBuildingJson(Operator):
         return {"RUNNING_MODAL"}
 
     def execute(self, context):
-        coll = _context_build_collection(context)
-        if coll is None:
-            self.report({"ERROR"}, "No active RSDW build collection. Use New Build or select a build piece.")
-            return {"CANCELLED"}
+        preferred_coll = _context_build_collection(context)
+        scene_objects = _scene_objects(context)
+        visible_objects = [
+            obj for obj in scene_objects
+            if not _is_object_hidden_for_export(obj, context)
+        ]
+        coll = _export_metadata_collection_for_scope(context, visible_objects, preferred=preferred_coll)
 
-        preflight = _run_build_preflight(context, coll, select_problems=True)
+        preflight = _run_build_preflight(
+            context,
+            coll,
+            select_problems=True,
+            objects=scene_objects,
+            scope_name="Visible scene",
+        )
         if preflight.get("unknown_runtime_index", 0):
             self.report(
                 {"ERROR"},
@@ -996,9 +1096,10 @@ class RSDW_OT_ExportBuildingJson(Operator):
             or preflight.get("exportable_items", 0)
             or preflight.get("exportable_actors", 0)
         ):
-            self.report({"ERROR"}, "No export-ready RSDW objects in this build.")
+            self.report({"ERROR"}, "No visible export-ready RSDW objects in this scene.")
             return {"CANCELLED"}
-        _set_active_collection(context, coll)
+        if coll is not None:
+            _set_active_collection(context, coll)
 
         # Reverse map: SM stem -> class_name. If multiple BPs share a mesh
         # we keep the first one (round-tripping is lossy for those props).
@@ -1013,16 +1114,21 @@ class RSDW_OT_ExportBuildingJson(Operator):
             self.report({"ERROR"}, "Invalid scale.")
             return {"CANCELLED"}
 
-        # Walk recursively so user-organized rooms/layers are included once.
-        all_objs = _collection_objects_recursive(coll)
+        # Export scope is scene-wide visibility, not collection membership.
+        # This lets users organize a build across multiple collections while
+        # hiding collections to exclude WIP/reference objects from export.
+        all_objs = [
+            obj for obj in visible_objects
+            if _is_building_piece_obj(obj) or _is_item_obj(obj) or _is_actor_obj(obj)
+        ]
 
         if not all_objs:
-            self.report({"ERROR"}, "Active collection (and its children) is empty.")
+            self.report({"ERROR"}, "No visible RSDW objects in the scene.")
             return {"CANCELLED"}
 
         # Re-apply the recenter offset captured at import time so positions
         # round-trip back into the game's world coordinate frame.
-        roff = coll.get("rsdw_recenter_offset_ue")
+        roff = coll.get("rsdw_recenter_offset_ue") if coll is not None else None
         if roff is not None and len(roff) == 3:
             ox, oy, oz = float(roff[0]), float(roff[1]), float(roff[2])
         else:
@@ -1064,21 +1170,12 @@ class RSDW_OT_ExportBuildingJson(Operator):
         items = []
         actors = []
         skipped = 0
-        hidden = 0
+        hidden = int(preflight.get("hidden_objects", 0) or 0)
         # Pieces whose runtime index we don't know -- the game's spawn
         # RPC takes only the int index so emitting them would silently
         # fail in-game. Collect for an honest error report.
         unknown_index_classes: dict = {}
         for i, obj in enumerate(all_objs):
-            # Skip explicitly hidden objects so the user can hide WIP/refs
-            # without bloating the export.
-            try:
-                if obj.hide_get() or obj.hide_render:
-                    hidden += 1
-                    continue
-            except Exception:
-                pass
-
             if _is_item_obj(obj) or _is_actor_obj(obj):
                 continue
             if not _is_building_piece_obj(obj):
@@ -1174,7 +1271,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
             pieces.append(row)
 
         for obj in all_objs:
-            if _is_object_hidden_for_export(obj) or not _is_item_obj(obj):
+            if not _is_item_obj(obj):
                 continue
             meta = _metadata_object_for(obj) or obj
             item_name = str(
@@ -1206,7 +1303,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
             })
 
         for obj in all_objs:
-            if _is_object_hidden_for_export(obj) or not _is_actor_obj(obj):
+            if not _is_actor_obj(obj):
                 continue
             meta = _metadata_object_for(obj) or obj
             actor_class = str(meta.get("rsdw_actor_class") or meta.get("rsdw_class_name") or "")
@@ -1226,18 +1323,18 @@ class RSDW_OT_ExportBuildingJson(Operator):
 
         if not pieces and not items and not actors:
             self.report({"ERROR"},
-                        "No objects in this collection map to exportable RSDW data.")
+                        "No visible objects in this scene map to exportable RSDW data.")
             return {"CANCELLED"}
 
         # Prefer the captured source name (the in-game base name as recorded
         # by the game tool) over Blender's COLLECTION_NAME_PREFIX-stripped
         # collection name. Falls back to the collection name if missing.
-        name = coll.get("rsdw_source_name") or ""
+        name = coll.get("rsdw_source_name") if coll is not None else ""
         if not name:
-            name = coll.name
+            name = coll.name if coll is not None else context.scene.name
             if name.startswith(COLLECTION_NAME_PREFIX):
                 name = name[len(COLLECTION_NAME_PREFIX):]
-        schema = coll.get("rsdw_source_schema") or "rsdwtools.buildings.v1"
+        schema = (coll.get("rsdw_source_schema") if coll is not None else "") or "rsdwtools.buildings.v1"
 
         out = {
             "schema": str(schema),
@@ -1257,7 +1354,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
         # collection has one set AND the piece is still in the export. Game
         # treats a missing anchor block as 'no anchor selected'.
         try:
-            anchor_pid = int(coll.get("rsdw_anchor_piece_id", 0) or 0)
+            anchor_pid = int((coll.get("rsdw_anchor_piece_id", 0) if coll is not None else 0) or 0)
         except (TypeError, ValueError):
             anchor_pid = 0
         if anchor_pid > 0:
@@ -1352,10 +1449,16 @@ def _piece_data_for_obj(obj, class_name: str, class_to_piece_data: dict, piece_d
     return pdi_known and pdi >= 0 and bool(pdn), pdi, pdn
 
 
-def _run_build_preflight(context, collection=None, select_problems: bool = False) -> dict:
+def _run_build_preflight(
+    context,
+    collection=None,
+    select_problems: bool = False,
+    objects: list | None = None,
+    scope_name: str | None = None,
+) -> dict:
     global _preflight_cache
     coll = collection or _context_build_collection(context)
-    if coll is None:
+    if objects is None and coll is None:
         _preflight_cache = {
             "collection": "",
             "ready": False,
@@ -1364,8 +1467,10 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
         }
         return _preflight_cache
 
-    objects = _collection_objects_recursive(coll)
-    visible_objects = [obj for obj in objects if not _is_object_hidden_for_export(obj)]
+    if objects is None:
+        objects = _collection_objects_recursive(coll)
+    label = scope_name or (coll.name if coll is not None else "Visible scene")
+    visible_objects = [obj for obj in objects if not _is_object_hidden_for_export(obj, context)]
     piece_objects = [obj for obj in visible_objects if _is_building_piece_obj(obj)]
     item_objects = [obj for obj in visible_objects if _is_item_obj(obj)]
     actor_objects = [obj for obj in visible_objects if _is_actor_obj(obj)]
@@ -1424,7 +1529,7 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
         status = "no-exportable-pieces"
 
     _preflight_cache = {
-        "collection": coll.name,
+        "collection": label,
         "ready": ready,
         "status": status,
         "total_objects": len(objects),
@@ -1442,7 +1547,7 @@ def _run_build_preflight(context, collection=None, select_problems: bool = False
         "_no_snap_objects": no_snap,
         "_duplicate_piece_id_objects": duplicate_piece_id_objects,
         "message": (
-            f"{coll.name}: {len(exportable)} export-ready piece(s), "
+            f"{label}: {len(exportable)} export-ready piece(s), "
             f"{len(item_objects)} item(s), {len(actor_objects)} actor(s), "
             f"{len(unknown_runtime)} missing runtime index, "
             f"{hidden_count} hidden."

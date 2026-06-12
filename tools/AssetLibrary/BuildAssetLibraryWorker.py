@@ -278,7 +278,7 @@ def _bake_mesh_to_actor_root(obj: bpy.types.Object, depsgraph: bpy.types.Depsgra
     return True
 
 
-def _bp_root_identity_errors(obj: bpy.types.Object | None, *, eps: float = 1e-5) -> list[str]:
+def _asset_root_identity_errors(obj: bpy.types.Object | None, *, eps: float = 1e-5) -> list[str]:
     if obj is None:
         return ["missing asset object"]
     errors: list[str] = []
@@ -296,7 +296,7 @@ def _bp_root_identity_errors(obj: bpy.types.Object | None, *, eps: float = 1e-5)
     return errors
 
 
-def _normalize_bp_asset_root() -> tuple[bpy.types.Object | None, dict]:
+def _normalize_visual_asset_root(schema: str) -> tuple[bpy.types.Object | None, dict]:
     mesh_objects = [obj for obj in list(bpy.data.objects) if obj.type == "MESH"]
     depsgraph = bpy.context.evaluated_depsgraph_get()
     baked = 0
@@ -319,9 +319,9 @@ def _normalize_bp_asset_root() -> tuple[bpy.types.Object | None, dict]:
         asset_obj.matrix_parent_inverse = Matrix.Identity(4)
         asset_obj.matrix_world = Matrix.Identity(4)
 
-    errors = _bp_root_identity_errors(asset_obj)
+    errors = _asset_root_identity_errors(asset_obj)
     return asset_obj, {
-        "schema": "RSDWBaseBuilder.BPRootNormalization.v1",
+        "schema": schema,
         "normalized": not errors and not failed,
         "baked_mesh_count": baked,
         "failed_meshes": failed,
@@ -329,6 +329,14 @@ def _normalize_bp_asset_root() -> tuple[bpy.types.Object | None, dict]:
         "root_identity_ok": not errors,
         "root_identity_errors": errors,
     }
+
+
+def _normalize_bp_asset_root() -> tuple[bpy.types.Object | None, dict]:
+    return _normalize_visual_asset_root("RSDWBaseBuilder.BPRootNormalization.v1")
+
+
+def _normalize_building_piece_visual_root() -> tuple[bpy.types.Object | None, dict]:
+    return _normalize_visual_asset_root("RSDWBaseBuilder.BuildingPieceVisualRootNormalization.v1")
 
 
 def _entry_material_refs(entry: dict) -> tuple[list[str], list[str]]:
@@ -836,11 +844,20 @@ def main() -> int:
 
         asset_kind = asset_metadata.get("asset_kind") or "model"
         bp_root_report: dict | None = None
+        building_piece_root_report: dict | None = None
 
         # BP assets represent Unreal actors. Bake component offsets into the
         # mesh data so the Blender asset object itself stays at the actor root.
         if asset_kind == "bp":
             asset_obj, bp_root_report = _normalize_bp_asset_root()
+        elif (
+            asset_kind == "building_piece"
+            and asset_metadata.get("building_piece_visual_transform_source") == "matching_bp_visual_component"
+        ):
+            # Some buildable actors rotate/offset their visible mesh under the
+            # actor root. Bake that visual transform into the mesh so imported
+            # objects still export only their game actor/root transform.
+            asset_obj, building_piece_root_report = _normalize_building_piece_visual_root()
         else:
             # Optional: collapse multi-mesh imports into one object so the asset
             # is a single drag-drop unit.
@@ -863,6 +880,16 @@ def main() -> int:
             asset_obj["rsdw_bp_root_normalization"] = "baked_mesh_v1"
             if bp_root_report:
                 asset_obj["rsdw_bp_root_identity_ok"] = bool(bp_root_report.get("root_identity_ok"))
+        if asset_kind == "building_piece" and building_piece_root_report is not None:
+            asset_obj["rsdw_building_piece_visual_root_normalized"] = bool(building_piece_root_report.get("normalized"))
+            asset_obj["rsdw_building_piece_visual_root_normalization"] = "baked_mesh_v1"
+            asset_obj["rsdw_building_piece_visual_root_identity_ok"] = bool(
+                building_piece_root_report.get("root_identity_ok")
+            )
+        if asset_metadata.get("building_piece_visual_transform_source"):
+            asset_obj["rsdw_building_piece_visual_transform_source"] = str(
+                asset_metadata["building_piece_visual_transform_source"]
+            )
         if asset_metadata.get("source_model_refs"):
             asset_obj["rsdw_source_model_refs"] = json.dumps(asset_metadata["source_model_refs"], ensure_ascii=False)
         class_name = asset_metadata.get("class_name") or ""
@@ -925,6 +952,7 @@ def main() -> int:
             "catalog_path": catalog_path,
             "component_reports": component_reports,
             "component_count": len(component_reports),
+            "building_piece_root_normalization": building_piece_root_report,
             "slot_count": sum(int(report.get("slot_count") or 0) for report in component_reports),
             "linked_materials": sorted({
                 name
