@@ -7,6 +7,7 @@ run either upstream pipeline.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import math
 import re
@@ -1006,6 +1007,100 @@ def _build_bp_targets(
     return targets, unresolved, skipped, counts
 
 
+def _matching_bp_component_for_piece(
+    target: dict[str, Any],
+    bp_targets_by_class: dict[str, dict[str, Any]],
+) -> dict[str, Any] | None:
+    bp_class = str(target.get("bp_class") or "")
+    if not bp_class:
+        return None
+    bp_target = bp_targets_by_class.get(bp_class)
+    if not bp_target:
+        return None
+
+    source_ref = str(target.get("source_entry_path") or "")
+    source_stem = str(target.get("source_sm_stem") or "")
+    components = [
+        component
+        for component in bp_target.get("components") or []
+        if isinstance(component, dict)
+    ]
+
+    exact_ref = [
+        component
+        for component in components
+        if source_ref and str(component.get("source_entry_path") or "") == source_ref
+    ]
+    if exact_ref:
+        return exact_ref[0]
+
+    stem_matches = [
+        component
+        for component in components
+        if source_stem and str(component.get("model_stem") or "") == source_stem
+    ]
+    if stem_matches:
+        return stem_matches[0]
+
+    return None
+
+
+def _apply_bp_visual_component_transforms(
+    building_targets: list[dict[str, Any]],
+    bp_targets: list[dict[str, Any]],
+) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    bp_targets_by_class = {
+        str(target.get("bp_class") or ""): target
+        for target in bp_targets
+        if target.get("bp_class")
+    }
+
+    for target in building_targets:
+        if target.get("asset_kind") != "building_piece":
+            continue
+        counts["building_pieces_checked"] += 1
+        components = target.get("components")
+        if not isinstance(components, list) or not components:
+            counts["without_component"] += 1
+            continue
+        component = components[0]
+        if component.get("transform"):
+            counts["already_transformed"] += 1
+            continue
+
+        matched_component = _matching_bp_component_for_piece(target, bp_targets_by_class)
+        if matched_component is None:
+            counts["without_matching_bp_component"] += 1
+            continue
+
+        transform = matched_component.get("transform")
+        if not transform:
+            counts["matching_bp_component_identity"] += 1
+            continue
+
+        component["transform"] = copy.deepcopy(transform)
+        component["component_transform_source"] = "matching_bp_visual_component"
+        component["component_transform_bp_class"] = str(target.get("bp_class") or "")
+        component["component_transform_component_name"] = str(matched_component.get("component_name") or "")
+        target["building_piece_visual_transform_source"] = "matching_bp_visual_component"
+        counts["applied"] += 1
+
+        rotation = transform.get("rotation") if isinstance(transform, dict) else None
+        yaw = None
+        if isinstance(rotation, dict):
+            yaw = rotation.get("Yaw", rotation.get("yaw"))
+        if yaw is not None:
+            try:
+                counts[f"applied_yaw_{int(round(float(yaw)))}"] += 1
+            except (TypeError, ValueError):
+                counts["applied_yaw_other"] += 1
+        else:
+            counts["applied_without_rotation"] += 1
+
+    return counts
+
+
 def _load_building_targets(
     path: Path,
     used_stems: set[str],
@@ -1117,6 +1212,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
         inventory=inventory,
         used_stems=used_stems,
     )
+    building_bp_transform_counts = _apply_bp_visual_component_transforms(building_targets, bp_targets)
 
     targets = [*building_targets, *item_targets, *bp_targets]
     unresolved = [*building_unresolved, *item_unresolved, *bp_unresolved]
@@ -1152,6 +1248,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
         "unresolved_unique_model_refs": len(unresolved_unique),
         "skipped": len(skipped),
         "building_source_summary": building_summary,
+        "building_bp_visual_transform_counts": dict(sorted(building_bp_transform_counts.items())),
         "item_counts": dict(sorted(item_counts.items())),
         "bp_counts": dict(sorted(bp_counts.items())),
         "icon_counts": dict(sorted(icon_counts.items())),
