@@ -936,6 +936,18 @@ def main(argv: list[str] | None = None) -> int:
         cwd=root,
     ))
 
+    stages.append(run_command(
+        "Decoration visual transform audit",
+        [
+            sys.executable,
+            root / "tools" / "Web" / "AuditDecorationVisualTransforms.py",
+            "--index", browser_web_index,
+            "--out", log_dir / "decoration_visual_transform_audit.json",
+        ],
+        log_path=log_dir / "05c_decoration_visual_transform_audit.log",
+        cwd=root,
+    ))
+
     build_target_ids: list[str] = []
     only_list: Path | None = None
     if args.mode == "smoke":
@@ -1231,6 +1243,7 @@ def main(argv: list[str] | None = None) -> int:
             "asset_catalog": str(catalog_file),
             "browser_web_index": str(browser_web_index),
             "browser_web_preview_root": str(browser_web_preview_root),
+            "decoration_visual_transform_audit": str(log_dir / "decoration_visual_transform_audit.json"),
             "asset_target_quality_report": str(log_dir / "asset_target_quality_report.json"),
             "asset_quality_report": str(log_dir / "asset_quality_report.json"),
             "material_inventory": str(material_inventory),

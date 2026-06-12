@@ -1026,21 +1026,35 @@ def _matching_bp_component_for_piece(
         if isinstance(component, dict)
     ]
 
+    def best_component(matches: list[dict[str, Any]]) -> dict[str, Any] | None:
+        if not matches:
+            return None
+        transformed = [
+            component
+            for component in matches
+            if component.get("transform")
+        ]
+        if transformed:
+            return transformed[0]
+        return matches[0]
+
     exact_ref = [
         component
         for component in components
         if source_ref and str(component.get("source_entry_path") or "") == source_ref
     ]
-    if exact_ref:
-        return exact_ref[0]
+    matched = best_component(exact_ref)
+    if matched is not None:
+        return matched
 
     stem_matches = [
         component
         for component in components
         if source_stem and str(component.get("model_stem") or "") == source_stem
     ]
-    if stem_matches:
-        return stem_matches[0]
+    matched = best_component(stem_matches)
+    if matched is not None:
+        return matched
 
     return None
 

@@ -168,12 +168,17 @@ export function ueTransformToThreeMatrix4(row = {}, offset = {}) {
   return ueMatrixRowsToThreeMatrix4(ueMatrixFromTransform(row), offset);
 }
 
-export function componentTransformToThreeMatrix4(transform = {}) {
-  if (Array.isArray(transform.matrix)) {
+export function componentTransformToThreeMatrix4(transform = {}, options = {}) {
+  if (!options.flipPitchRoll && Array.isArray(transform.matrix)) {
     return ueMatrixRowsToThreeMatrix4(transform.matrix);
   }
   const loc = transform.location || {};
-  const rot = transform.rotation || {};
+  const sourceRot = transform.rotation || {};
+  const rot = options.flipPitchRoll ? {
+    ...sourceRot,
+    Pitch: -numberOr(sourceRot.Pitch ?? sourceRot.pitch),
+    Roll: -numberOr(sourceRot.Roll ?? sourceRot.roll),
+  } : sourceRot;
   const scale = transform.scale || {};
   return ueMatrixRowsToThreeMatrix4(matrixFromComponentParts(loc, rot, scale));
 }

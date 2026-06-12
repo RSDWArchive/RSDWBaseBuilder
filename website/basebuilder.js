@@ -1353,7 +1353,9 @@ import {
       const componentRoot = new THREE.Group();
       componentRoot.name = component.name || "component";
       componentRoot.add(clone);
-      const matrix = componentTransformToThreeMatrix4(component.transform || {});
+      const matrix = componentTransformToThreeMatrix4(component.transform || {}, {
+        flipPitchRoll: target.asset_kind === "building_piece",
+      });
       componentRoot.matrixAutoUpdate = true;
       const position = new THREE.Vector3();
       const quaternion = new THREE.Quaternion();

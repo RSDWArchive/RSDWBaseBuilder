@@ -166,7 +166,109 @@ def _component_roots(objects: list[bpy.types.Object]) -> list[bpy.types.Object]:
     return roots or objects
 
 
-def _apply_component_transform(objects: list[bpy.types.Object], transform: dict) -> None:
+def _identity_matrix4() -> list[list[float]]:
+    return [
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ]
+
+
+def _mat3_mul(a: list[list[float]], b: list[list[float]]) -> list[list[float]]:
+    return [
+        [sum(a[row][idx] * b[idx][col] for idx in range(3)) for col in range(3)]
+        for row in range(3)
+    ]
+
+
+def _quat_to_matrix3(quat: dict) -> list[list[float]]:
+    x = float(quat.get("X", 0.0) or 0.0)
+    y = float(quat.get("Y", 0.0) or 0.0)
+    z = float(quat.get("Z", 0.0) or 0.0)
+    w = float(quat.get("W", 1.0) or 1.0)
+    length = math.sqrt(x * x + y * y + z * z + w * w)
+    if length <= 0.0:
+        return [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    x /= length
+    y /= length
+    z /= length
+    w /= length
+    xx, yy, zz = x * x, y * y, z * z
+    xy, xz, yz = x * y, x * z, y * z
+    wx, wy, wz = w * x, w * y, w * z
+    return [
+        [1.0 - 2.0 * (yy + zz), 2.0 * (xy - wz), 2.0 * (xz + wy)],
+        [2.0 * (xy + wz), 1.0 - 2.0 * (xx + zz), 2.0 * (yz - wx)],
+        [2.0 * (xz - wy), 2.0 * (yz + wx), 1.0 - 2.0 * (xx + yy)],
+    ]
+
+
+def _rotator_to_matrix3(rot: dict) -> list[list[float]]:
+    pitch = math.radians(float(rot.get("Pitch", 0.0) or 0.0))
+    yaw = math.radians(float(rot.get("Yaw", 0.0) or 0.0))
+    roll = math.radians(float(rot.get("Roll", 0.0) or 0.0))
+
+    cp, sp = math.cos(pitch), math.sin(pitch)
+    cy, sy = math.cos(yaw), math.sin(yaw)
+    cr, sr = math.cos(roll), math.sin(roll)
+
+    rz = [
+        [cy, -sy, 0.0],
+        [sy, cy, 0.0],
+        [0.0, 0.0, 1.0],
+    ]
+    ry = [
+        [cp, 0.0, sp],
+        [0.0, 1.0, 0.0],
+        [-sp, 0.0, cp],
+    ]
+    rx = [
+        [1.0, 0.0, 0.0],
+        [0.0, cr, -sr],
+        [0.0, sr, cr],
+    ]
+    return _mat3_mul(_mat3_mul(rz, ry), rx)
+
+
+def _matrix_from_component_parts(transform: dict, *, flip_pitch_roll: bool = False) -> list[list[float]]:
+    loc = transform.get("location") or {}
+    scale = transform.get("scale") or {}
+    sx = float(scale.get("X", 1.0) or 1.0)
+    sy = float(scale.get("Y", 1.0) or 1.0)
+    sz = float(scale.get("Z", 1.0) or 1.0)
+
+    rot = dict(transform.get("rotation") or {})
+    if flip_pitch_roll:
+        rot["Pitch"] = -float(rot.get("Pitch", 0.0) or 0.0)
+        rot["Roll"] = -float(rot.get("Roll", 0.0) or 0.0)
+
+    if not rot and isinstance(transform.get("rotation_quat"), dict):
+        rot3 = _quat_to_matrix3(transform["rotation_quat"])
+    else:
+        rot3 = _rotator_to_matrix3(rot)
+
+    m = _identity_matrix4()
+    for row in range(3):
+        m[row][0] = rot3[row][0] * sx
+        m[row][1] = rot3[row][1] * sy
+        m[row][2] = rot3[row][2] * sz
+    m[0][3] = float(loc.get("X", 0.0) or 0.0)
+    m[1][3] = float(loc.get("Y", 0.0) or 0.0)
+    m[2][3] = float(loc.get("Z", 0.0) or 0.0)
+    return m
+
+
+def _apply_component_transform(
+    objects: list[bpy.types.Object],
+    transform: dict,
+    *,
+    flip_pitch_roll: bool = False,
+) -> None:
     """Apply a conservative UE-relative transform to imported component roots.
 
     UE locations are centimeters. UEFormat imports geometry at 0.01 scale, so
@@ -174,9 +276,17 @@ def _apply_component_transform(objects: list[bpy.types.Object], transform: dict)
     """
     if not transform:
         return
-    matrix_rows = transform.get("matrix")
+    matrix_rows = None if flip_pitch_roll else transform.get("matrix")
     if matrix_rows:
         component_matrix = _blender_matrix_from_ue_matrix(matrix_rows)
+        for obj in _component_roots(objects):
+            obj.matrix_world = component_matrix @ obj.matrix_world
+        return
+
+    if flip_pitch_roll:
+        component_matrix = _blender_matrix_from_ue_matrix(
+            _matrix_from_component_parts(transform, flip_pitch_roll=True)
+        )
         for obj in _component_roots(objects):
             obj.matrix_world = component_matrix @ obj.matrix_world
         return
@@ -516,6 +626,7 @@ def _import_component(
     materials_manifest: Path | None,
     material_mode: str,
     pack_unmatched_textures: bool,
+    flip_component_pitch_roll: bool,
 ) -> tuple[list[bpy.types.Object], dict]:
     entry = component.get("source_entry") or {}
     if not entry:
@@ -533,7 +644,11 @@ def _import_component(
     before = set(bpy.data.objects)
     _import_uemodel(uemodel_abs)
     imported = _new_objects_since(before)
-    _apply_component_transform(imported, component.get("transform") or {})
+    _apply_component_transform(
+        imported,
+        component.get("transform") or {},
+        flip_pitch_roll=flip_component_pitch_roll,
+    )
 
     linked: dict[str, bpy.types.Material] = {}
     swapped = 0
@@ -585,6 +700,7 @@ def _import_component(
         "unmatched_built": unmatched_built,
         "base_color_built": base_color_built,
         "transform_applied": bool(component.get("transform")),
+        "flip_pitch_roll": bool(flip_component_pitch_roll),
     }
     return imported, report
 
@@ -816,6 +932,7 @@ def main() -> int:
             manifest_path=web_assets_manifest,
         )
 
+        asset_kind = asset_metadata.get("asset_kind") or "model"
         component_specs = list(asset_metadata.get("components") or [])
         if not component_specs:
             component_specs = [{
@@ -838,11 +955,11 @@ def main() -> int:
                 materials_manifest=materials_manifest,
                 material_mode=material_mode,
                 pack_unmatched_textures=pack_unmatched_textures,
+                flip_component_pitch_roll=asset_kind == "building_piece",
             )
             imported_objects.extend(imported)
             component_reports.append(report)
 
-        asset_kind = asset_metadata.get("asset_kind") or "model"
         bp_root_report: dict | None = None
         building_piece_root_report: dict | None = None
 
