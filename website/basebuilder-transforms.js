@@ -197,20 +197,28 @@ export function updateObjectFromState(object, state, offset = {}) {
   applyMatrixToObject(object, ueTransformToThreeMatrix4(state, offset));
 }
 
-export function updateStateFromObject(object, previous = {}, offset = {}) {
+function stableAngle(next, previous, epsilon = 0.0001) {
+  const delta = normalizeDegrees(numberOr(next) - numberOr(previous));
+  return Math.abs(delta) <= epsilon ? numberOr(previous) : next;
+}
+
+export function updateStateFromObject(object, previous = {}, offset = {}, options = {}) {
+  const prev = normalizeTransform(previous);
   const pos = threeVectorToUe(object.position, offset);
   const rot = ueRotatorFromThreeQuaternion(object.quaternion);
+  const updateRotation = options.updateRotation !== false;
+  const updateScale = options.updateScale !== false;
   return {
-    ...normalizeTransform(previous),
+    ...prev,
     x: pos.x,
     y: pos.y,
     z: pos.z,
-    pitch: rot.pitch,
-    yaw: rot.yaw,
-    roll: rot.roll,
-    scale_x: object.scale.x,
-    scale_y: object.scale.z,
-    scale_z: object.scale.y,
+    pitch: updateRotation ? stableAngle(rot.pitch, prev.pitch) : prev.pitch,
+    yaw: updateRotation ? stableAngle(rot.yaw, prev.yaw) : prev.yaw,
+    roll: updateRotation ? stableAngle(rot.roll, prev.roll) : prev.roll,
+    scale_x: updateScale ? object.scale.x : prev.scale_x,
+    scale_y: updateScale ? object.scale.z : prev.scale_y,
+    scale_z: updateScale ? object.scale.y : prev.scale_z,
   };
 }
 

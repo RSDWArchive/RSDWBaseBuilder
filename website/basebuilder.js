@@ -40,6 +40,7 @@ import {
   const GLTF_PRELOAD_CONCURRENCY = 8;
   const IMPORT_RENDER_BATCH_SIZE = 100;
   const PLACED_LIST_LIMIT = 500;
+  const UNASSIGNED_COLLECTION_ID = "";
   const SPATIAL_CELL_SIZE_CM = 1000;
   const SPATIAL_PICK_RADIUS_CM = 2500;
   const SPATIAL_SURFACE_RADIUS_CM = 3500;
@@ -154,6 +155,21 @@ import {
     selectionTitle: document.getElementById("selection-title"),
     selectionMeta: document.getElementById("selection-meta"),
     placedList: document.getElementById("placed-list"),
+    placedNewCollection: document.getElementById("placed-new-collection"),
+    placedCollectionSelect: document.getElementById("placed-collection-select"),
+    placedMoveSelected: document.getElementById("placed-move-selected"),
+    placedRemoveFromCollection: document.getElementById("placed-remove-from-collection"),
+    collectionDialog: document.getElementById("collection-dialog"),
+    collectionDialogForm: document.getElementById("collection-dialog-form"),
+    collectionDialogEyebrow: document.getElementById("collection-dialog-eyebrow"),
+    collectionDialogTitle: document.getElementById("collection-dialog-title"),
+    collectionDialogMessage: document.getElementById("collection-dialog-message"),
+    collectionDialogField: document.getElementById("collection-dialog-field"),
+    collectionDialogLabel: document.getElementById("collection-dialog-label"),
+    collectionDialogInput: document.getElementById("collection-dialog-input"),
+    collectionDialogCancel: document.getElementById("collection-dialog-cancel"),
+    collectionDialogSecondary: document.getElementById("collection-dialog-secondary"),
+    collectionDialogSubmit: document.getElementById("collection-dialog-submit"),
     transformInputs: Array.from(document.querySelectorAll("[data-transform]")),
   };
 
@@ -178,6 +194,11 @@ import {
   let activePlacementId = "";
   let orientationMode = "world";
   let closedPlacedGroupIds = new Set();
+  let uiCollections = [];
+  let unassignedCollectionCollapsed = false;
+  let nextUiCollectionId = 1;
+  let activeCollectionDialog = null;
+  let pendingImportMode = "replace";
   let favoriteTargetIds = new Set();
   let viewOffset = { x: 0, y: 0, z: 0 };
   let buildName = "Browser Base";
@@ -2040,6 +2061,7 @@ import {
       rotateStepIndex: 0,
       templateState: { ...placement.state },
       metadata,
+      uiCollectionId: placement.uiCollectionId,
       sourcePlacementId: "",
       moveExisting: false,
       clickToPlace: true,
@@ -2449,7 +2471,9 @@ import {
       scheduleGroundGridUpdate();
       return placement;
     }
-    return createPlacement(session.target, state, session.metadata || {});
+    return createPlacement(session.target, state, session.metadata || {}, {
+      uiCollectionId: session.uiCollectionId || "",
+    });
   }
 
   function ensurePlacementVisualState(placement) {
@@ -2846,6 +2870,7 @@ import {
       state: normalizeTransform(transform),
       metadata: { ...metadata },
       hidden: Boolean(options.hidden),
+      uiCollectionId: normalizeUiCollectionId(options.uiCollectionId || options.ui_collection_id || ""),
       group: null,
       visual: null,
     };
@@ -3033,12 +3058,12 @@ import {
     const selected = selectedPlacements();
     if (!selected.length) return;
     pendingTransformChanged = true;
+    const stateUpdateOptions = transformStateUpdateOptions();
     if (selected.length === 1) {
       const placement = selected[0];
       const root = getVisualRoot(placement);
-      placement.state = updateStateFromObject(root, placement.state, viewOffset);
-      markPlacementBoundsDirty(placement);
-      updatePlacementSpatialIndex(placement);
+      placement.state = updateStateFromObject(root, placement.state, viewOffset, stateUpdateOptions);
+      setVisualTransform(placement);
     } else {
       selectionPivot.updateMatrixWorld(true);
       const previousMatrix = selectionPivot.userData.previousMatrix;
@@ -3051,9 +3076,9 @@ import {
         const nextWorldMatrix = currentWorldMatrix.premultiply(deltaMatrix);
         if (root) {
           applyWorldMatrixToObject(root, nextWorldMatrix);
-          placement.state = updateStateFromObject(root, placement.state, viewOffset);
+          placement.state = updateStateFromObject(root, placement.state, viewOffset, stateUpdateOptions);
         } else {
-          placement.state = stateFromWorldMatrix(placement, nextWorldMatrix);
+          placement.state = stateFromWorldMatrix(placement, nextWorldMatrix, stateUpdateOptions);
         }
         markPlacementBoundsDirty(placement);
         setVisualTransform(placement);
@@ -3064,6 +3089,13 @@ import {
     renderInspector();
     renderPlacedList();
     updateCounters();
+  }
+
+  function transformStateUpdateOptions() {
+    if (activeGizmoMode === "scale") return { updateRotation: false, updateScale: true };
+    if (activeGizmoMode === "rotate") return { updateRotation: true, updateScale: false };
+    if (activeGizmoMode === "translate") return { updateRotation: false, updateScale: false };
+    return {};
   }
 
   function applyWorldMatrixToObject(object, worldMatrix) {
@@ -3077,11 +3109,11 @@ import {
     object.updateMatrixWorld(true);
   }
 
-  function stateFromWorldMatrix(placement, worldMatrix) {
+  function stateFromWorldMatrix(placement, worldMatrix, options = {}) {
     const object = new THREE.Object3D();
     worldMatrix.decompose(object.position, object.quaternion, object.scale);
     object.updateMatrixWorld(true);
-    return updateStateFromObject(object, placement.state, viewOffset);
+    return updateStateFromObject(object, placement.state, viewOffset, options);
   }
 
   function syncSelectionBoxes() {
@@ -3528,9 +3560,68 @@ import {
     return placement.target.target_id || placement.target.asset_stem || placement.target.display_name;
   }
 
-  function placedGroups() {
-    const groups = new Map();
+  function normalizeUiCollectionId(id) {
+    const text = String(id || "");
+    if (!text) return UNASSIGNED_COLLECTION_ID;
+    return uiCollections.some((collection) => collection.id === text) ? text : UNASSIGNED_COLLECTION_ID;
+  }
+
+  function cleanCollectionName(value) {
+    return String(value || "").trim().replace(/\s+/g, " ").slice(0, 48);
+  }
+
+  function collectionById(id) {
+    return uiCollections.find((collection) => collection.id === id) || null;
+  }
+
+  function collectionLabel(id) {
+    return id ? (collectionById(id)?.name || "Collection") : "Unassigned";
+  }
+
+  function selectedPlacementsForCollections() {
+    return selectedPlacements().filter(Boolean);
+  }
+
+  function placedAssetGroupCollapseId(collectionId, groupId) {
+    return `collection:${collectionId || "unassigned"}:asset:${groupId}`;
+  }
+
+  function makePlacedCollectionSections() {
+    const sections = [
+      {
+        id: UNASSIGNED_COLLECTION_ID,
+        name: "Unassigned",
+        order: -1,
+        collapsed: unassignedCollectionCollapsed,
+        isUnassigned: true,
+        placements: [],
+        hiddenCount: 0,
+      },
+    ];
+    for (const collection of uiCollections.slice().sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name, undefined, { numeric: true }))) {
+      sections.push({
+        id: collection.id,
+        name: collection.name,
+        order: collection.order,
+        collapsed: Boolean(collection.collapsed),
+        isUnassigned: false,
+        placements: [],
+        hiddenCount: 0,
+      });
+    }
+    const byId = new Map(sections.map((section) => [section.id, section]));
     for (const placement of placements.values()) {
+      placement.uiCollectionId = normalizeUiCollectionId(placement.uiCollectionId);
+      const section = byId.get(placement.uiCollectionId) || byId.get(UNASSIGNED_COLLECTION_ID);
+      section.placements.push(placement);
+      if (placement.hidden) section.hiddenCount += 1;
+    }
+    return sections;
+  }
+
+  function placedGroups(rows = placements.values()) {
+    const groups = new Map();
+    for (const placement of rows) {
       const id = placedGroupId(placement);
       if (!groups.has(id)) {
         groups.set(id, {
@@ -3548,6 +3639,252 @@ import {
     }
     return Array.from(groups.values())
       .sort((a, b) => a.target.display_name.localeCompare(b.target.display_name, undefined, { numeric: true }));
+  }
+
+  function syncCollectionControls() {
+    if (!els.placedCollectionSelect) return;
+    const selected = selectedPlacementsForCollections();
+    const hasSelection = selected.length > 0;
+    els.placedCollectionSelect.textContent = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = uiCollections.length ? "Move Selected To..." : "No Collections";
+    els.placedCollectionSelect.appendChild(placeholder);
+    for (const collection of uiCollections.slice().sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name, undefined, { numeric: true }))) {
+      const option = document.createElement("option");
+      option.value = collection.id;
+      option.textContent = collection.name;
+      els.placedCollectionSelect.appendChild(option);
+    }
+    els.placedCollectionSelect.value = "";
+    els.placedCollectionSelect.disabled = !hasSelection || !uiCollections.length;
+    syncCollectionMoveButton();
+    if (els.placedRemoveFromCollection) {
+      els.placedRemoveFromCollection.disabled = !selected.some((placement) => placement.uiCollectionId);
+    }
+  }
+
+  function syncCollectionMoveButton() {
+    if (!els.placedMoveSelected) return;
+    const hasSelection = selectedPlacementsForCollections().length > 0;
+    els.placedMoveSelected.disabled = !hasSelection || !els.placedCollectionSelect?.value;
+  }
+
+  function isCollectionDialogOpen() {
+    return Boolean(activeCollectionDialog);
+  }
+
+  function closeCollectionDialog(result) {
+    if (!activeCollectionDialog) return;
+    const dialog = activeCollectionDialog;
+    activeCollectionDialog = null;
+    els.collectionDialog.hidden = true;
+    els.collectionDialogSubmit.classList.remove("themed-dialog__button--danger");
+    els.collectionDialogSubmit.classList.add("themed-dialog__button--primary");
+    els.collectionDialogSecondary.hidden = true;
+    els.collectionDialogSecondary.textContent = "";
+    if (dialog.previousFocus?.focus) dialog.previousFocus.focus({ preventScroll: true });
+    dialog.resolve(result);
+  }
+
+  function openCollectionDialog({
+    eyebrow = "Placed Collections",
+    title,
+    message = "",
+    label = "Collection Name",
+    defaultValue = "",
+    confirmLabel = "Create",
+    confirmValue = true,
+    secondaryLabel = "",
+    secondaryValue = "secondary",
+    cancelLabel = "Cancel",
+    showInput = true,
+    danger = false,
+  }) {
+    if (!els.collectionDialog) return Promise.resolve(null);
+    if (activeCollectionDialog) closeCollectionDialog(null);
+    els.collectionDialogEyebrow.textContent = eyebrow;
+    els.collectionDialogTitle.textContent = title;
+    els.collectionDialogMessage.textContent = message;
+    els.collectionDialogLabel.textContent = label;
+    els.collectionDialogInput.value = defaultValue;
+    els.collectionDialogField.hidden = !showInput;
+    els.collectionDialogCancel.textContent = cancelLabel;
+    els.collectionDialogSubmit.textContent = confirmLabel;
+    els.collectionDialogSecondary.textContent = secondaryLabel;
+    els.collectionDialogSecondary.hidden = !secondaryLabel;
+    els.collectionDialogSubmit.classList.toggle("themed-dialog__button--danger", danger);
+    els.collectionDialogSubmit.classList.toggle("themed-dialog__button--primary", !danger);
+    els.collectionDialog.hidden = false;
+    return new Promise((resolve) => {
+      activeCollectionDialog = {
+        resolve,
+        showInput,
+        confirmValue,
+        secondaryValue,
+        previousFocus: document.activeElement,
+      };
+      window.requestAnimationFrame(() => {
+        if (showInput) {
+          els.collectionDialogInput.focus();
+          els.collectionDialogInput.select();
+        } else {
+          els.collectionDialogSubmit.focus();
+        }
+      });
+    });
+  }
+
+  async function newCollectionName(defaultName = "New Collection", options = {}) {
+    const raw = await openCollectionDialog({
+      title: options.title || "New Collection",
+      message: options.message || "Create a custom section for organizing placed objects. This only affects your browser view.",
+      label: "Collection Name",
+      defaultValue: defaultName,
+      confirmLabel: options.confirmLabel || "Create",
+    });
+    if (raw === null) return "";
+    return cleanCollectionName(raw);
+  }
+
+  async function chooseImportMode() {
+    return openCollectionDialog({
+      eyebrow: "Build Import",
+      title: "Import Build JSON",
+      message: placements.size
+        ? "Import replaces the current scene. Append keeps your current scene and adds the selected JSON."
+        : "Import opens the selected JSON. Append is also available for adding into the current scene.",
+      confirmLabel: "Import",
+      confirmValue: "replace",
+      secondaryLabel: "Append",
+      secondaryValue: "append",
+      showInput: false,
+      danger: placements.size > 0,
+    });
+  }
+
+  async function createUiCollection() {
+    const name = await newCollectionName(`Collection ${uiCollections.length + 1}`, {
+      title: "New Collection",
+      confirmLabel: "Create",
+    });
+    if (!name) return;
+    pushUndoSnapshot();
+    const id = `collection_${nextUiCollectionId++}`;
+    uiCollections.push({
+      id,
+      name,
+      order: uiCollections.length,
+      collapsed: false,
+    });
+    renderPlacedList();
+    updateCounters();
+    showViewportNotice("Collection Created");
+  }
+
+  async function renameUiCollection(id) {
+    const collection = collectionById(id);
+    if (!collection) return;
+    const name = await newCollectionName(collection.name, {
+      title: "Rename Collection",
+      message: "Rename this placed-object collection. Exports are not affected.",
+      confirmLabel: "Rename",
+    });
+    if (!name || name === collection.name) return;
+    pushUndoSnapshot();
+    collection.name = name;
+    renderPlacedList();
+    updateCounters();
+    showViewportNotice("Collection Renamed");
+  }
+
+  async function deleteUiCollection(id) {
+    const collection = collectionById(id);
+    if (!collection) return;
+    const confirmed = await openCollectionDialog({
+      title: "Delete Collection",
+      message: `Delete "${collection.name}"? Objects stay in the build and move back to Unassigned.`,
+      confirmLabel: "Delete",
+      showInput: false,
+      danger: true,
+    });
+    if (!confirmed) return;
+    pushUndoSnapshot();
+    for (const placement of placements.values()) {
+      if (placement.uiCollectionId === id) placement.uiCollectionId = UNASSIGNED_COLLECTION_ID;
+    }
+    uiCollections = uiCollections.filter((item) => item.id !== id);
+    renderPlacedList();
+    updateCounters();
+    showViewportNotice("Collection Deleted");
+  }
+
+  function setUiCollectionCollapsed(id, collapsed) {
+    if (id) {
+      const collection = collectionById(id);
+      if (!collection) return;
+      collection.collapsed = Boolean(collapsed);
+    } else {
+      unassignedCollectionCollapsed = Boolean(collapsed);
+    }
+    renderPlacedList();
+    scheduleAutosave();
+  }
+
+  function movePlacementsToUiCollection(rows, id) {
+    const collectionId = normalizeUiCollectionId(id);
+    const movers = rows.filter((placement) => placement && placement.uiCollectionId !== collectionId);
+    if (!movers.length) return;
+    pushUndoSnapshot();
+    for (const placement of movers) placement.uiCollectionId = collectionId;
+    renderPlacedList();
+    updateCounters();
+    showViewportNotice(collectionId ? `Moved to ${collectionLabel(collectionId)}` : "Moved to Unassigned");
+  }
+
+  function moveSelectedToChosenCollection() {
+    const id = els.placedCollectionSelect?.value || "";
+    if (!id) return;
+    movePlacementsToUiCollection(selectedPlacementsForCollections(), id);
+  }
+
+  function removeSelectedFromUiCollection() {
+    movePlacementsToUiCollection(selectedPlacementsForCollections(), UNASSIGNED_COLLECTION_ID);
+  }
+
+  function uiCollectionStateFromSnapshot(snapshot = {}) {
+    const seen = new Set();
+    const collections = [];
+    for (const row of snapshot.ui_collections || []) {
+      const id = String(row?.id || "").trim();
+      const name = cleanCollectionName(row?.name || "");
+      if (!id || !name || seen.has(id)) continue;
+      seen.add(id);
+      collections.push({
+        id,
+        name,
+        order: Number.isFinite(Number(row.order)) ? Number(row.order) : collections.length,
+        collapsed: Boolean(row.collapsed),
+      });
+    }
+    let maxGeneratedId = 0;
+    for (const collection of collections) {
+      const match = /^collection_(\d+)$/.exec(collection.id);
+      if (match) maxGeneratedId = Math.max(maxGeneratedId, Number(match[1] || 0));
+    }
+    return {
+      collections,
+      unassignedCollapsed: Boolean(snapshot.unassigned_collection_collapsed),
+      closedGroupIds: new Set(Array.isArray(snapshot.closed_placed_group_ids) ? snapshot.closed_placed_group_ids.map(String) : []),
+      nextId: Math.max(Number(snapshot.next_ui_collection_id || 1), maxGeneratedId + 1, 1),
+    };
+  }
+
+  function applyUiCollectionState(state) {
+    uiCollections = state.collections || [];
+    unassignedCollectionCollapsed = Boolean(state.unassignedCollapsed);
+    closedPlacedGroupIds = state.closedGroupIds instanceof Set ? new Set(state.closedGroupIds) : new Set();
+    nextUiCollectionId = Math.max(Number(state.nextId || 1), 1);
   }
 
   function referenceNameFromFile(file) {
@@ -3849,81 +4186,173 @@ import {
     return row;
   }
 
+  function renderPlacedGroup(group, parent, collectionId, rowState) {
+    const hasGroupHeader = group.placements.length > 1;
+    let groupBody = parent;
+    let isOpen = true;
+    if (hasGroupHeader) {
+      const collapseId = placedAssetGroupCollapseId(collectionId, group.id);
+      isOpen = !closedPlacedGroupIds.has(collapseId);
+      const wrapper = document.createElement("section");
+      wrapper.className = `placed-group${isOpen ? " is-open" : ""}`;
+      const header = document.createElement("div");
+      header.className = "placed-group-header";
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "placed-group-toggle";
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      const hiddenText = group.hiddenCount ? `, ${group.hiddenCount.toLocaleString()} hidden` : "";
+      const toggleGroupOpen = () => {
+        if (isOpen) closedPlacedGroupIds.add(collapseId);
+        else closedPlacedGroupIds.delete(collapseId);
+        renderPlacedList();
+      };
+      toggle.innerHTML = `
+        <span class="placed-group-caret" aria-hidden="true"></span>
+        <span>
+          <span class="placed-name"></span>
+          <span class="placed-meta"></span>
+        </span>
+      `;
+      toggle.querySelector(".placed-name").textContent = group.target.display_name;
+      toggle.querySelector(".placed-meta").textContent =
+        `${group.placements.length.toLocaleString()} ${kindPluralLabel(group.target.asset_kind)}${hiddenText}`;
+      toggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleGroupOpen();
+      });
+      header.addEventListener("click", (event) => {
+        if (event.target?.closest?.(".placed-visibility")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        toggleGroupOpen();
+      });
+
+      const allHidden = group.hiddenCount === group.placements.length;
+      const visibilityButton = createPlacedVisibilityButton({
+        hidden: allHidden,
+        label: `${group.target.display_name} group`,
+        onClick: () => setPlacementsHidden(group.placements, !allHidden),
+      });
+      header.append(toggle, visibilityButton);
+      groupBody = document.createElement("div");
+      groupBody.className = "placed-group-body";
+      wrapper.append(header, groupBody);
+      parent.appendChild(wrapper);
+    }
+
+    if (!isOpen) return;
+    for (const placement of group.placements) {
+      if (rowState.shownRows >= PLACED_LIST_LIMIT) {
+        rowState.capped = true;
+        break;
+      }
+      groupBody.appendChild(renderPlacedRow(placement));
+      rowState.shownRows += 1;
+    }
+  }
+
+  function renderCollectionActions(section, header) {
+    const allHidden = section.placements.length > 0 && section.hiddenCount === section.placements.length;
+    const visibilityButton = createPlacedVisibilityButton({
+      hidden: allHidden,
+      label: `${section.name} collection`,
+      onClick: () => setPlacementsHidden(section.placements, !allHidden),
+    });
+    visibilityButton.disabled = !section.placements.length;
+    header.appendChild(visibilityButton);
+    if (section.isUnassigned) return;
+
+    const rename = document.createElement("button");
+    rename.type = "button";
+    rename.className = "placed-group-action";
+    rename.textContent = "Rename";
+    rename.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      renameUiCollection(section.id);
+    });
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "placed-group-action";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      deleteUiCollection(section.id);
+    });
+    header.append(rename, remove);
+  }
+
+  function renderPlacedCollection(section, rowState) {
+    const isOpen = !section.collapsed;
+    const wrapper = document.createElement("section");
+    wrapper.className = `placed-group placed-collection${section.isUnassigned ? " placed-collection--unassigned" : ""}${isOpen ? " is-open" : ""}`;
+    const header = document.createElement("div");
+    header.className = "placed-group-header";
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "placed-group-toggle";
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    const hiddenText = section.hiddenCount ? `, ${section.hiddenCount.toLocaleString()} hidden` : "";
+    toggle.innerHTML = `
+      <span class="placed-group-caret" aria-hidden="true"></span>
+      <span>
+        <span class="placed-name"></span>
+        <span class="placed-meta"></span>
+      </span>
+    `;
+    toggle.querySelector(".placed-name").textContent = section.name;
+    toggle.querySelector(".placed-meta").textContent =
+      `${section.placements.length.toLocaleString()} placed${hiddenText}`;
+    const toggleCollectionOpen = () => setUiCollectionCollapsed(section.id, isOpen);
+    toggle.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleCollectionOpen();
+    });
+    header.addEventListener("click", (event) => {
+      if (event.target?.closest?.(".placed-visibility, .placed-group-action")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleCollectionOpen();
+    });
+    header.appendChild(toggle);
+    renderCollectionActions(section, header);
+    wrapper.appendChild(header);
+
+    if (isOpen) {
+      const body = document.createElement("div");
+      body.className = "placed-group-body";
+      if (!section.placements.length) {
+        const empty = document.createElement("div");
+        empty.className = "placed-row placed-row--empty";
+        empty.textContent = "No placed objects";
+        body.appendChild(empty);
+      } else {
+        for (const group of placedGroups(section.placements)) {
+          renderPlacedGroup(group, body, section.id, rowState);
+        }
+      }
+      wrapper.appendChild(body);
+    }
+    els.placedList.appendChild(wrapper);
+  }
+
   function renderPlacedList() {
     els.placedList.textContent = "";
+    syncCollectionControls();
     renderReferenceList();
-    let shownRows = 0;
-    let capped = false;
-    for (const group of placedGroups()) {
-      const hasGroupHeader = group.placements.length > 1;
-      let groupBody = els.placedList;
-      let isOpen = true;
-      if (hasGroupHeader) {
-        isOpen = !closedPlacedGroupIds.has(group.id);
-        const wrapper = document.createElement("section");
-        wrapper.className = `placed-group${isOpen ? " is-open" : ""}`;
-        const header = document.createElement("div");
-        header.className = "placed-group-header";
-
-        const toggle = document.createElement("button");
-        toggle.type = "button";
-        toggle.className = "placed-group-toggle";
-        toggle.setAttribute("aria-expanded", String(isOpen));
-        const hiddenText = group.hiddenCount ? `, ${group.hiddenCount.toLocaleString()} hidden` : "";
-        const toggleGroupOpen = () => {
-          if (isOpen) closedPlacedGroupIds.add(group.id);
-          else closedPlacedGroupIds.delete(group.id);
-          renderPlacedList();
-        };
-        toggle.innerHTML = `
-          <span class="placed-group-caret" aria-hidden="true"></span>
-          <span>
-            <span class="placed-name"></span>
-            <span class="placed-meta"></span>
-          </span>
-        `;
-        toggle.querySelector(".placed-name").textContent = group.target.display_name;
-        toggle.querySelector(".placed-meta").textContent =
-          `${group.placements.length.toLocaleString()} ${kindPluralLabel(group.target.asset_kind)}${hiddenText}`;
-        toggle.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          toggleGroupOpen();
-        });
-        header.addEventListener("click", (event) => {
-          if (event.target?.closest?.(".placed-visibility")) return;
-          event.preventDefault();
-          event.stopPropagation();
-          toggleGroupOpen();
-        });
-
-        const allHidden = group.hiddenCount === group.placements.length;
-        const visibilityButton = createPlacedVisibilityButton({
-          hidden: allHidden,
-          label: `${group.target.display_name} group`,
-          onClick: () => setPlacementsHidden(group.placements, !allHidden),
-        });
-        header.append(toggle, visibilityButton);
-        groupBody = document.createElement("div");
-        groupBody.className = "placed-group-body";
-        wrapper.append(header, groupBody);
-        els.placedList.appendChild(wrapper);
-      }
-
-      if (!isOpen) continue;
-      for (const placement of group.placements) {
-        if (shownRows >= PLACED_LIST_LIMIT) {
-          capped = true;
-          break;
-        }
-        groupBody.appendChild(renderPlacedRow(placement));
-        shownRows += 1;
-      }
+    const rowState = { shownRows: 0, capped: false };
+    for (const section of makePlacedCollectionSections()) {
+      renderPlacedCollection(section, rowState);
     }
-    if (capped || placements.size > shownRows) {
+    if (rowState.capped || placements.size > rowState.shownRows) {
       const summary = document.createElement("div");
       summary.className = "placed-row placed-summary";
-      summary.textContent = `Showing row details for ${shownRows.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
+      summary.textContent = `Showing row details for ${rowState.shownRows.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
       els.placedList.appendChild(summary);
     }
   }
@@ -4138,7 +4567,16 @@ import {
         state: { ...placement.state },
         metadata: { ...placement.metadata },
         hidden: Boolean(placement.hidden),
+        ui_collection_id: normalizeUiCollectionId(placement.uiCollectionId),
       })),
+      ui_collections: uiCollections.map((collection) => ({
+        id: collection.id,
+        name: collection.name,
+        order: collection.order,
+        collapsed: Boolean(collection.collapsed),
+      })),
+      unassigned_collection_collapsed: Boolean(unassignedCollectionCollapsed),
+      closed_placed_group_ids: Array.from(closedPlacedGroupIds),
       selected_ids: Array.from(selectedPlacedIds),
       view_offset: { ...viewOffset },
       build_name: buildName,
@@ -4146,6 +4584,7 @@ import {
       anchor_piece_id: anchorPieceId,
       next_object_id: nextObjectId,
       next_piece_id: nextPieceId,
+      next_ui_collection_id: nextUiCollectionId,
     };
   }
 
@@ -4189,6 +4628,7 @@ import {
   }
 
   async function restoreBuildSnapshot(snapshot) {
+    const collectionState = uiCollectionStateFromSnapshot(snapshot);
     const entries = [];
     for (const row of snapshot.placements || []) {
       const target = targetLookup.byId.get(row.target_id);
@@ -4199,12 +4639,14 @@ import {
         transform: row.state,
         metadata: row.metadata,
         hidden: Boolean(row.hidden),
+        uiCollectionId: row.ui_collection_id || row.uiCollectionId || "",
       });
     }
     await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading restored models" });
     bulkMutationActive = true;
     try {
       clearBuild({ resetOffset: false, render: false });
+      applyUiCollectionState(collectionState);
       viewOffset = { x: 0, y: 0, z: 0, ...(snapshot.view_offset || {}) };
       buildName = snapshot.build_name || "Browser Base";
       buildSchema = snapshot.build_schema || "rsdwtools.buildings.v1";
@@ -4214,6 +4656,7 @@ import {
       await createPlacementsBulk(entries, { statusPrefix: "Restoring" });
       nextObjectId = Number(snapshot.next_object_id || nextObjectId);
       nextPieceId = Number(snapshot.next_piece_id || nextPieceId);
+      nextUiCollectionId = Math.max(Number(snapshot.next_ui_collection_id || nextUiCollectionId), nextUiCollectionId);
     } finally {
       bulkMutationActive = false;
     }
@@ -4275,7 +4718,10 @@ import {
         const transform = { ...placement.state };
         const metadata = { ...placement.metadata };
         delete metadata.piece_id;
-        const duplicated = await createPlacement(placement.target, transform, metadata, { select: false });
+        const duplicated = await createPlacement(placement.target, transform, metadata, {
+          select: false,
+          uiCollectionId: placement.uiCollectionId,
+        });
         newIds.push(duplicated.id);
       }
       setSelection(newIds);
@@ -4309,7 +4755,10 @@ import {
         };
         const metadata = { ...placement.metadata };
         delete metadata.piece_id;
-        const duplicated = await createPlacement(placement.target, transform, metadata, { select: false });
+        const duplicated = await createPlacement(placement.target, transform, metadata, {
+          select: false,
+          uiCollectionId: placement.uiCollectionId,
+        });
         duplicatedPlacements.push(duplicated);
         newIds.push(duplicated.id);
       }
@@ -4424,7 +4873,7 @@ import {
   }
 
   function clearBuild({ resetOffset = true, recordUndo = false, render = true } = {}) {
-    if (recordUndo && placements.size) pushUndoSnapshot();
+    if (recordUndo && (placements.size || uiCollections.length)) pushUndoSnapshot();
     for (const placement of placements.values()) {
       disposeVisual(placement);
     }
@@ -4435,6 +4884,9 @@ import {
     activePlacementId = "";
     activeGizmoMode = "";
     closedPlacedGroupIds.clear();
+    uiCollections = [];
+    unassignedCollectionCollapsed = false;
+    nextUiCollectionId = 1;
     anchorPieceId = 0;
     nextPieceId = 1;
     if (resetOffset) viewOffset = { x: 0, y: 0, z: 0 };
@@ -4644,6 +5096,7 @@ import {
       await createPlacement(entry.target, entry.transform, entry.metadata, {
         id: entry.id,
         hidden: entry.hidden,
+        uiCollectionId: entry.uiCollectionId || entry.ui_collection_id || "",
         select: false,
         render: false,
       });
@@ -4656,33 +5109,67 @@ import {
     updateGroundGrid();
   }
 
-  async function importBuildingJson(file) {
+  function remapAppendPieceIds(entries, importedAnchor) {
+    const sourceAnchorPieceId = Number(importedAnchor?.piece_id || 0);
+    let appendedAnchorPieceId = 0;
+    for (const entry of entries) {
+      if (entry.target.asset_kind !== "building_piece") continue;
+      const sourcePieceId = Number(entry.metadata.piece_id || 0);
+      const nextId = allocatePieceId();
+      entry.metadata = {
+        ...entry.metadata,
+        piece_id: nextId,
+      };
+      if (sourcePieceId > 0 && sourcePieceId === sourceAnchorPieceId) {
+        appendedAnchorPieceId = nextId;
+      }
+    }
+    return appendedAnchorPieceId;
+  }
+
+  async function importBuildingJson(file, { mode = "replace" } = {}) {
+    const appendMode = mode === "append";
     setLoading(true);
     try {
       els.assetStatus.textContent = "Parsing import";
       const data = JSON.parse(await file.text());
       pushUndoSnapshot();
+      const hadPlacements = placements.size > 0;
       const rows = [...(data.pieces || []), ...(data.items || []), ...(data.actors || [])];
       const importedAnchor = importedAnchorPiece(data);
       els.assetStatus.textContent = "Resolving import targets";
       const { entries, skipped } = buildImportPlacementEntries(data);
       await preloadGltfsForTargets(entries.map((entry) => entry.target), { statusPrefix: "Preloading import models" });
-      viewOffset = importViewOffset(rows, importedAnchor);
       bulkMutationActive = true;
-      clearBuild({ resetOffset: false, render: false });
-      buildName = data.name || file.name.replace(/\.json$/i, "") || "Browser Base";
-      buildSchema = data.schema || "rsdwtools.buildings.v1";
-      anchorPieceId = Number(importedAnchor?.piece_id || data.anchor_piece_id || 0);
-      await createPlacementsBulk(entries);
+      let appendedAnchorPieceId = 0;
+      if (appendMode) {
+        if (!hadPlacements) {
+          viewOffset = importViewOffset(rows, importedAnchor);
+          buildName = data.name || file.name.replace(/\.json$/i, "") || buildName;
+          buildSchema = data.schema || buildSchema || "rsdwtools.buildings.v1";
+        }
+        appendedAnchorPieceId = remapAppendPieceIds(entries, importedAnchor);
+      } else {
+        viewOffset = importViewOffset(rows, importedAnchor);
+        clearBuild({ resetOffset: false, render: false });
+        buildName = data.name || file.name.replace(/\.json$/i, "") || "Browser Base";
+        buildSchema = data.schema || "rsdwtools.buildings.v1";
+        anchorPieceId = Number(importedAnchor?.piece_id || data.anchor_piece_id || 0);
+      }
+      await createPlacementsBulk(entries, { statusPrefix: appendMode ? "Appending" : "Importing" });
       bulkMutationActive = false;
-      els.assetStatus.textContent = "Finalizing import";
+      if (appendMode && !anchorPieceId && appendedAnchorPieceId) {
+        anchorPieceId = appendedAnchorPieceId;
+      }
+      els.assetStatus.textContent = appendMode ? "Finalizing append" : "Finalizing import";
       setSelection([], { render: false });
       renderInspector();
       renderPlacedList();
       updateCounters();
       focusCameraOnBuild({ notify: false });
       const skippedText = skipped ? `, skipped ${skipped.toLocaleString()} missing targets` : "";
-      els.assetStatus.textContent = `Imported ${entries.length.toLocaleString()} objects${skippedText}`;
+      els.assetStatus.textContent = `${appendMode ? "Appended" : "Imported"} ${entries.length.toLocaleString()} objects${skippedText}`;
+      scheduleAutosave();
     } catch (error) {
       console.error(error);
       els.assetStatus.textContent = `Import failed: ${error.message}`;
@@ -5004,9 +5491,46 @@ import {
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
+        if (isCollectionDialogOpen()) {
+          event.preventDefault();
+          closeCollectionDialog(null);
+          return;
+        }
         closeMenus();
         closeAssetContextMenu();
       }
+    });
+    els.collectionDialogForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!activeCollectionDialog) return;
+      if (activeCollectionDialog.showInput) {
+        const value = cleanCollectionName(els.collectionDialogInput.value);
+        if (!value) {
+          els.collectionDialogInput.focus();
+          return;
+        }
+        closeCollectionDialog(value);
+        return;
+      }
+      closeCollectionDialog(activeCollectionDialog.confirmValue);
+    });
+    els.collectionDialogCancel?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      closeCollectionDialog(null);
+    });
+    els.collectionDialogSecondary?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!activeCollectionDialog) return;
+      closeCollectionDialog(activeCollectionDialog.secondaryValue);
+    });
+    els.collectionDialog?.addEventListener("click", (event) => {
+      if (!event.target?.matches?.("[data-dialog-cancel]")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeCollectionDialog(null);
     });
     els.assetSearch.addEventListener("input", () => {
       resetVisibleAssetResults();
@@ -5051,10 +5575,17 @@ import {
         renderAssets();
       });
     }
-    els.importJson.addEventListener("click", () => els.fileInput.click());
+    els.importJson.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const mode = await chooseImportMode();
+      if (!mode) return;
+      pendingImportMode = mode;
+      els.fileInput.click();
+    });
     els.fileInput.addEventListener("change", () => {
       const file = els.fileInput.files && els.fileInput.files[0];
-      if (file) importBuildingJson(file);
+      if (file) importBuildingJson(file, { mode: pendingImportMode });
+      pendingImportMode = "replace";
       els.fileInput.value = "";
     });
     els.importReference?.addEventListener("click", () => els.referenceFileInput?.click());
@@ -5064,6 +5595,19 @@ import {
     });
     els.exportJson.addEventListener("click", exportBuildingJson);
     els.clearBuild.addEventListener("click", () => clearBuild({ recordUndo: true }));
+    els.placedNewCollection?.addEventListener("click", (event) => {
+      event.preventDefault();
+      createUiCollection();
+    });
+    els.placedMoveSelected?.addEventListener("click", (event) => {
+      event.preventDefault();
+      moveSelectedToChosenCollection();
+    });
+    els.placedCollectionSelect?.addEventListener("change", syncCollectionMoveButton);
+    els.placedRemoveFromCollection?.addEventListener("click", (event) => {
+      event.preventDefault();
+      removeSelectedFromUiCollection();
+    });
     els.setAnchor.addEventListener("click", setSelectedAnchor);
     els.clearAnchor.addEventListener("click", () => {
       pushUndoSnapshot();
@@ -5105,6 +5649,7 @@ import {
     });
     window.addEventListener("keydown", (event) => {
       updateGizmoSnapModifierFromEvent(event);
+      if (isCollectionDialogOpen()) return;
       if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
       const key = event.key.toLowerCase();
       if (key === "d") setDuplicateNudgeModifier(true);

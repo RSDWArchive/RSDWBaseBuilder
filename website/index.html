@@ -285,12 +285,44 @@
       </div>
 
       <section class="placed-section" aria-label="Placed objects">
-        <h2>Placed</h2>
+        <div class="placed-section-header">
+          <h2>Placed</h2>
+          <button id="placed-new-collection" class="placed-action-button" type="button">New Collection</button>
+        </div>
+        <div class="placed-actions" aria-label="Placed collection actions">
+          <select id="placed-collection-select" aria-label="Move selected to collection">
+            <option value="">Move Selected To...</option>
+          </select>
+          <button id="placed-move-selected" class="placed-action-button" type="button">Move</button>
+          <button id="placed-remove-from-collection" class="placed-action-button" type="button">Unassign</button>
+        </div>
         <div id="placed-list" class="placed-list"></div>
       </section>
     </aside>
   </main>
 
-  <script type="module" src="./basebuilder.js?v=20260612-component-roll"></script>
+  <div id="collection-dialog" class="themed-dialog" hidden>
+    <div class="themed-dialog__backdrop" data-dialog-cancel></div>
+    <section class="themed-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="collection-dialog-title">
+      <form id="collection-dialog-form" class="themed-dialog__form">
+        <header class="themed-dialog__header">
+          <p id="collection-dialog-eyebrow" class="themed-dialog__eyebrow">Placed Collections</p>
+          <h2 id="collection-dialog-title">New Collection</h2>
+        </header>
+        <p id="collection-dialog-message" class="themed-dialog__message"></p>
+        <label id="collection-dialog-field" class="themed-dialog__field">
+          <span id="collection-dialog-label">Collection Name</span>
+          <input id="collection-dialog-input" type="text" autocomplete="off" maxlength="64" />
+        </label>
+        <div class="themed-dialog__actions">
+          <button id="collection-dialog-cancel" class="themed-dialog__button" type="button">Cancel</button>
+          <button id="collection-dialog-secondary" class="themed-dialog__button" type="button" hidden>Append</button>
+          <button id="collection-dialog-submit" class="themed-dialog__button themed-dialog__button--primary" type="submit">Create</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script type="module" src="./basebuilder.js?v=20260622-import-dialog-title"></script>
 </body>
 </html>
