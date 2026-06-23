@@ -54,7 +54,11 @@ def _filter_targets(targets: list[dict[str, Any]], only_list: Path | None) -> li
     ]
 
 
-def _target_icon_preview_report(targets: list[dict[str, Any]]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _target_icon_preview_report(
+    targets: list[dict[str, Any]],
+    *,
+    allow_missing_required_icons: bool,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     icon_counts: Counter[str] = Counter()
     preview_counts: Counter[str] = Counter()
     failures: list[dict[str, Any]] = []
@@ -69,14 +73,21 @@ def _target_icon_preview_report(targets: list[dict[str, Any]]) -> tuple[dict[str
         icon_counts[f"{kind}:{'resolved' if icon_exists else 'missing'}"] += 1
         preview_counts[f"{kind}:{preview_mode or 'unspecified'}"] += 1
 
+        allow_generated_preview = (
+            allow_missing_required_icons
+            and not icon_exists
+            and preview_mode == "generated"
+            and icon_source == "missing"
+        )
+
         if kind in {"building_piece", "item"}:
-            if preview_mode != "custom_icon":
+            if preview_mode != "custom_icon" and not allow_generated_preview:
                 failures.append({
                     "target_id": target.get("target_id"),
                     "asset_kind": kind,
                     "reason": f"expected custom_icon preview_mode, got {preview_mode!r}",
                 })
-            if not icon_exists:
+            if not icon_exists and not allow_generated_preview:
                 failures.append({
                     "target_id": target.get("target_id"),
                     "asset_kind": kind,
@@ -319,12 +330,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--materials-manifest", type=Path, default=None)
     parser.add_argument("--only-list", type=Path, default=None)
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--allow-missing-required-icons", action="store_true",
+                        help="Allow item/building-piece targets to use generated previews when archive icons are missing.")
     args = parser.parse_args(argv)
 
     target_doc = _load_json(args.target_file)
     targets = _filter_targets(list(target_doc.get("targets") or []), args.only_list)
 
-    target_report, target_failures = _target_icon_preview_report(targets)
+    target_report, target_failures = _target_icon_preview_report(
+        targets,
+        allow_missing_required_icons=args.allow_missing_required_icons,
+    )
     source_regression_report, source_regression_failures = _target_source_regression_report(targets)
     build_report: dict[str, Any] | None = None
     build_failures: list[dict[str, Any]] = []

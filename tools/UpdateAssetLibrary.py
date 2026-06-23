@@ -723,6 +723,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--only", default=None)
     parser.add_argument("--package", action="store_true", help="Build the shippable extension zip after a successful full/smoke build.")
     parser.add_argument("--skip-package", action="store_true")
+    parser.add_argument("--allow-missing-required-icons", action="store_true",
+                        help="Allow item/building-piece targets without authoritative archive icons.")
     parser.add_argument("--clean-stage", action="store_true", help="Remove _build/extension before staging runtime files.")
     parser.add_argument("--sync-portable-extension", action="store_true",
                         help="After the pipeline succeeds, replace the portable Blender installed extension with the staged extension.")
@@ -874,36 +876,44 @@ def main(argv: list[str] | None = None) -> int:
         cwd=root,
     ))
 
+    asset_target_command = [
+        sys.executable,
+        root / "tools" / "AssetLibrary" / "BuildAssetLibraryTargets.py",
+        "--version", version,
+        "--archive-root", args.archive_root,
+        "--model-root", args.model_root,
+        "--archive-json-root", Path(inputs["archive_json_root"]),
+        "--archive-texture-root", Path(inputs["archive_texture_root"]),
+        "--item-data", Path(inputs["item_data"]),
+        "--bp-data", Path(inputs["bp_data"]),
+        "--model-data", Path(inputs["sm_data"]),
+        "--model-data", Path(inputs["sk_data"]),
+        "--building-targets", building_targets,
+        "--library-root", Path(inputs["library_root"]),
+        "--out", unified_targets,
+    ]
+    if args.allow_missing_required_icons:
+        asset_target_command.append("--allow-missing-required-icons")
+
     stages.append(run_command(
         "Unified asset targets",
-        [
-            sys.executable,
-            root / "tools" / "AssetLibrary" / "BuildAssetLibraryTargets.py",
-            "--version", version,
-            "--archive-root", args.archive_root,
-            "--model-root", args.model_root,
-            "--archive-json-root", Path(inputs["archive_json_root"]),
-            "--archive-texture-root", Path(inputs["archive_texture_root"]),
-            "--item-data", Path(inputs["item_data"]),
-            "--bp-data", Path(inputs["bp_data"]),
-            "--model-data", Path(inputs["sm_data"]),
-            "--model-data", Path(inputs["sk_data"]),
-            "--building-targets", building_targets,
-            "--library-root", Path(inputs["library_root"]),
-            "--out", unified_targets,
-        ],
+        asset_target_command,
         log_path=log_dir / "04_asset_targets.log",
         cwd=root,
     ))
 
+    asset_target_quality_command = [
+        sys.executable,
+        root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
+        "--target-file", unified_targets,
+        "--out", log_dir / "asset_target_quality_report.json",
+    ]
+    if args.allow_missing_required_icons:
+        asset_target_quality_command.append("--allow-missing-required-icons")
+
     stages.append(run_command(
         "Asset target quality",
-        [
-            sys.executable,
-            root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
-            "--target-file", unified_targets,
-            "--out", log_dir / "asset_target_quality_report.json",
-        ],
+        asset_target_quality_command,
         log_path=log_dir / "04b_asset_target_quality.log",
         cwd=root,
     ))
@@ -1156,6 +1166,8 @@ def main(argv: list[str] | None = None) -> int:
             quality_cmd.extend(["--materials-manifest", materials_manifest])
         if only_list is not None:
             quality_cmd.extend(["--only-list", only_list])
+        if args.allow_missing_required_icons:
+            quality_cmd.append("--allow-missing-required-icons")
         if args.dry_run:
             print_section("Asset quality verification")
             print("Skipped because --dry-run was supplied.")
