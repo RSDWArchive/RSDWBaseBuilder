@@ -842,6 +842,19 @@ def main(argv: list[str] | None = None) -> int:
     ))
 
     stages.append(run_command(
+        "PieceDataMap refresh",
+        [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "BuildPieceDataMap.py",
+            "--catalog-file", root / "CatalogData" / "_catalog.json",
+            "--archive-json-root", Path(inputs["archive_json_root"]),
+            "--out", args.extension_source_root / "data" / "PieceDataMap.json",
+        ],
+        log_path=log_dir / "01b_piece_data_map.log",
+        cwd=root,
+    ))
+
+    stages.append(run_command(
         "Catalog reconciliation",
         [
             sys.executable,

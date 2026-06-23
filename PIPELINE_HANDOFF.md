@@ -123,29 +123,33 @@ For `targets`, `smoke`, and `full`, the main stage order is:
 
 1. Prepare extension stage when required
 2. Refresh `tools\ModelData\BPMap.json`
-3. Reconcile building-piece catalog data
-4. Build building-piece targets
-5. Build unified asset targets
-6. Verify target quality
-7. Write `blender_assets.cats.txt`
-8. Build the browser web index from target data
-9. Build material inventory
-10. Build shared materials when material mode requires them
-11. Build generated asset `.blend` files
-12. Bake generated previews for BP assets unless skipped; this also writes
+3. Refresh `addon\data\PieceDataMap.json` from the runtime building catalog
+4. Reconcile building-piece catalog data
+5. Build building-piece targets
+6. Build unified asset targets
+7. Verify target quality
+8. Write `blender_assets.cats.txt`
+9. Build the browser web index from target data
+10. Build material inventory
+11. Build shared materials when material mode requires them
+12. Build generated asset `.blend` files
+13. Bake generated previews for BP assets unless skipped; this also writes
     browser BP preview WebPs
-13. Rebuild the browser web index so generated BP preview paths are included
-14. Verify Blender asset metadata
-15. Verify built asset quality
-16. Audit generated file sizes for Git safety
-17. Optionally package the extension
-18. Optionally sync the portable Blender extension
-19. Optionally write or execute the Git commit plan
+14. Rebuild the browser web index so generated BP preview paths are included
+15. Verify Blender asset metadata
+16. Verify built asset quality
+17. Audit generated file sizes for Git safety
+18. Optionally package the extension
+19. Optionally sync the portable Blender extension
+20. Optionally write or execute the Git commit plan
 
 ## Inputs and Outputs
 
 Tracked source/config files that may be refreshed by the pipeline:
 
+- `CatalogData\_catalog.json`
+- `CatalogData\_catalog_disk.json`
+- `addon\data\PieceDataMap.json`
 - `tools\AssetLibrary\asset_library_targets.json`
 - `tools\AssetLibrary\catalog_asset_targets.json`
 - `tools\AssetLibrary\catalog_reconciliation.json`
@@ -199,12 +203,13 @@ An orchestration run should treat the BaseBuilder step as successful only when:
   `portable_extension_sync.json`.
 - The final Git commit plan has no blocked paths before commit creation.
 
-For game version `0.11.2.2`, the known full target summary is:
+For game version `0.12.0.0`, the known target summary after refreshing the
+runtime building catalog is:
 
-- 2,928 generated assets total
-- 1,390 BP assets
-- 647 building-piece assets
-- 891 item assets
+- 3,528 generated assets total
+- 1,678 BP assets
+- 771 building-piece assets
+- 1,079 item assets
 
 Target counts may legitimately change after upstream game updates. When they
 change, confirm Archive and Model were both updated to the same version before

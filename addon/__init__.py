@@ -124,7 +124,7 @@ def _reverse_bpmap() -> dict:
 def _load_piece_data_map() -> dict:
     """Short BP class name -> {piece_data_index, piece_data_name}.
 
-    Harvested offline from the example building JSONs by
+    Generated from the runtime building catalog by
     tools/AssetLibrary/BuildPieceDataMap.py. Used by the export
     operator to fill in piece_data_* for drag-dropped pieces.
     """

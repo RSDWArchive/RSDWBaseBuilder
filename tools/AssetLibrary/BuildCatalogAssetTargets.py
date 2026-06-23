@@ -1,8 +1,8 @@
 """Create catalog-shaped asset-library build targets.
 
 The runtime catalog is the master list because it is the only authoritative
-source for piece_data_index. This script converts the 648-row reconciliation
-report into concrete .blend build targets and a dry-run cut list for existing
+source for piece_data_index. This script converts the reconciliation report
+into concrete .blend build targets and a dry-run cut list for existing
 non-catalog-shaped blends.
 """
 

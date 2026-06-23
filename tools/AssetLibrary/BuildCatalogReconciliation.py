@@ -1,4 +1,4 @@
-"""Build a catalog-first reconciliation report for the 648 BuildingPieceData rows.
+"""Build a catalog-first reconciliation report for BuildingPieceData rows.
 
 The catalog is the master list. PieceDataMap, BPMap, and .blend files are joins
 against that master and do not have to be 648 rows themselves.
@@ -15,7 +15,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 CATALOG_FILE = REPO / "CatalogData" / "_catalog.json"
 DISK_CATALOG_FILE = REPO / "CatalogData" / "_catalog_disk.json"
-PIECE_DATA_MAP_FILE = REPO / "data" / "PieceDataMap.json"
+PIECE_DATA_MAP_FILE = REPO / "addon" / "data" / "PieceDataMap.json"
 BPMAP_FILE = REPO / "tools" / "ModelData" / "BPMap.json"
 BLEND_ROOT = REPO / "_build" / "extension"
 OUT_FILE = REPO / "tools" / "AssetLibrary" / "catalog_reconciliation.json"
@@ -35,6 +35,10 @@ def _archive_roots(archive_json_root: Path) -> list[tuple[Path, str]]:
         (
             archive_json_root / "RSDragonwilds" / "Plugins" / "GameFeatures" / "Fishing" / "Content" / "Gameplay" / "BaseBuilding" / "BuildingPieces",
             "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces",
+        ),
+        (
+            archive_json_root / "RSDragonwilds" / "Plugins" / "GameFeatures" / "UmbralSands" / "Content" / "Gameplay" / "Buildpieces" / "Decorations" / "Recipes",
+            "BuildingPieceData /UmbralSands/Gameplay/Buildpieces/Decorations/Recipes",
         ),
     ]
 
@@ -112,7 +116,8 @@ def main(argv: list[str] | None = None) -> int:
 
     catalog = _load_json(args.catalog_file)
     disk_catalog = _load_json(args.disk_catalog_file)
-    piece_data_map = _load_json(args.piece_data_map).get("mapping", {})
+    piece_data_map_doc = _load_json(args.piece_data_map)
+    piece_data_map = piece_data_map_doc.get("mapping", {})
     bpmap = _load_json(args.bpmap).get("mapping", {})
 
     archive_by_pdn = _archive_index_by_piece_data_name(_archive_roots(args.archive_json_root))
@@ -128,6 +133,20 @@ def main(argv: list[str] | None = None) -> int:
             "piece_data_index": value.get("piece_data_index"),
             "piece_data_name": piece_data_name,
         })
+    for bp_class, values in (piece_data_map_doc.get("shared_bp_classes") or {}).items():
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            piece_data_name = value.get("piece_data_name")
+            if not piece_data_name:
+                continue
+            match = {
+                "bp_class": bp_class,
+                "piece_data_index": value.get("piece_data_index"),
+                "piece_data_name": piece_data_name,
+            }
+            if match not in pdm_by_pdn[piece_data_name]:
+                pdm_by_pdn[piece_data_name].append(match)
 
     blend_by_stem: dict[str, list[str]] = defaultdict(list)
     blend_files = sorted(args.blend_root.rglob("*.blend")) if args.blend_root.is_dir() else []

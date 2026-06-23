@@ -129,6 +129,9 @@ at repo root. Blender displays the catalogs as `BP`, `Building Pieces`, and
 
 The full pipeline also refreshes source-side manifests under `tools/`, such as:
 
+- `CatalogData\_catalog.json`
+- `CatalogData\_catalog_disk.json`
+- `addon\data\PieceDataMap.json`
 - `tools\AssetLibrary\asset_library_targets.json`
 - `tools\AssetLibrary\catalog_asset_targets.json`
 - `tools\AssetLibrary\catalog_reconciliation.json`
@@ -167,20 +170,21 @@ Quality reports are written under each run's `PipelineLogs\<timestamp>\` folder:
 
 ## Expected Validation
 
-For game version `0.11.2.2`, the current full run should produce:
+For game version `0.12.0.0`, the current target generation should produce:
 
-- 2,928 generated assets total
-- 1,390 BP assets
-- 647 building-piece assets
-- 891 item assets
-- 3 unresolved model-ref records across 1 unique unresolved model ref
+- 3,528 generated assets total
+- 1,678 BP assets
+- 771 building-piece assets
+- 1,079 item assets
+- 13 unresolved model-ref records across 3 unique unresolved model refs
 
 The validation stages should report:
 
-- asset build: `2928 ok, 0 failed`
-- metadata verification: `2928 ok, 0 failed`
-- asset target quality: all `647` building pieces and `891` item targets have
-  resolved authoritative icons; BP targets use generated preview mode
+- asset build: `3528 ok, 0 failed`
+- metadata verification: `3528 ok, 0 failed`
+- asset target quality: all `771` building pieces and `1078` of `1079` item
+  targets have resolved authoritative icons; `ITEM_AnimaOrb` is the known
+  allowed missing item icon; BP targets use generated preview mode
 - asset quality: item/building-piece assets use custom icons, BP assets use
   Blender default/generated previews, and fallback material mode reports
   materialized slots
