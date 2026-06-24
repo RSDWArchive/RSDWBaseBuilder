@@ -88,8 +88,9 @@ Useful options:
 - `--workers` controls concurrent Blender worker count.
 - `--force` rebuilds already successful assets.
 - `--limit` and `--only` restrict the target set for focused testing.
-- `--material-mode fallback` is the default for smoke/full quality builds. It
-  builds shared MI-derived material shards and links/falls back to them.
+- `--material-mode optimized-pbr` is the default for smoke/full quality builds.
+  It builds shared PBR material shards from RSDWModel WebAssets and links/falls
+  back to them.
 - Shared materials externalize texture files into `_MaterialTextures/` by
   default so the same texture data is not packed repeatedly into material
   shard `.blend` files.

@@ -795,6 +795,8 @@ def main(argv: list[str] | None = None) -> int:
     material_inventory = root / "tools" / "ModelData" / "MaterialInventory.json"
     materials_blend = Path(inputs["library_root"]) / "_Materials.blend"
     materials_manifest = Path(inputs["library_root"]) / "_Materials.manifest.json"
+    piece_data_map = args.extension_source_root / "data" / "PieceDataMap.json"
+    snap_data = args.extension_source_root / "data" / "Snaps.json"
     progress_file = args.build_root / f"AssetLibraryProgress.{version}.json"
     generated_preview_progress_file = args.build_root / f"GeneratedPreviewProgress.{version}.json"
     run_summary_path = root / "PipelineRun.json"
@@ -817,18 +819,6 @@ def main(argv: list[str] | None = None) -> int:
 
     stages: list[dict[str, Any]] = []
 
-    if not args.dry_run or args.package or args.mode != "targets":
-        stages.append(run_command(
-            "Prepare extension stage",
-            stage_command(
-                args,
-                include_current_assets=args.include_current_assets,
-                log_dir=log_dir,
-            ),
-            log_path=log_dir / "00_stage.log",
-            cwd=root,
-        ))
-
     stages.append(run_command(
         "BPMap refresh",
         [
@@ -848,11 +838,35 @@ def main(argv: list[str] | None = None) -> int:
             root / "tools" / "AssetLibrary" / "BuildPieceDataMap.py",
             "--catalog-file", root / "CatalogData" / "_catalog.json",
             "--archive-json-root", Path(inputs["archive_json_root"]),
-            "--out", args.extension_source_root / "data" / "PieceDataMap.json",
+            "--out", piece_data_map,
         ],
         log_path=log_dir / "01b_piece_data_map.log",
         cwd=root,
     ))
+
+    stages.append(run_command(
+        "Snap data refresh",
+        [
+            sys.executable,
+            root / "tools" / "ModelData" / "BuildSnaps.py",
+            "--json-root", Path(inputs["archive_json_root"]),
+            "--out", snap_data,
+        ],
+        log_path=log_dir / "01c_snap_data.log",
+        cwd=root,
+    ))
+
+    if not args.dry_run or args.package or args.mode != "targets":
+        stages.append(run_command(
+            "Prepare extension stage",
+            stage_command(
+                args,
+                include_current_assets=args.include_current_assets,
+                log_dir=log_dir,
+            ),
+            log_path=log_dir / "02_stage.log",
+            cwd=root,
+        ))
 
     stages.append(run_command(
         "Catalog reconciliation",
@@ -861,13 +875,13 @@ def main(argv: list[str] | None = None) -> int:
             root / "tools" / "AssetLibrary" / "BuildCatalogReconciliation.py",
             "--catalog-file", root / "CatalogData" / "_catalog.json",
             "--disk-catalog-file", root / "CatalogData" / "_catalog_disk.json",
-            "--piece-data-map", args.extension_source_root / "data" / "PieceDataMap.json",
+            "--piece-data-map", piece_data_map,
             "--bpmap", root / "tools" / "ModelData" / "BPMap.json",
             "--archive-json-root", Path(inputs["archive_json_root"]),
             "--blend-root", Path(inputs["library_root"]),
             "--out", catalog_reconciliation,
         ],
-        log_path=log_dir / "02_catalog_reconciliation.log",
+        log_path=log_dir / "03_catalog_reconciliation.log",
         cwd=root,
     ))
 
@@ -885,7 +899,7 @@ def main(argv: list[str] | None = None) -> int:
             "--library-root", Path(inputs["library_root"]),
             "--out", building_targets,
         ],
-        log_path=log_dir / "03_building_targets.log",
+        log_path=log_dir / "04_building_targets.log",
         cwd=root,
     ))
 
@@ -911,7 +925,7 @@ def main(argv: list[str] | None = None) -> int:
     stages.append(run_command(
         "Unified asset targets",
         asset_target_command,
-        log_path=log_dir / "04_asset_targets.log",
+        log_path=log_dir / "05_asset_targets.log",
         cwd=root,
     ))
 
@@ -927,7 +941,7 @@ def main(argv: list[str] | None = None) -> int:
     stages.append(run_command(
         "Asset target quality",
         asset_target_quality_command,
-        log_path=log_dir / "04b_asset_target_quality.log",
+        log_path=log_dir / "05b_asset_target_quality.log",
         cwd=root,
     ))
 
@@ -940,7 +954,7 @@ def main(argv: list[str] | None = None) -> int:
             "--library-root", Path(inputs["library_root"]),
             "--out", catalog_file,
         ],
-        log_path=log_dir / "05_asset_catalog.log",
+        log_path=log_dir / "06_asset_catalog.log",
         cwd=root,
     ))
 
@@ -951,11 +965,11 @@ def main(argv: list[str] | None = None) -> int:
             root / "tools" / "Web" / "BuildBaseBuilderWebIndex.py",
             "--target-file", unified_targets,
             "--model-index", args.model_root / "website" / "model-index.json",
-            "--snaps", args.extension_source_root / "data" / "Snaps.json",
+            "--snaps", snap_data,
             "--out", browser_web_index,
             "--bp-web-preview-root", browser_web_preview_root,
         ],
-        log_path=log_dir / "05b_browser_web_index.log",
+        log_path=log_dir / "06b_browser_web_index.log",
         cwd=root,
     ))
 
@@ -967,7 +981,7 @@ def main(argv: list[str] | None = None) -> int:
             "--index", browser_web_index,
             "--out", log_dir / "decoration_visual_transform_audit.json",
         ],
-        log_path=log_dir / "05c_decoration_visual_transform_audit.log",
+        log_path=log_dir / "06c_decoration_visual_transform_audit.log",
         cwd=root,
     ))
 
@@ -1121,7 +1135,7 @@ def main(argv: list[str] | None = None) -> int:
             root / "tools" / "Web" / "BuildBaseBuilderWebIndex.py",
             "--target-file", unified_targets,
             "--model-index", args.model_root / "website" / "model-index.json",
-            "--snaps", args.extension_source_root / "data" / "Snaps.json",
+            "--snaps", snap_data,
             "--out", browser_web_index,
             "--bp-web-preview-root", browser_web_preview_root,
         ]
@@ -1266,6 +1280,8 @@ def main(argv: list[str] | None = None) -> int:
             "building_targets": str(building_targets),
             "asset_library_targets": str(unified_targets),
             "asset_catalog": str(catalog_file),
+            "piece_data_map": str(piece_data_map),
+            "snap_data": str(snap_data),
             "browser_web_index": str(browser_web_index),
             "browser_web_preview_root": str(browser_web_preview_root),
             "decoration_visual_transform_audit": str(log_dir / "decoration_visual_transform_audit.json"),

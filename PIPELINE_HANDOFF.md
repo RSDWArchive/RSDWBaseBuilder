@@ -39,6 +39,12 @@ Required upstream data includes:
 - RSDWModel static and skeletal model data
 - RSDWModel `WebAssets\WebAssetManifest.json` for optimized PBR material builds
 
+BaseBuilder owns its packaged snap metadata. During the BaseBuilder pipeline,
+`tools\ModelData\BuildSnaps.py` scans the selected
+`E:\Github\RSDWArchive\<version>\json` tree and refreshes
+`addon\data\Snaps.json` before the extension is staged or the browser index is
+built. RSDWArchive should not write this file directly.
+
 Blender is resolved in this order:
 
 1. `E:\Github\RSDWBaseBuilder\_local\blender-5.0.0-windows-x64\blender.exe`
@@ -121,27 +127,28 @@ Default material mode is `optimized-pbr`. Available material modes are:
 
 For `targets`, `smoke`, and `full`, the main stage order is:
 
-1. Prepare extension stage when required
-2. Refresh `tools\ModelData\BPMap.json`
-3. Refresh `addon\data\PieceDataMap.json` from the runtime building catalog
-4. Reconcile building-piece catalog data
-5. Build building-piece targets
-6. Build unified asset targets
-7. Verify target quality
-8. Write `blender_assets.cats.txt`
-9. Build the browser web index from target data
-10. Build material inventory
-11. Build shared materials when material mode requires them
-12. Build generated asset `.blend` files
-13. Bake generated previews for BP assets unless skipped; this also writes
+1. Refresh `tools\ModelData\BPMap.json`
+2. Refresh `addon\data\PieceDataMap.json` from the runtime building catalog
+3. Refresh `addon\data\Snaps.json` from the selected Archive JSON tree
+4. Prepare extension stage when required, after runtime data has been refreshed
+5. Reconcile building-piece catalog data
+6. Build building-piece targets
+7. Build unified asset targets
+8. Verify target quality
+9. Write `blender_assets.cats.txt`
+10. Build the browser web index from target data and refreshed snap data
+11. Build material inventory
+12. Build shared materials when material mode requires them
+13. Build generated asset `.blend` files
+14. Bake generated previews for BP assets unless skipped; this also writes
     browser BP preview WebPs
-14. Rebuild the browser web index so generated BP preview paths are included
-15. Verify Blender asset metadata
-16. Verify built asset quality
-17. Audit generated file sizes for Git safety
-18. Optionally package the extension
-19. Optionally sync the portable Blender extension
-20. Optionally write or execute the Git commit plan
+15. Rebuild the browser web index so generated BP preview paths are included
+16. Verify Blender asset metadata
+17. Verify built asset quality
+18. Audit generated file sizes for Git safety
+19. Optionally package the extension
+20. Optionally sync the portable Blender extension
+21. Optionally write or execute the Git commit plan
 
 ## Inputs and Outputs
 
@@ -150,6 +157,7 @@ Tracked source/config files that may be refreshed by the pipeline:
 - `CatalogData\_catalog.json`
 - `CatalogData\_catalog_disk.json`
 - `addon\data\PieceDataMap.json`
+- `addon\data\Snaps.json`
 - `tools\AssetLibrary\asset_library_targets.json`
 - `tools\AssetLibrary\catalog_asset_targets.json`
 - `tools\AssetLibrary\catalog_reconciliation.json`
@@ -193,8 +201,11 @@ An orchestration run should treat the BaseBuilder step as successful only when:
   skipped.
 - `PipelineRun.json` points at the current `PipelineLogs\<timestamp>\` folder.
 - `asset_target_quality_report.json` has no blocking icon or target errors.
+- `addon\data\Snaps.json` has been regenerated from the selected Archive JSON
+  tree before staging/package work.
 - `website\basebuilder-index.json` contains no local absolute paths and points
-  at browser BP previews after a full, non-limited build.
+  at browser BP previews after a full, non-limited build. Its embedded snap
+  metadata should reflect the refreshed `addon\data\Snaps.json`.
 - `asset_metadata_report.json` and `asset_quality_report.json` pass for build
   modes that generate assets.
 - `git_file_size_audit.json` has no oversized generated source files.
@@ -288,6 +299,7 @@ default_mode: 'smoke'
 default_material_mode: 'optimized-pbr'
 success_files:
   - 'PipelineRun.json'
+  - 'addon\data\Snaps.json'
   - 'PipelineLogs\<timestamp>\asset_target_quality_report.json'
   - 'PipelineLogs\<timestamp>\asset_metadata_report.json'
   - 'PipelineLogs\<timestamp>\asset_quality_report.json'

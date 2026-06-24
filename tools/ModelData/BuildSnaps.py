@@ -121,16 +121,24 @@ def _piece_tag(entries) -> str:
             continue
         props = e.get("Properties") or {}
         pp = props.get("PieceProfile") or {}
-        tag = (pp.get("PieceTag") or {}).get("TagName")
+        tag = _tag_name(pp.get("PieceTag"), "")
         if tag:
             return tag
     return ""
 
 
+def _tag_name(value, default: str = "") -> str:
+    if isinstance(value, dict):
+        return str(value.get("TagName") or default)
+    if isinstance(value, str):
+        return value
+    return default
+
+
 def _norm_plug(p):
     prof = p.get("PlugProfile") or {}
-    pt = (prof.get("PieceTag") or {}).get("TagName", "")
-    plt = (prof.get("PlugTag") or {}).get("TagName", "")
+    pt = _tag_name(prof.get("PieceTag"), "None")
+    plt = _tag_name(prof.get("PlugTag"), "")
     pi = [t for t in (prof.get("PieceIgnoringTypes") or [])]
     pli = [t for t in (prof.get("PlugIgnoringTypes") or [])]
     xform = p.get("PlugTransform") or {}
