@@ -65,6 +65,7 @@ upstream update pipelines itself.
 python tools\UpdateAssetLibrary.py --version 0.11.2.2 --mode targets --dry-run
 python tools\UpdateAssetLibrary.py --version 0.11.2.2 --mode smoke
 python tools\UpdateAssetLibrary.py --version 0.11.2.2 --mode full --package --clean-stage
+python tools\UpdateAssetLibrary.py --version 0.11.2.2 --mode package-stage --package
 python tools\UpdateAssetLibrary.py --mode sync-portable
 ```
 
@@ -73,15 +74,20 @@ The pipeline prefers `_local/blender-5.0.0-windows-x64/blender.exe`, then
 single Blender extension zip in `dist/`; publish that zip through GitHub
 Releases rather than committing it to Git.
 
-Use `--sync-portable-extension` on a full/package-current run, or
+Use `--sync-portable-extension` on a full/package-stage run, or
 `--mode sync-portable` after a successful build, to replace the selected
 portable Blender install at
 `portable\extensions\user_default\rsdw_base_builder` with `_build\extension`.
 
-Full and `package-current` runs also write an Archive-style Git commit batch
+Full and legacy `package-current` runs also write an Archive-style Git commit batch
 plan to `PipelineLogs\<timestamp>\GitCommitPlan.json` unless
 `--skip-git-plan` is supplied. Use `--run-git-plan` to force planning on
 targets/smoke runs.
+
+For master orchestration, use `--mode build-local`, `--mode validate-local`,
+`--mode package-stage`, `--mode sync-portable`, and `--mode publish --git-mode
+plan-only|commit-only|push-each`. The release quality default is
+`--quality-policy strict`.
 
 ## Development Notes
 

@@ -84,7 +84,22 @@ python tools\UpdateAssetLibrary.py --mode sync-portable
 Package the currently staged extension without rebuilding all assets:
 
 ```powershell
-python tools\UpdateAssetLibrary.py --mode package-current --package
+python tools\UpdateAssetLibrary.py --version <game-version> --mode package-stage --package
+```
+
+Validate current local outputs without rebuilding assets:
+
+```powershell
+python tools\UpdateAssetLibrary.py --version <game-version> --mode validate-local --quality-policy strict
+```
+
+Run the master-facing publish step. This only performs git preflight and the
+requested git plan/commit/push behavior:
+
+```powershell
+python tools\UpdateAssetLibrary.py --version <game-version> --mode publish --git-mode plan-only
+python tools\UpdateAssetLibrary.py --version <game-version> --mode publish --git-mode commit-only
+python tools\UpdateAssetLibrary.py --version <game-version> --mode publish --git-mode push-each
 ```
 
 Force git commit planning for a partial run:
@@ -115,15 +130,29 @@ Current modes:
 - `smoke`: builds a smoke target subset selected from
   `tools\AssetLibrary\asset_library_targets.json`.
 - `full`: builds the full generated asset library.
+- `build-local`: master-facing full local build mode. It builds and validates
+  local outputs but does not package, sync, commit, or push by default.
+- `validate-local`: master-facing validation mode for current outputs. It does
+  not rebuild target data or assets.
+- `package-stage`: release-safe package mode for the existing staged extension.
+  It fails if the stage has no generated `.blend` asset files.
 - `sync-portable`: copies the existing staged extension into the configured
   portable Blender extension directory.
-- `package-current`: stages runtime files, audits generated file sizes,
-  packages the current staged extension, and runs git planning by default.
+- `publish`: master-facing git phase. It runs pre-publish safety checks and then
+  executes `--git-mode plan-only`, `commit-only`, or `push-each`.
+- `resume`: master-facing full build mode that relies on existing progress/skip
+  behavior and never cleans stage unless `--clean-stage` is explicitly supplied.
+- `package-current`: legacy source-only diagnostic package mode. It now requires
+  `--allow-source-only-package` and should not be used for release artifacts.
 
 Default mode is `smoke`.
 
 Default material mode is `optimized-pbr`. Available material modes are:
 `optimized-pbr`, `light`, `fallback`, `base-color`, and `none`.
+
+Default quality policy is `strict`. Use `--quality-policy tolerant` only for an
+acknowledged/allowlisted missing-icon situation; the run summary records the
+selected policy.
 
 For `targets`, `smoke`, and `full`, the main stage order is:
 
@@ -185,9 +214,10 @@ Important generated reports:
 - `PipelineLogs\<timestamp>\git_file_size_audit.json`
 - `PipelineLogs\<timestamp>\GitCommitPlan.json`
 - `PipelineLogs\<timestamp>\portable_extension_sync.json`
+- `PipelineLogs\<timestamp>\package_report.json`
 - `_build\extension\_Materials.manifest.json`
 - `dist\rsdw_base_builder-<addon-version>.zip`
-- `dist\rsdw_base_builder-<addon-version>.package_report.json`
+- `dist\rsdw_base_builder-<addon-version>.package.json`
 
 The release artifact is the single zip under `dist\`. Publish that zip through
 GitHub Releases or the larger orchestrator release system. Do not commit it.
@@ -292,11 +322,29 @@ depends_on:
   - 'E:\Github\RSDWArchive'
   - 'E:\Github\RSDWModel'
 entrypoint: 'python tools\UpdateAssetLibrary.py'
+contract_file: 'pipeline.contract.json'
 version_argument: '--version <game-version>'
-canonical_full_command: >
-  python tools\UpdateAssetLibrary.py --version <game-version> --mode full --package --clean-stage --sync-portable-extension
+canonical_phase_order:
+  - build_local
+  - validate_local
+  - package
+  - sync_portable
+  - publish
+canonical_build_local_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode build-local --quality-policy strict
+canonical_validate_local_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode validate-local --quality-policy strict
+canonical_package_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode package-stage --package
+canonical_sync_portable_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode sync-portable
+canonical_publish_plan_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode publish --git-mode plan-only
+canonical_publish_push_command: >
+  python tools\UpdateAssetLibrary.py --version <game-version> --mode publish --git-mode push-each
 default_mode: 'smoke'
 default_material_mode: 'optimized-pbr'
+default_quality_policy: 'strict'
 success_files:
   - 'PipelineRun.json'
   - 'addon\data\Snaps.json'
@@ -316,5 +364,9 @@ ignored_outputs:
 commit_policy:
   branch: 'main'
   push_target: 'origin/main'
+  git_modes:
+    - plan-only
+    - commit-only
+    - push-each
   commit_generated_outputs: false
 ```

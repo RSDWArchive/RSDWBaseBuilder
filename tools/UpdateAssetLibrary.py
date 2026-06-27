@@ -22,6 +22,16 @@ DEFAULT_ARCHIVE_ROOT = Path(r"E:/Github/RSDWArchive")
 DEFAULT_MODEL_ROOT = Path(r"E:/Github/RSDWModel")
 DEFAULT_RELEASE_MAX_MB = 1900.0
 DEFAULT_GIT_BATCH_GB = 1.9
+FULL_ASSET_MODES = {"full", "build-local", "resume"}
+GENERATED_OUTPUT_PREFIXES = (
+    "_build/",
+    "_local/",
+    "dist/",
+    "PipelineLogs/",
+)
+GENERATED_OUTPUT_FILES = {
+    "PipelineRun.json",
+}
 
 
 def repo_root() -> Path:
@@ -44,12 +54,73 @@ def utc_stamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%SZ")
 
 
+def create_log_dir(root: Path) -> Path:
+    base = root / "PipelineLogs" / utc_stamp()
+    for index in range(100):
+        candidate = base if index == 0 else Path(f"{base}-{index:02d}")
+        try:
+            candidate.mkdir(parents=True, exist_ok=False)
+            return candidate
+        except FileExistsError:
+            continue
+    raise SystemExit(f"could not create unique PipelineLogs directory from {base}")
+
+
 def print_section(title: str) -> None:
     print(f"\n== {title} ==")
 
 
 def command_text(cmd: Sequence[str | Path]) -> str:
     return subprocess.list2cmdline([str(part) for part in cmd])
+
+
+def normalize_rel(path: str) -> str:
+    return path.replace("\\", "/").strip().strip('"')
+
+
+def run_git_text(root: Path, args: Sequence[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def git_stdout(root: Path, args: Sequence[str]) -> str:
+    proc = run_git_text(root, args)
+    if proc.returncode != 0:
+        message = proc.stderr.strip() or proc.stdout.strip() or f"git {' '.join(args)} failed"
+        raise SystemExit(message)
+    return proc.stdout.strip()
+
+
+def is_full_asset_mode(args: argparse.Namespace) -> bool:
+    return args.mode in FULL_ASSET_MODES
+
+
+def quality_policy_summary(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "mode": args.quality_policy,
+        "allow_missing_required_icons": args.quality_policy == "tolerant",
+        "legacy_allow_flag": bool(args.allow_missing_required_icons),
+    }
+
+
+def extend_quality_policy_args(cmd: list[str | Path], args: argparse.Namespace) -> None:
+    if args.quality_policy == "tolerant":
+        cmd.append("--allow-missing-required-icons")
+
+
+def resolved_git_mode(args: argparse.Namespace) -> str:
+    if args.git_mode:
+        return str(args.git_mode)
+    if args.git_push_each:
+        return "push-each"
+    if args.git_commit_batches:
+        return "commit-only"
+    return "plan-only"
 
 
 def candidate_blenders(root: Path) -> list[Path]:
@@ -173,7 +244,7 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
             missing.append(f"{name}: {path}")
     if missing:
         raise SystemExit("Missing required input(s):\n  " + "\n  ".join(missing))
-    if blender is None and args.mode != "targets" and not args.dry_run:
+    if blender is None and args.mode in {"smoke", *FULL_ASSET_MODES} and not args.dry_run:
         raise SystemExit("blender.exe not found. Pass --blender or set BLENDER_EXE.")
 
     item_doc = load_json(item_data)
@@ -268,9 +339,10 @@ def should_run_git_plan(args: argparse.Namespace) -> bool:
     if args.skip_git_plan or args.dry_run:
         return False
     return (
-        args.mode in {"full", "package-current"}
+        args.mode in {"full", "package-current", "publish"}
         or args.run_git_plan
         or args.git_plan
+        or bool(args.git_mode)
         or args.git_commit_batches
     )
 
@@ -304,7 +376,10 @@ def run_git_plan_stage(
         return {"skipped": True, "reason": skipped_git_plan_reason(args)}, None
 
     git_plan_output = resolve_git_plan_output(args, root, log_dir)
-    git_mode = "commit-batches" if args.git_commit_batches else "plan"
+    publish_mode = resolved_git_mode(args)
+    execute = publish_mode in {"commit-only", "push-each"}
+    push_each = publish_mode == "push-each"
+    git_mode = "commit-batches" if execute else "plan"
     git_cmd: list[str | Path] = [
         sys.executable,
         root / "tools" / "PlanGitCommits.py",
@@ -320,13 +395,13 @@ def run_git_plan_stage(
         "--message-prefix",
         f"Update RSDWBaseBuilder {version}",
     ]
-    if args.git_commit_batches:
+    if execute:
         git_cmd.append("--execute")
-    if args.git_push_each:
+    if push_each:
         git_cmd.append("--push-each")
 
     stage = run_command(
-        "Git commit plan" if not args.git_commit_batches else "Git commit batches",
+        "Git commit plan" if not execute else "Git commit batches",
         git_cmd,
         log_path=log_dir / log_name,
         cwd=root,
@@ -334,9 +409,10 @@ def run_git_plan_stage(
     summary = {
         "skipped": False,
         "mode": git_mode,
+        "git_mode": publish_mode,
         "plan": str(git_plan_output),
-        "commit_batches": args.git_commit_batches,
-        "push_each": args.git_push_each,
+        "commit_batches": execute,
+        "push_each": push_each,
         **load_git_plan_summary(git_plan_output),
     }
     return summary, stage
@@ -401,7 +477,7 @@ def prune_shared_material_outputs(library_root: Path) -> dict[str, Any]:
     }
 
 
-def package_command(args: argparse.Namespace) -> list[str | Path]:
+def package_command(args: argparse.Namespace, *, manifest_out: Path | None = None) -> list[str | Path]:
     cmd: list[str | Path] = [
         sys.executable,
         repo_root() / "tools" / "AssetLibrary" / "BuildExtensionZip.py",
@@ -411,6 +487,8 @@ def package_command(args: argparse.Namespace) -> list[str | Path]:
     ]
     if args.blender is not None:
         cmd.extend(["--blender", args.blender])
+    if manifest_out is not None:
+        cmd.extend(["--manifest-out", manifest_out])
     return cmd
 
 
@@ -531,8 +609,7 @@ def run_portable_sync_stage(
 
 def run_sync_portable(args: argparse.Namespace) -> int:
     root = repo_root()
-    log_dir = root / "PipelineLogs" / utc_stamp()
-    log_dir.mkdir(parents=True, exist_ok=True)
+    log_dir = create_log_dir(root)
     stage_dir = extension_stage_dir(args)
     extension_id, version = read_manifest_info(stage_dir)
     if not extension_id:
@@ -563,8 +640,11 @@ def run_sync_portable(args: argparse.Namespace) -> int:
         "schema": "RSDWBaseBuilder.PipelineRun.v1",
         "generated_at_utc": now_iso(),
         "version": version or "unknown",
+        "game_version": args.version,
+        "addon_version": version or "unknown",
         "mode": args.mode,
         "dry_run": False,
+        "quality_policy": quality_policy_summary(args),
         "inputs": {
             "stage_dir": str(stage_dir),
         },
@@ -580,7 +660,8 @@ def run_sync_portable(args: argparse.Namespace) -> int:
     (root / "PipelineRun.json").write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
     print_section("Pipeline summary")
     print(json.dumps({
-        "version": version,
+        "game_version": args.version,
+        "addon_version": version,
         "mode": args.mode,
         "log_dir": str(log_dir),
         "run_summary": str(root / "PipelineRun.json"),
@@ -590,14 +671,21 @@ def run_sync_portable(args: argparse.Namespace) -> int:
 
 def run_package_current(args: argparse.Namespace) -> int:
     root = repo_root()
-    log_dir = root / "PipelineLogs" / utc_stamp()
-    log_dir.mkdir(parents=True, exist_ok=True)
+    log_dir = create_log_dir(root)
     run_summary_path = root / "PipelineRun.json"
     stage_dir = extension_stage_dir(args)
     version = read_manifest_version(args.extension_source_root) or "unknown"
     stages: list[dict[str, Any]] = []
+    package_report_path = log_dir / "package_report.json"
+    package_report: dict[str, Any] | None = None
 
     print_section("Package Current Extension")
+    if not args.allow_source_only_package:
+        raise SystemExit(
+            "package-current is source-only and is not release-safe. "
+            "Use --mode package-stage for release zips, or pass "
+            "--allow-source-only-package if you intentionally want a source-only package."
+        )
     print(f"extension_source_root: {args.extension_source_root}")
     print(f"stage_dir: {stage_dir}")
     print(f"release_max_mb: {args.release_max_mb}")
@@ -637,10 +725,12 @@ def run_package_current(args: argparse.Namespace) -> int:
         else:
             stages.append(run_command(
                 "Package extension",
-                package_command(args),
+                package_command(args, manifest_out=package_report_path),
                 log_path=log_dir / "02_package.log",
                 cwd=root,
             ))
+            if package_report_path.is_file():
+                package_report = load_json(package_report_path)
 
     portable_sync: dict[str, Any] = {"skipped": True, "reason": "--sync-portable-extension not supplied"}
     if args.sync_portable_extension:
@@ -673,8 +763,11 @@ def run_package_current(args: argparse.Namespace) -> int:
         "schema": "RSDWBaseBuilder.PipelineRun.v1",
         "generated_at_utc": now_iso(),
         "version": version,
+        "game_version": args.version,
+        "addon_version": version,
         "mode": args.mode,
         "dry_run": args.dry_run,
+        "quality_policy": quality_policy_summary(args),
         "inputs": {
             "extension_source_root": str(args.extension_source_root),
             "stage_dir": str(stage_dir),
@@ -686,8 +779,10 @@ def run_package_current(args: argparse.Namespace) -> int:
             "git_file_size_audit": str(log_dir / "git_file_size_audit.json"),
             "portable_extension_sync": str(log_dir / "portable_extension_sync.json"),
             "git_commit_plan": str(resolve_git_plan_output(args, root, log_dir)),
+            "package_report": str(package_report_path),
             "dist": str(root / "dist"),
         },
+        "package": package_report,
         "stages": stages,
         "portable_extension_sync": portable_sync,
         "git_plan": git_plan,
@@ -704,6 +799,389 @@ def run_package_current(args: argparse.Namespace) -> int:
     return 0
 
 
+def summarize_release_stage(stage_dir: Path) -> dict[str, Any]:
+    stage_dir = stage_dir.resolve()
+    extension_id, addon_version = read_manifest_info(stage_dir)
+    if not extension_id:
+        raise SystemExit(f"staged extension manifest is missing id: {stage_dir / 'blender_manifest.toml'}")
+    if not (stage_dir / "blender_assets.cats.txt").is_file():
+        raise SystemExit(f"staged extension is missing blender asset catalog: {stage_dir / 'blender_assets.cats.txt'}")
+
+    files = [path for path in stage_dir.rglob("*") if path.is_file()]
+    blend_files = [path for path in files if path.suffix.lower() == ".blend"]
+    if not blend_files:
+        raise SystemExit(
+            f"staged extension has no .blend asset files: {stage_dir}. "
+            "Run a full/build-local pipeline before package-stage."
+        )
+    bytes_total = sum(path.stat().st_size for path in files)
+    return {
+        "schema": "RSDWBaseBuilder.ReleaseStageSummary.v1",
+        "stage_dir": str(stage_dir),
+        "extension_id": extension_id,
+        "addon_version": addon_version,
+        "file_count": len(files),
+        "blend_file_count": len(blend_files),
+        "bytes": bytes_total,
+        "mb": round(bytes_total / (1024 * 1024), 3),
+    }
+
+
+def run_package_stage(args: argparse.Namespace) -> int:
+    root = repo_root()
+    log_dir = create_log_dir(root)
+    run_summary_path = root / "PipelineRun.json"
+    stage_dir = extension_stage_dir(args)
+    stage_summary = summarize_release_stage(stage_dir)
+    addon_version = str(stage_summary.get("addon_version") or "unknown")
+    stages: list[dict[str, Any]] = [{
+        "title": "Validate release stage",
+        "ok": True,
+        **stage_summary,
+    }]
+    package_report_path = log_dir / "package_report.json"
+    package_report: dict[str, Any] | None = None
+
+    print_section("Package staged extension")
+    print(json.dumps(stage_summary, indent=2))
+    print(f"release_max_mb: {args.release_max_mb}")
+    print(f"logs: {log_dir}")
+
+    if args.dry_run or args.skip_package:
+        reason = "--dry-run" if args.dry_run else "--skip-package"
+        print_section("Package extension")
+        print(f"Skipped by {reason}.")
+        stages.append({"title": "Package extension", "skipped": True, "reason": reason})
+    else:
+        stages.append(run_command(
+            "Package extension",
+            package_command(args, manifest_out=package_report_path),
+            log_path=log_dir / "00_package_stage.log",
+            cwd=root,
+        ))
+        if package_report_path.is_file():
+            package_report = load_json(package_report_path)
+
+    portable_sync: dict[str, Any] = {"skipped": True, "reason": "--sync-portable-extension not supplied"}
+    if args.sync_portable_extension:
+        if args.dry_run:
+            print_section("Sync portable extension")
+            print("Skipped because --dry-run was supplied.")
+            portable_sync = {"skipped": True, "reason": "--dry-run"}
+            stages.append({"title": "Sync portable extension", "skipped": True, "reason": "--dry-run"})
+        else:
+            portable_sync, portable_sync_stage = run_portable_sync_stage(
+                args,
+                root=root,
+                log_dir=log_dir,
+                stage_dir=stage_dir,
+                log_name="01_sync_portable_extension.log",
+            )
+            stages.append(portable_sync_stage)
+
+    git_plan, git_plan_stage = run_git_plan_stage(
+        args,
+        root=root,
+        log_dir=log_dir,
+        version=args.version or addon_version,
+        log_name="02_git_commit_plan.log",
+    )
+    if git_plan_stage is not None:
+        stages.append(git_plan_stage)
+
+    run_summary = {
+        "schema": "RSDWBaseBuilder.PipelineRun.v1",
+        "generated_at_utc": now_iso(),
+        "version": args.version or addon_version,
+        "game_version": args.version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "dry_run": args.dry_run,
+        "quality_policy": quality_policy_summary(args),
+        "inputs": {
+            "stage_dir": str(stage_dir),
+        },
+        "outputs": {
+            "log_dir": str(log_dir),
+            "package_report": str(package_report_path),
+            "dist": str(root / "dist"),
+            "portable_extension_sync": str(log_dir / "portable_extension_sync.json"),
+            "git_commit_plan": str(resolve_git_plan_output(args, root, log_dir)),
+        },
+        "release_stage": stage_summary,
+        "package": package_report,
+        "portable_extension_sync": portable_sync,
+        "git_plan": git_plan,
+        "git_commit_plan": git_plan,
+        "stages": stages,
+    }
+    run_summary_path.write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
+    print_section("Pipeline summary")
+    print(json.dumps({
+        "game_version": args.version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "log_dir": str(log_dir),
+        "package_report": str(package_report_path),
+        "run_summary": str(run_summary_path),
+    }, indent=2))
+    return 0
+
+
+def run_publish_preflight_stage(
+    args: argparse.Namespace,
+    *,
+    root: Path,
+    log_dir: Path,
+) -> dict[str, Any]:
+    print_section("Publish preflight")
+    failures: list[str] = []
+    checks: dict[str, Any] = {}
+
+    try:
+        branch = git_stdout(root, ["rev-parse", "--abbrev-ref", "HEAD"])
+        checks["branch"] = branch
+        if branch != "main":
+            failures.append(f"expected branch 'main', got {branch!r}")
+    except SystemExit as exc:
+        failures.append(str(exc))
+
+    try:
+        upstream = git_stdout(root, ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"])
+        checks["upstream"] = upstream
+        if upstream != "origin/main":
+            failures.append(f"expected upstream 'origin/main', got {upstream!r}")
+        ahead_behind = git_stdout(root, ["rev-list", "--left-right", "--count", "HEAD...@{u}"])
+        ahead, behind = [int(part) for part in ahead_behind.split()]
+        checks["ahead"] = ahead
+        checks["behind"] = behind
+        if behind:
+            failures.append(f"local branch is behind upstream by {behind} commit(s)")
+    except SystemExit as exc:
+        failures.append(str(exc))
+    except ValueError:
+        failures.append("could not parse ahead/behind count")
+
+    for key in ("user.name", "user.email"):
+        proc = run_git_text(root, ["config", "--get", key])
+        value = proc.stdout.strip()
+        checks[key] = value
+        if proc.returncode != 0 or not value:
+            failures.append(f"missing git config {key}")
+
+    status_proc = run_git_text(root, ["status", "--porcelain=v1"])
+    status_lines = status_proc.stdout.splitlines()
+    generated_changes: list[str] = []
+    for line in status_lines:
+        if len(line) < 4:
+            continue
+        path = normalize_rel(line[3:])
+        if " -> " in path:
+            path = normalize_rel(path.split(" -> ", 1)[1])
+        if path in GENERATED_OUTPUT_FILES or any(path.startswith(prefix) for prefix in GENERATED_OUTPUT_PREFIXES):
+            generated_changes.append(path)
+    checks["changed_path_count"] = len(status_lines)
+    checks["generated_output_changes"] = generated_changes[:50]
+    if generated_changes:
+        failures.append(
+            "generated outputs are present in git status: "
+            + ", ".join(generated_changes[:10])
+        )
+
+    checks["git_mode"] = resolved_git_mode(args)
+    checks["dry_run"] = args.dry_run
+    report = {
+        "schema": "RSDWBaseBuilder.PublishPreflight.v1",
+        "generated_at_utc": now_iso(),
+        "checks": checks,
+        "failed": len(failures),
+        "failures": failures,
+        "ok": not failures,
+    }
+    report_path = log_dir / "publish_preflight.json"
+    report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({**report, "report": str(report_path)}, indent=2))
+    if failures:
+        raise SystemExit(f"Publish preflight failed. See {report_path}")
+    return {
+        "title": "Publish preflight",
+        "log": str(report_path),
+        "ok": True,
+        "failed": 0,
+    }
+
+
+def run_publish(args: argparse.Namespace) -> int:
+    root = repo_root()
+    log_dir = create_log_dir(root)
+    run_summary_path = root / "PipelineRun.json"
+    game_version = args.version or detect_version(args.archive_root, args.model_root)
+    addon_version = read_manifest_version(extension_stage_dir(args)) or read_manifest_version(args.extension_source_root) or "unknown"
+    stages: list[dict[str, Any]] = []
+    stages.append(run_publish_preflight_stage(args, root=root, log_dir=log_dir))
+    git_plan, git_plan_stage = run_git_plan_stage(
+        args,
+        root=root,
+        log_dir=log_dir,
+        version=game_version,
+        log_name="01_git_commit_plan.log",
+    )
+    if git_plan_stage is not None:
+        stages.append(git_plan_stage)
+
+    run_summary = {
+        "schema": "RSDWBaseBuilder.PipelineRun.v1",
+        "generated_at_utc": now_iso(),
+        "version": game_version,
+        "game_version": game_version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "dry_run": args.dry_run,
+        "quality_policy": quality_policy_summary(args),
+        "git_mode": resolved_git_mode(args),
+        "inputs": {
+            "archive_root": str(args.archive_root),
+            "model_root": str(args.model_root),
+            "stage_dir": str(extension_stage_dir(args)),
+        },
+        "outputs": {
+            "log_dir": str(log_dir),
+            "publish_preflight": str(log_dir / "publish_preflight.json"),
+            "git_commit_plan": str(resolve_git_plan_output(args, root, log_dir)),
+        },
+        "stages": stages,
+        "git_plan": git_plan,
+        "git_commit_plan": git_plan,
+    }
+    run_summary_path.write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
+    print_section("Pipeline summary")
+    print(json.dumps({
+        "game_version": game_version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "git_mode": resolved_git_mode(args),
+        "log_dir": str(log_dir),
+        "run_summary": str(run_summary_path),
+    }, indent=2))
+    return 0
+
+
+def run_validate_local(args: argparse.Namespace) -> int:
+    root = repo_root()
+    log_dir = create_log_dir(root)
+    inputs = resolve_inputs(args)
+    game_version = str(inputs["version"])
+    addon_version = read_manifest_version(extension_stage_dir(args)) or read_manifest_version(args.extension_source_root) or "unknown"
+    stage_dir = extension_stage_dir(args)
+    unified_targets = root / "tools" / "AssetLibrary" / "asset_library_targets.json"
+    browser_web_index = root / "website" / "basebuilder-index.json"
+    materials_manifest = stage_dir / "_Materials.manifest.json"
+    progress_file = args.build_root / f"AssetLibraryProgress.{game_version}.json"
+    stages: list[dict[str, Any]] = []
+
+    print_section("Validate local outputs")
+    print(f"game_version: {game_version}")
+    print(f"addon_version: {addon_version}")
+    print(f"quality_policy: {args.quality_policy}")
+    print(f"logs: {log_dir}")
+
+    quality_cmd: list[str | Path] = [
+        sys.executable,
+        root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
+        "--target-file", unified_targets,
+        "--out", log_dir / "asset_target_quality_report.json",
+    ]
+    extend_quality_policy_args(quality_cmd, args)
+    stages.append(run_command(
+        "Asset target quality",
+        quality_cmd,
+        log_path=log_dir / "00_asset_target_quality.log",
+        cwd=root,
+    ))
+
+    if progress_file.is_file():
+        build_quality_cmd: list[str | Path] = [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "VerifyAssetLibraryQuality.py",
+            "--target-file", unified_targets,
+            "--progress-file", progress_file,
+            "--out", log_dir / "asset_quality_report.json",
+        ]
+        if materials_manifest.is_file():
+            build_quality_cmd.extend(["--materials-manifest", materials_manifest])
+        extend_quality_policy_args(build_quality_cmd, args)
+        stages.append(run_command(
+            "Asset quality verification",
+            build_quality_cmd,
+            log_path=log_dir / "01_asset_quality.log",
+            cwd=root,
+        ))
+    else:
+        stages.append({
+            "title": "Asset quality verification",
+            "skipped": True,
+            "reason": f"progress file not found: {progress_file}",
+        })
+
+    web_index_cmd: list[str | Path] = [
+        sys.executable,
+        root / "tools" / "Web" / "VerifyBaseBuilderWebIndex.py",
+        "--index", browser_web_index,
+    ]
+    extend_quality_policy_args(web_index_cmd, args)
+    stages.append(run_command(
+        "Browser web index verification",
+        web_index_cmd,
+        log_path=log_dir / "02_verify_web_index.log",
+        cwd=root,
+    ))
+
+    stages.append(run_command(
+        "Git file-size audit",
+        [
+            sys.executable,
+            root / "tools" / "AssetLibrary" / "AuditGitFileSizes.py",
+            stage_dir,
+            "--limit-mb", str(args.git_file_limit_mb),
+            "--out", log_dir / "git_file_size_audit.json",
+        ],
+        log_path=log_dir / "03_git_file_size_audit.log",
+        cwd=root,
+    ))
+
+    run_summary = {
+        "schema": "RSDWBaseBuilder.PipelineRun.v1",
+        "generated_at_utc": now_iso(),
+        "version": game_version,
+        "game_version": game_version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "dry_run": args.dry_run,
+        "quality_policy": quality_policy_summary(args),
+        "inputs": {key: str(value) for key, value in inputs.items()},
+        "outputs": {
+            "log_dir": str(log_dir),
+            "asset_target_quality_report": str(log_dir / "asset_target_quality_report.json"),
+            "asset_quality_report": str(log_dir / "asset_quality_report.json"),
+            "web_index_verification_log": str(log_dir / "02_verify_web_index.log"),
+            "git_file_size_audit": str(log_dir / "git_file_size_audit.json"),
+        },
+        "stages": stages,
+        "git_plan": {"skipped": True, "reason": "validate-local mode"},
+        "git_commit_plan": {"skipped": True, "reason": "validate-local mode"},
+    }
+    (root / "PipelineRun.json").write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
+    print_section("Pipeline summary")
+    print(json.dumps({
+        "game_version": game_version,
+        "addon_version": addon_version,
+        "mode": args.mode,
+        "log_dir": str(log_dir),
+        "run_summary": str(root / "PipelineRun.json"),
+    }, indent=2))
+    return 0
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Update the RSDW Base Builder asset library.")
     parser.add_argument("--version", default=None, help="Game version. Defaults to latest shared Archive/Model version.")
@@ -715,7 +1193,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--extension-source-root", type=Path, default=default_extension_source_root())
     parser.add_argument("--library-root", type=Path, default=None)
     parser.add_argument("--blender", type=Path, default=None)
-    parser.add_argument("--mode", choices=("package-current", "sync-portable", "targets", "smoke", "full"), default="smoke")
+    parser.add_argument(
+        "--mode",
+        choices=(
+            "package-current",
+            "package-stage",
+            "sync-portable",
+            "targets",
+            "smoke",
+            "full",
+            "build-local",
+            "validate-local",
+            "publish",
+            "resume",
+        ),
+        default="smoke",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Generate plans/catalogs, but do not write asset blends or package.")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 4) // 2))
@@ -723,8 +1216,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--only", default=None)
     parser.add_argument("--package", action="store_true", help="Build the shippable extension zip after a successful full/smoke build.")
     parser.add_argument("--skip-package", action="store_true")
+    parser.add_argument("--quality-policy", choices=("strict", "tolerant"), default="strict",
+                        help="Release quality policy. strict fails missing required icons; tolerant allows known missing required icons and records the policy.")
     parser.add_argument("--allow-missing-required-icons", action="store_true",
-                        help="Allow item/building-piece targets without authoritative archive icons.")
+                        help="Legacy alias for --quality-policy tolerant.")
+    parser.add_argument("--allow-source-only-package", action="store_true",
+                        help="Permit package-current to create a source-only diagnostic package. Use package-stage for releases.")
     parser.add_argument("--clean-stage", action="store_true", help="Remove _build/extension before staging runtime files.")
     parser.add_argument("--sync-portable-extension", action="store_true",
                         help="After the pipeline succeeds, replace the portable Blender installed extension with the staged extension.")
@@ -751,7 +1248,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--release-max-mb", type=float, default=DEFAULT_RELEASE_MAX_MB,
                         help="Fail packaging if the single release zip exceeds this size.")
     parser.add_argument("--git-plan", action="store_true",
-                        help="Legacy alias for --run-git-plan. Full/package-current runs plan by default.")
+                        help="Legacy alias for --run-git-plan. Full/package-current/publish runs plan by default.")
     parser.add_argument("--skip-git-plan", action="store_true",
                         help="Skip final Git commit batch planning.")
     parser.add_argument("--run-git-plan", action="store_true",
@@ -764,6 +1261,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="Create Git commits from the final batch plan. This stages and commits files.")
     parser.add_argument("--git-push-each", action="store_true",
                         help="Push after each Git commit batch. Requires --git-commit-batches.")
+    parser.add_argument("--git-mode", choices=("plan-only", "commit-only", "push-each"), default=None,
+                        help="Publish git behavior for --mode publish. Legacy git commit flags are still accepted.")
     return parser.parse_args(argv)
 
 
@@ -774,17 +1273,30 @@ def main(argv: list[str] | None = None) -> int:
     args.extension_source_root = args.extension_source_root.resolve()
     if args.library_root is not None:
         args.library_root = args.library_root.resolve()
+    if args.allow_missing_required_icons:
+        args.quality_policy = "tolerant"
+    if args.git_mode == "commit-only":
+        args.git_commit_batches = True
+    elif args.git_mode == "push-each":
+        args.git_commit_batches = True
+        args.git_push_each = True
     if args.git_push_each and not args.git_commit_batches:
         raise SystemExit("--git-push-each requires --git-commit-batches.")
     if args.mode == "sync-portable":
         return run_sync_portable(args)
     if args.mode == "package-current":
         return run_package_current(args)
+    if args.mode == "package-stage":
+        return run_package_stage(args)
+    if args.mode == "publish":
+        return run_publish(args)
+    if args.mode == "validate-local":
+        return run_validate_local(args)
 
     inputs = resolve_inputs(args)
     version = str(inputs["version"])
-    log_dir = root / "PipelineLogs" / utc_stamp()
-    log_dir.mkdir(parents=True, exist_ok=True)
+    addon_version = read_manifest_version(args.extension_source_root) or "unknown"
+    log_dir = create_log_dir(root)
 
     catalog_reconciliation = root / "tools" / "AssetLibrary" / "catalog_reconciliation.json"
     building_targets = root / "tools" / "AssetLibrary" / "catalog_asset_targets.json"
@@ -814,6 +1326,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{key}: {inputs[key]}")
     print(f"mode: {args.mode}")
     print(f"dry_run: {args.dry_run}")
+    print(f"quality_policy: {args.quality_policy}")
     print(f"git plan: {resolve_git_plan_output(args, root, log_dir) if should_run_git_plan(args) else '<skipped>'}")
     print(f"logs: {log_dir}")
 
@@ -919,8 +1432,7 @@ def main(argv: list[str] | None = None) -> int:
         "--library-root", Path(inputs["library_root"]),
         "--out", unified_targets,
     ]
-    if args.allow_missing_required_icons:
-        asset_target_command.append("--allow-missing-required-icons")
+    extend_quality_policy_args(asset_target_command, args)
 
     stages.append(run_command(
         "Unified asset targets",
@@ -935,8 +1447,7 @@ def main(argv: list[str] | None = None) -> int:
         "--target-file", unified_targets,
         "--out", log_dir / "asset_target_quality_report.json",
     ]
-    if args.allow_missing_required_icons:
-        asset_target_quality_command.append("--allow-missing-required-icons")
+    extend_quality_policy_args(asset_target_quality_command, args)
 
     stages.append(run_command(
         "Asset target quality",
@@ -1021,7 +1532,7 @@ def main(argv: list[str] | None = None) -> int:
         ))
 
         build_shared_materials = (
-            args.mode in {"smoke", "full"}
+            (args.mode == "smoke" or is_full_asset_mode(args))
             and args.material_mode in {"optimized-pbr", "fallback"}
             and not args.skip_shared_materials
         )
@@ -1056,7 +1567,7 @@ def main(argv: list[str] | None = None) -> int:
                 ))
                 if args.material_mode == "optimized-pbr":
                     stages[-1]["web_assets_manifest"] = str(inputs["web_assets_manifest"])
-        elif args.mode in {"smoke", "full"}:
+        elif args.mode == "smoke" or is_full_asset_mode(args):
             print_section("Shared materials")
             reason = "--skip-shared-materials" if args.skip_shared_materials else f"--material-mode {args.material_mode}"
             print(f"Skipped by {reason}.")
@@ -1083,7 +1594,7 @@ def main(argv: list[str] | None = None) -> int:
             build_cmd.extend(["--web-assets-manifest", Path(inputs["web_assets_manifest"])])
         if only_list is not None:
             build_cmd.extend(["--only-list", only_list])
-        if args.mode == "full" and args.limit is not None:
+        if is_full_asset_mode(args) and args.limit is not None:
             build_cmd.extend(["--limit", str(args.limit)])
         if args.only:
             build_cmd.extend(["--only", args.only])
@@ -1140,7 +1651,7 @@ def main(argv: list[str] | None = None) -> int:
             "--bp-web-preview-root", browser_web_preview_root,
         ]
         if (
-            args.mode == "full"
+            is_full_asset_mode(args)
             and not args.limit
             and not args.only
             and not args.skip_generated_previews
@@ -1193,8 +1704,7 @@ def main(argv: list[str] | None = None) -> int:
             quality_cmd.extend(["--materials-manifest", materials_manifest])
         if only_list is not None:
             quality_cmd.extend(["--only-list", only_list])
-        if args.allow_missing_required_icons:
-            quality_cmd.append("--allow-missing-required-icons")
+        extend_quality_policy_args(quality_cmd, args)
         if args.dry_run:
             print_section("Asset quality verification")
             print("Skipped because --dry-run was supplied.")
@@ -1221,6 +1731,8 @@ def main(argv: list[str] | None = None) -> int:
         ))
 
     package_requested = args.package and not args.skip_package and args.mode != "targets"
+    package_report_path = log_dir / "package_report.json"
+    package_report: dict[str, Any] | None = None
     if package_requested:
         if args.dry_run:
             print_section("Package")
@@ -1229,10 +1741,12 @@ def main(argv: list[str] | None = None) -> int:
         else:
             stages.append(run_command(
                 "Package extension",
-                package_command(args),
+                package_command(args, manifest_out=package_report_path),
                 log_path=log_dir / "11_package.log",
                 cwd=root,
             ))
+            if package_report_path.is_file():
+                package_report = load_json(package_report_path)
 
     portable_sync: dict[str, Any] = {"skipped": True, "reason": "--sync-portable-extension not supplied"}
     if args.sync_portable_extension:
@@ -1271,8 +1785,11 @@ def main(argv: list[str] | None = None) -> int:
         "schema": "RSDWBaseBuilder.PipelineRun.v1",
         "generated_at_utc": now_iso(),
         "version": version,
+        "game_version": version,
+        "addon_version": addon_version,
         "mode": args.mode,
         "dry_run": args.dry_run,
+        "quality_policy": quality_policy_summary(args),
         "inputs": {key: str(value) for key, value in inputs.items()},
         "outputs": {
             "log_dir": str(log_dir),
@@ -1294,9 +1811,11 @@ def main(argv: list[str] | None = None) -> int:
             "portable_extension_sync": str(log_dir / "portable_extension_sync.json"),
             "git_commit_plan": str(resolve_git_plan_output(args, root, log_dir)),
             "progress_file": str(progress_file),
+            "package_report": str(package_report_path),
         },
         "target_summary": target_summary,
         "smoke_target_ids": build_target_ids,
+        "package": package_report,
         "stages": stages,
         "portable_extension_sync": portable_sync,
         "git_plan": git_plan,
@@ -1305,9 +1824,11 @@ def main(argv: list[str] | None = None) -> int:
     run_summary_path.write_text(json.dumps(run_summary, indent=2), encoding="utf-8")
     print_section("Pipeline summary")
     print(json.dumps({
-        "version": version,
+        "game_version": version,
+        "addon_version": addon_version,
         "mode": args.mode,
         "dry_run": args.dry_run,
+        "quality_policy": args.quality_policy,
         "target_summary": target_summary,
         "log_dir": str(log_dir),
         "run_summary": str(run_summary_path),

@@ -103,10 +103,10 @@ Useful options:
 - `--skip-shared-materials` skips shared material shard generation; workers can
   still build local fallback materials when `--material-mode fallback` is used.
 - `--sync-portable-extension` installs the staged extension into the selected
-  portable Blender after a full/package-current run.
+  portable Blender after a full/package-stage run.
 - `--portable-extension-dir` overrides the installed extension directory. The
   target must still be under `portable\extensions\user_default`.
-- Full and `package-current` runs write
+- Full and legacy `package-current` runs write
   `PipelineLogs\<timestamp>\GitCommitPlan.json` by default.
 - `--skip-git-plan` skips final Git commit batch planning.
 - `--run-git-plan` or legacy `--git-plan` forces commit planning for
@@ -114,6 +114,14 @@ Useful options:
 - `--git-plan-output` writes the commit plan to an explicit path.
 - `--git-commit-batches` creates the planned commits; `--git-push-each` also
   pushes each created batch.
+- `--quality-policy strict` is the release default. Use
+  `--quality-policy tolerant` only when missing required icons are acknowledged.
+- `--mode package-stage --package` is the release-safe package command for the
+  existing `_build/extension` stage. `--mode package-current` is source-only and
+  requires `--allow-source-only-package`.
+- `--mode publish --git-mode plan-only|commit-only|push-each` is the
+  master-facing git phase. It runs pre-publish branch/upstream/identity checks
+  before planning, committing, or pushing.
 
 ## What The Pipeline Builds
 

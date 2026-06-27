@@ -44,6 +44,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--expected-targets", type=int, default=None)
     parser.add_argument("--expected-model-refs", type=int, default=None)
     parser.add_argument("--require-bp-web-previews", action="store_true")
+    parser.add_argument("--allow-missing-required-icons", action="store_true",
+                        help="Allow item/building-piece browser rows without icons for tolerant release validation.")
     return parser.parse_args()
 
 
@@ -85,7 +87,7 @@ def main() -> int:
         icon_path = str(target.get("icon_path") or "")
         if icon_path:
             icon_count += 1
-        if kind in {"building_piece", "item"} and not icon_path:
+        if kind in {"building_piece", "item"} and not icon_path and not args.allow_missing_required_icons:
             failures.append(f"{target_id}: missing browser icon_path")
         if kind == "bp" and icon_path:
             failures.append(f"{target_id}: BP target should not carry a custom icon_path")
@@ -115,6 +117,7 @@ def main() -> int:
         "unique_component_model_refs": summary.get("unique_component_model_refs"),
         "snap_class_count": summary.get("snap_class_count"),
         "icon_count": icon_count,
+        "allow_missing_required_icons": args.allow_missing_required_icons,
         "web_preview_count": web_preview_count,
         "bp_count": bp_count,
         "failed": len(failures),

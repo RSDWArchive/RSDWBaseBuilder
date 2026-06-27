@@ -1,0 +1,176 @@
+{
+  "schema": "RSDWBaseBuilder.PipelineContract.v1",
+  "project": "RSDWBaseBuilder",
+  "repo_path": "E:/Github/RSDWBaseBuilder",
+  "dependency_order": [
+    "RSDWArchive",
+    "RSDWModel",
+    "RSDWBaseBuilder"
+  ],
+  "parameters": {
+    "game_version": {
+      "required": true,
+      "example": "0.12.0.0",
+      "description": "Archive/Model input version consumed from RSDWArchive and RSDWModel."
+    },
+    "addon_version": {
+      "required": false,
+      "source": "addon/blender_manifest.toml",
+      "description": "Blender add-on package version used for release zip naming."
+    },
+    "resource_profile": {
+      "required": false,
+      "default": "balanced",
+      "supported": [
+        "balanced",
+        "max-local"
+      ],
+      "status": "planned",
+      "description": "Future worker/resource preset. Current command accepts explicit worker flags instead."
+    },
+    "quality_policy": {
+      "required": false,
+      "default": "strict",
+      "supported": [
+        "strict",
+        "tolerant"
+      ],
+      "description": "strict fails missing required icons; tolerant allows known missing required icons and records the policy."
+    },
+    "git_mode": {
+      "required": false,
+      "default": "plan-only",
+      "supported": [
+        "plan-only",
+        "commit-only",
+        "push-each"
+      ],
+      "description": "Publish behavior requested by the master pipeline."
+    }
+  },
+  "phases": {
+    "build_local": {
+      "status": "implemented",
+      "mutates_outputs": true,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "build-local",
+        "--quality-policy",
+        "{quality_policy}"
+      ],
+      "notes": "Builds local targets, staged extension data, asset library outputs, browser index, reports, and git file-size audit. Does not package, sync portable Blender, commit, or push unless extra flags are supplied."
+    },
+    "validate_local": {
+      "status": "implemented",
+      "mutates_outputs": false,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "validate-local",
+        "--quality-policy",
+        "{quality_policy}"
+      ],
+      "notes": "Runs existing quality, browser-index, and file-size validators against current local outputs. Writes only PipelineLogs and PipelineRun.json."
+    },
+    "package": {
+      "status": "implemented",
+      "mutates_outputs": true,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "package-stage",
+        "--package"
+      ],
+      "notes": "Release-safe packaging of the existing staged extension. Fails if the stage has no generated .blend asset files."
+    },
+    "sync_portable": {
+      "status": "implemented",
+      "mutates_outputs": true,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "sync-portable"
+      ],
+      "notes": "Copies the current staged extension into the configured portable Blender extension directory."
+    },
+    "publish": {
+      "status": "implemented",
+      "mutates_outputs": false,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "publish",
+        "--git-mode",
+        "{git_mode}"
+      ],
+      "notes": "Runs publish preflight, then git plan/commit/push according to git_mode. No build or package work is performed."
+    },
+    "resume": {
+      "status": "implemented",
+      "mutates_outputs": true,
+      "command": [
+        "python",
+        "tools/UpdateAssetLibrary.py",
+        "--version",
+        "{game_version}",
+        "--mode",
+        "resume",
+        "--quality-policy",
+        "{quality_policy}"
+      ],
+      "notes": "Current resume mode reuses existing asset/progress skip behavior and never cleans stage unless --clean-stage is explicitly supplied. Rich PipelineState reuse policy remains planned."
+    }
+  },
+  "publish_git_modes": {
+    "plan-only": "Create GitCommitPlan.json without staging, committing, or pushing.",
+    "commit-only": "Create commit batches locally without pushing.",
+    "push-each": "Create each commit batch and push after each commit."
+  },
+  "success_files": [
+    "PipelineRun.json",
+    "PipelineLogs/<timestamp>/asset_target_quality_report.json",
+    "PipelineLogs/<timestamp>/asset_quality_report.json",
+    "PipelineLogs/<timestamp>/git_file_size_audit.json",
+    "PipelineLogs/<timestamp>/package_report.json"
+  ],
+  "release_artifact": {
+    "path_template": "dist/rsdw_base_builder-<addon-version>.zip",
+    "package_report_template": "dist/rsdw_base_builder-<addon-version>.package.json",
+    "version_source": "addon/blender_manifest.toml"
+  },
+  "ignored_generated_outputs": [
+    "_build/",
+    "_local/",
+    "dist/",
+    "PipelineLogs/",
+    "PipelineRun.json"
+  ],
+  "git_policy": {
+    "branch": "main",
+    "upstream": "origin/main",
+    "pre_publish_checks": [
+      "branch",
+      "upstream",
+      "behind_upstream",
+      "git_identity",
+      "generated_output_changes"
+    ],
+    "no_extra_branches": true
+  }
+}
