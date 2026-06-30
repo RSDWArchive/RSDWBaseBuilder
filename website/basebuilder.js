@@ -3582,6 +3582,29 @@ import {
     return selectedPlacements().filter(Boolean);
   }
 
+  function selectPlacementIds(ids, options = {}) {
+    const validIds = Array.from(ids || []).filter((id) => placements.has(id));
+    const mode = options.mode || "replace";
+    const next = mode === "replace" ? new Set() : new Set(selectedPlacedIds);
+    if (mode === "subtract") {
+      for (const id of validIds) next.delete(id);
+    } else {
+      for (const id of validIds) next.add(id);
+    }
+    const activeId = options.activeId && next.has(options.activeId)
+      ? options.activeId
+      : validIds.find((id) => next.has(id)) || "";
+    setSelection(next, { activeId });
+  }
+
+  function selectPlacedCollection(section, event) {
+    if (!section?.placements?.length) return;
+    const mode = selectionModifierFromEvent(event);
+    selectPlacementIds(section.placements.map((placement) => placement.id), { mode });
+    const verb = mode === "subtract" ? "Removed" : mode === "add" ? "Added" : "Selected";
+    showViewportNotice(`${verb} ${section.name}`);
+  }
+
   function placedAssetGroupCollapseId(collectionId, groupId) {
     return `collection:${collectionId || "unassigned"}:asset:${groupId}`;
   }
@@ -3596,6 +3619,7 @@ import {
         isUnassigned: true,
         placements: [],
         hiddenCount: 0,
+        selectedCount: 0,
       },
     ];
     for (const collection of uiCollections.slice().sort((a, b) => (a.order - b.order) || a.name.localeCompare(b.name, undefined, { numeric: true }))) {
@@ -3607,6 +3631,7 @@ import {
         isUnassigned: false,
         placements: [],
         hiddenCount: 0,
+        selectedCount: 0,
       });
     }
     const byId = new Map(sections.map((section) => [section.id, section]));
@@ -3615,6 +3640,7 @@ import {
       const section = byId.get(placement.uiCollectionId) || byId.get(UNASSIGNED_COLLECTION_ID);
       section.placements.push(placement);
       if (placement.hidden) section.hiddenCount += 1;
+      if (selectedPlacedIds.has(placement.id)) section.selectedCount = (section.selectedCount || 0) + 1;
     }
     return sections;
   }
@@ -4289,37 +4315,49 @@ import {
   function renderPlacedCollection(section, rowState) {
     const isOpen = !section.collapsed;
     const wrapper = document.createElement("section");
-    wrapper.className = `placed-group placed-collection${section.isUnassigned ? " placed-collection--unassigned" : ""}${isOpen ? " is-open" : ""}`;
+    wrapper.className = `placed-group placed-collection${section.isUnassigned ? " placed-collection--unassigned" : ""}${isOpen ? " is-open" : ""}${section.selectedCount ? " is-active" : ""}`;
     const header = document.createElement("div");
     header.className = "placed-group-header";
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "placed-group-toggle";
-    toggle.setAttribute("aria-expanded", String(isOpen));
+    const caretToggle = document.createElement("button");
+    caretToggle.type = "button";
+    caretToggle.className = "placed-group-caret-toggle";
+    caretToggle.setAttribute("aria-expanded", String(isOpen));
+    caretToggle.setAttribute("aria-label", `${isOpen ? "Collapse" : "Expand"} ${section.name}`);
+    caretToggle.title = `${isOpen ? "Collapse" : "Expand"} ${section.name}`;
+    caretToggle.innerHTML = `<span class="placed-group-caret" aria-hidden="true"></span>`;
+    const selectButton = document.createElement("button");
+    selectButton.type = "button";
+    selectButton.className = "placed-group-select";
+    selectButton.disabled = !section.placements.length;
     const hiddenText = section.hiddenCount ? `, ${section.hiddenCount.toLocaleString()} hidden` : "";
-    toggle.innerHTML = `
-      <span class="placed-group-caret" aria-hidden="true"></span>
+    const selectedText = section.selectedCount ? `, ${section.selectedCount.toLocaleString()} selected` : "";
+    selectButton.innerHTML = `
       <span>
         <span class="placed-name"></span>
         <span class="placed-meta"></span>
       </span>
     `;
-    toggle.querySelector(".placed-name").textContent = section.name;
-    toggle.querySelector(".placed-meta").textContent =
-      `${section.placements.length.toLocaleString()} placed${hiddenText}`;
+    selectButton.querySelector(".placed-name").textContent = section.name;
+    selectButton.querySelector(".placed-meta").textContent =
+      `${section.placements.length.toLocaleString()} placed${hiddenText}${selectedText}`;
     const toggleCollectionOpen = () => setUiCollectionCollapsed(section.id, isOpen);
-    toggle.addEventListener("click", (event) => {
+    caretToggle.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       toggleCollectionOpen();
+    });
+    selectButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      selectPlacedCollection(section, event);
     });
     header.addEventListener("click", (event) => {
-      if (event.target?.closest?.(".placed-visibility, .placed-group-action")) return;
+      if (event.target?.closest?.("button")) return;
       event.preventDefault();
       event.stopPropagation();
-      toggleCollectionOpen();
+      selectPlacedCollection(section, event);
     });
-    header.appendChild(toggle);
+    header.append(caretToggle, selectButton);
     renderCollectionActions(section, header);
     wrapper.appendChild(header);
 
