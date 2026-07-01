@@ -564,16 +564,16 @@ def _ue_row_to_blender_matrix(
     oz: float,
     *,
     flip_roll: bool = True,
-    flip_pitch: bool = False,
+    flip_pitch: bool = True,
 ) -> Matrix:
     loc = Vector((
         (float(row.get("x", 0.0)) - ox) * scale,
         -(float(row.get("y", 0.0)) - oy) * scale,
         (float(row.get("z", 0.0)) - oz) * scale,
     ))
-    # UE Rotator axes map through the same Y mirror used for position.
-    # Building pieces/items use the legacy mirrored roll convention. BP actors
-    # use corrected actor signs for X/Y tilt while keeping Z/yaw mirrored.
+    # UE Rotator axes map through the same Y mirror used for position. Match
+    # the browser builder's JSON boundary: pitch and roll are both mirrored,
+    # while yaw is mirrored through Blender's Z axis below.
     roll_sign = -1.0 if flip_roll else 1.0
     pitch_sign = -1.0 if flip_pitch else 1.0
     rot = Euler((
@@ -598,7 +598,7 @@ def _apply_ue_transform(
     oz: float,
     *,
     flip_roll: bool = True,
-    flip_pitch: bool = False,
+    flip_pitch: bool = True,
 ) -> None:
     obj.matrix_world = _ue_row_to_blender_matrix(
         row,
@@ -623,7 +623,7 @@ def _ue_transform_from_matrix(
     oz: float,
     *,
     flip_roll: bool = True,
-    flip_pitch: bool = False,
+    flip_pitch: bool = True,
 ) -> dict:
     loc, rot, scl = mw.decompose()
     try:
@@ -994,7 +994,7 @@ class RSDW_OT_ImportBuildingJson(Operator):
             if inst is None:
                 no_blend[stem] = no_blend.get(stem, 0) + 1
                 continue
-            _apply_ue_transform(inst, item, scale, ox, oy, oz, flip_roll=False, flip_pitch=True)
+            _apply_ue_transform(inst, item, scale, ox, oy, oz)
             inst["rsdw_asset_kind"] = "item"
             inst["rsdw_actor_name"] = str(item.get("actor_name") or inst.name)
             inst["rsdw_actor_class"] = str(item.get("actor_class") or "")
@@ -1024,7 +1024,7 @@ class RSDW_OT_ImportBuildingJson(Operator):
             if inst is None:
                 no_blend[stem] = no_blend.get(stem, 0) + 1
                 continue
-            _apply_ue_transform(inst, actor, scale, ox, oy, oz, flip_roll=False, flip_pitch=True)
+            _apply_ue_transform(inst, actor, scale, ox, oy, oz)
             inst["rsdw_asset_kind"] = "bp"
             inst["rsdw_actor_name"] = str(actor.get("actor_name") or inst.name)
             inst["rsdw_actor_class"] = actor_class
@@ -1299,7 +1299,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 "item_asset_path": item_path,
                 "item_source": str(meta.get("rsdw_item_source") or "ItemData"),
                 "count": item_count,
-                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz, flip_roll=False, flip_pitch=True),
+                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz),
             })
 
         for obj in all_objs:
@@ -1318,7 +1318,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 "actor_name": str(meta.get("rsdw_actor_name") or obj.name),
                 "actor_class": actor_class,
                 "class_path": class_path,
-                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz, flip_roll=False, flip_pitch=True),
+                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz),
             })
 
         if not pieces and not items and not actors:

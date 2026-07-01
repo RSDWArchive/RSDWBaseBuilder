@@ -1558,13 +1558,34 @@ button:focus-visible {
 }
 
 .placed-summary {
+  display: flex;
+  flex-wrap: wrap;
   min-height: 38px;
   border-color: rgba(243, 207, 137, 0.16);
   color: var(--rsdw-muted);
   font-size: 0.78rem;
   font-weight: 800;
   justify-content: center;
+  gap: 0.45rem;
   text-align: center;
+}
+
+.placed-summary-action {
+  min-height: 28px;
+  border: 1px solid rgba(243, 207, 137, 0.22);
+  border-radius: 7px;
+  background: rgba(243, 207, 137, 0.08);
+  color: var(--rsdw-text);
+  padding: 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.placed-summary-action:hover,
+.placed-summary-action:focus-visible {
+  border-color: rgba(243, 207, 137, 0.44);
+  background: rgba(243, 207, 137, 0.14);
+  transform: none;
 }
 
 .themed-dialog {

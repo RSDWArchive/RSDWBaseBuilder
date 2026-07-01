@@ -188,6 +188,7 @@ import {
   let activeCategoryPath = "";
   let visibleAssetResultCount = RESULT_LIMIT;
   let assetViewMode = "list";
+  let placedListVisibleLimit = PLACED_LIST_LIMIT;
   let selectedTargetId = "";
   let selectedPlacedIds = new Set();
   let selectedReferenceIds = new Set();
@@ -4271,7 +4272,7 @@ import {
 
     if (!isOpen) return;
     for (const placement of group.placements) {
-      if (rowState.shownRows >= PLACED_LIST_LIMIT) {
+      if (rowState.shownRows >= placedListVisibleLimit) {
         rowState.capped = true;
         break;
       }
@@ -4390,7 +4391,34 @@ import {
     if (rowState.capped || placements.size > rowState.shownRows) {
       const summary = document.createElement("div");
       summary.className = "placed-row placed-summary";
-      summary.textContent = `Showing row details for ${rowState.shownRows.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
+      const text = document.createElement("span");
+      text.textContent = `Showing row details for ${rowState.shownRows.toLocaleString()} of ${placements.size.toLocaleString()} placed objects`;
+      summary.appendChild(text);
+      if (!rowState.capped) {
+        els.placedList.appendChild(summary);
+        return;
+      }
+      const showMore = document.createElement("button");
+      showMore.type = "button";
+      showMore.className = "placed-summary-action";
+      showMore.textContent = `Show ${Math.min(PLACED_LIST_LIMIT, Math.max(placements.size - rowState.shownRows, 0)).toLocaleString()} more`;
+      showMore.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        placedListVisibleLimit = Math.min(placements.size, placedListVisibleLimit + PLACED_LIST_LIMIT);
+        renderPlacedList();
+      });
+      const showAll = document.createElement("button");
+      showAll.type = "button";
+      showAll.className = "placed-summary-action";
+      showAll.textContent = "Show all";
+      showAll.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        placedListVisibleLimit = placements.size;
+        renderPlacedList();
+      });
+      summary.append(showMore, showAll);
       els.placedList.appendChild(summary);
     }
   }
