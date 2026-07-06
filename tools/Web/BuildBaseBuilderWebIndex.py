@@ -37,7 +37,9 @@ def load_json(path: Path) -> Any:
 
 def write_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp_path = path.with_name(f"{path.name}.tmp")
+    tmp_path.write_text(json.dumps(data, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    tmp_path.replace(path)
 
 
 def _shorten_class(class_name: str) -> str:
@@ -257,7 +259,7 @@ def _target_export_metadata(target: dict[str, Any], kind: str) -> dict[str, Any]
             "actor_class": ITEM_ACTOR_CLASS,
             "item_asset_name": item_name,
             "item_asset_path": _unreal_asset_path_from_json_relative(item_json_relative, item_name),
-            "item_source": "ItemData",
+            "item_source": str(target.get("item_source") or "ItemData"),
             "item_count": 1,
             "item_json_relative": item_json_relative,
         }

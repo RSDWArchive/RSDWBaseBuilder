@@ -54,6 +54,7 @@ ITEM_SOURCE_MODEL_OVERRIDES = {
     # though it uses the bonemeal icon and has a matching bonemeal source model.
     "ITEM_Resources_Bones_CorruptedBonemeal": "RSDragonwilds/Content/Art/Item/Resources/Bone_Meal/SM_Bone_Meal_01.uemodel",
 }
+PLAN_ITEM_VISUAL_MODEL = "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
 
 
 def _now_iso() -> str:
@@ -120,6 +121,10 @@ def _model_data_files(model_version_root: Path) -> list[Path]:
 
 def _default_item_data(archive_root: Path) -> Path:
     return archive_root / "website" / "tools" / "ItemData" / "ItemData.json"
+
+
+def _default_plan_data(archive_root: Path) -> Path:
+    return archive_root / "website" / "tools" / "PlanData" / "PlanData.json"
 
 
 def _default_bp_data(archive_root: Path) -> Path:
@@ -467,6 +472,16 @@ def _resolved_refs_from_value(value: Any, inventory: dict[str, Any]) -> tuple[li
 
 
 def _display_from_item(item: dict[str, Any], key: str) -> str:
+    def text_value(value: Any) -> str:
+        if isinstance(value, str):
+            return value.strip()
+        if isinstance(value, dict):
+            for field in ("LocalizedString", "SourceString", "displayName", "name"):
+                text = value.get(field)
+                if isinstance(text, str) and text.strip():
+                    return text.strip()
+        return ""
+
     props = item.get("properties") or {}
     enrichment = item.get("enrichment") or {}
     for candidate in (
@@ -476,12 +491,40 @@ def _display_from_item(item: dict[str, Any], key: str) -> str:
         props.get("Name"),
         item.get("name"),
     ):
-        if isinstance(candidate, str) and candidate.strip():
-            return candidate.strip()
+        text = text_value(candidate)
+        if text:
+            return text
     return Path(key).stem
 
 
+def _is_plan_item(key: str, item: dict[str, Any]) -> bool:
+    props = item.get("properties") or {}
+    item_type = str(item.get("type") or "")
+    if item_type == "BP_Consumables_Plan_Base_C":
+        return True
+    if "DA_Consumable_Plan" in Path(key).stem:
+        return True
+    tags = props.get("ItemFilterTags")
+    if isinstance(tags, list) and any(str(tag) == "ItemFilter.Type.Consumable.Plan" for tag in tags):
+        return True
+    return False
+
+
 def _item_catalog_path(key: str, item: dict[str, Any]) -> str:
+    if _is_plan_item(key, item):
+        parts = Path(key.replace("\\", "/")).parts
+        if "Plans" in parts:
+            idx = parts.index("Plans")
+            subfolders = [part.replace("_", " ") for part in parts[idx + 1:-1]]
+            return "/".join(["Items", "Plans", *subfolders]) if subfolders else "Items/Plans"
+        if "Items" in parts:
+            idx = parts.index("Items")
+            subfolders = [part.replace("_", " ") for part in parts[idx + 1:-1]]
+            if subfolders and subfolders[0] != "Plans":
+                subfolders = ["Plans", *subfolders]
+            return "/".join(["Items", *subfolders]) if subfolders else "Items/Plans"
+        return "Items/Plans"
+
     item_type = str(item.get("type") or "").strip()
     if item_type and item_type.lower() not in {"itemdata", "item"}:
         return f"Items/{item_type}"
@@ -822,6 +865,7 @@ def _dedupe_components(components: list[dict[str, Any]]) -> list[dict[str, Any]]
 def _build_item_targets(
     *,
     item_data: Path,
+    item_source: str,
     texture_root: Path,
     inventory: dict[str, Any],
     used_stems: set[str],
@@ -843,8 +887,18 @@ def _build_item_targets(
                 counts["manual_source_overrides"] += 1
             else:
                 misses.append(override_ref)
+        if not refs and _is_plan_item(key, item):
+            fallback_ref = _override_model_ref(PLAN_ITEM_VISUAL_MODEL, inventory)
+            if fallback_ref.get("entry"):
+                refs = [fallback_ref]
+                counts["plan_visual_fallbacks"] += 1
+            else:
+                misses.append(fallback_ref)
         if misses:
-            unresolved.extend({**miss, "asset_kind": "item", "item_json_relative": key} for miss in misses)
+            unresolved.extend(
+                {**miss, "asset_kind": "item", "item_source": item_source, "item_json_relative": key}
+                for miss in misses
+            )
         if not refs:
             counts["without_model_refs"] += 1
             continue
@@ -881,6 +935,7 @@ def _build_item_targets(
                 "transform": {},
             }],
             "item_json_relative": key,
+            "item_source": item_source,
             "item_type": item.get("type") or "",
             "item_name": item.get("name") or "",
             "primary_model_ref": primary["path"],
@@ -1188,6 +1243,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
     archive_json_root = (args.archive_json_root or archive_version_root / "json").resolve()
     archive_texture_root = (args.archive_texture_root or archive_version_root / "textures").resolve()
     item_data = (args.item_data or _default_item_data(args.archive_root)).resolve()
+    plan_data = (args.plan_data or _default_plan_data(args.archive_root)).resolve()
     bp_data = (args.bp_data or _default_bp_data(args.archive_root)).resolve()
     model_data_files = [path.resolve() for path in (args.model_data or _model_data_files(model_version_root))]
 
@@ -1197,6 +1253,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
         (archive_json_root, "archive json root"),
         (archive_texture_root, "archive texture root"),
         (item_data, "ItemData.json"),
+        (plan_data, "PlanData.json"),
         (bp_data, "BPData.json"),
         (args.building_targets, "building target file"),
         *[(path, path.name) for path in model_data_files],
@@ -1216,6 +1273,14 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
     )
     item_targets, item_unresolved, item_counts = _build_item_targets(
         item_data=item_data,
+        item_source="ItemData",
+        texture_root=archive_texture_root,
+        inventory=inventory,
+        used_stems=used_stems,
+    )
+    plan_targets, plan_unresolved, plan_counts = _build_item_targets(
+        item_data=plan_data,
+        item_source="PlanData",
         texture_root=archive_texture_root,
         inventory=inventory,
         used_stems=used_stems,
@@ -1228,8 +1293,14 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
     )
     building_bp_transform_counts = _apply_bp_visual_component_transforms(building_targets, bp_targets)
 
-    targets = [*building_targets, *item_targets, *bp_targets]
-    unresolved = [*building_unresolved, *item_unresolved, *bp_unresolved]
+    combined_item_counts = item_counts + plan_counts
+    for key, value in item_counts.items():
+        combined_item_counts[f"ItemData.{key}"] = value
+    for key, value in plan_counts.items():
+        combined_item_counts[f"PlanData.{key}"] = value
+
+    targets = [*building_targets, *item_targets, *plan_targets, *bp_targets]
+    unresolved = [*building_unresolved, *item_unresolved, *plan_unresolved, *bp_unresolved]
     skipped = [*building_skipped, *bp_skipped]
     kind_counts = Counter(target.get("asset_kind") for target in targets)
     icon_counts = Counter(
@@ -1263,7 +1334,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
         "skipped": len(skipped),
         "building_source_summary": building_summary,
         "building_bp_visual_transform_counts": dict(sorted(building_bp_transform_counts.items())),
-        "item_counts": dict(sorted(item_counts.items())),
+        "item_counts": dict(sorted(combined_item_counts.items())),
         "bp_counts": dict(sorted(bp_counts.items())),
         "icon_counts": dict(sorted(icon_counts.items())),
         "preview_mode_counts": dict(sorted(preview_mode_counts.items())),
@@ -1298,6 +1369,7 @@ def build_targets(args: argparse.Namespace) -> dict[str, Any]:
             "archive_json_root": str(archive_json_root),
             "archive_texture_root": str(archive_texture_root),
             "item_data": str(item_data),
+            "plan_data": str(plan_data),
             "bp_data": str(bp_data),
             "building_targets": str(args.building_targets.resolve()),
             "model_data": [str(path) for path in model_data_files],
@@ -1318,6 +1390,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--archive-json-root", type=Path, default=None)
     parser.add_argument("--archive-texture-root", type=Path, default=None)
     parser.add_argument("--item-data", type=Path, default=None)
+    parser.add_argument("--plan-data", type=Path, default=None)
     parser.add_argument("--bp-data", type=Path, default=None)
     parser.add_argument("--model-data", type=Path, action="append", default=None)
     parser.add_argument("--building-targets", type=Path, default=DEFAULT_BUILDING_TARGETS)
@@ -1333,7 +1406,9 @@ def main(argv: list[str] | None = None) -> int:
     print("Smoke targets:", len(doc.get("smoke_target_ids") or []))
     if not args.dry_run:
         args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        tmp_out = args.out.with_name(f"{args.out.name}.tmp")
+        tmp_out.write_text(json.dumps(doc, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+        tmp_out.replace(args.out)
         print(f"Wrote targets -> {args.out}")
     return 0
 

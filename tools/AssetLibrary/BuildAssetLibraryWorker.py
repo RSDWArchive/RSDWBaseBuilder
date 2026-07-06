@@ -1026,6 +1026,8 @@ def main() -> int:
             asset_obj["rsdw_piece_data_name"] = str(asset_metadata["piece_data_name"])
         if asset_metadata.get("item_json_relative"):
             asset_obj["rsdw_item_json_relative"] = str(asset_metadata["item_json_relative"])
+        if asset_metadata.get("item_source"):
+            asset_obj["rsdw_item_source"] = str(asset_metadata["item_source"])
         if asset_metadata.get("item_type"):
             asset_obj["rsdw_item_type"] = str(asset_metadata["item_type"])
         if asset_metadata.get("item_name"):

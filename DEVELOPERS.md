@@ -154,8 +154,13 @@ current upstream Archive/Model inputs.
 
 The asset-library pipeline has explicit preview and material expectations:
 
-- Item previews come from `properties.Icon` in `ItemData.json`, resolved against
-  the selected Archive texture root.
+- Item previews come from `properties.Icon` in `ItemData.json` and
+  `PlanData.json`, resolved against the selected Archive texture root.
+- Plan consumables from `PlanData.json` are exported as Items with
+  `item_source = "PlanData"`. Their game mesh currently points at an unavailable
+  `Scroll_2` source, so the target builder uses the available
+  `SM_DR_Scroll_01` model as the editor visual while preserving the real plan
+  asset path for export.
 - Building-piece previews come from the referenced building-piece JSON
   `Properties.DisplayIcon`.
 - BP assets normally do not have authoritative UI icons. They should ship

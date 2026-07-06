@@ -99,6 +99,7 @@ def _validate_target(library_root: Path, target: dict[str, Any]) -> dict[str, An
     if expected_kind == "item":
         common_props.extend([
             ("rsdw_item_json_relative", "item_json_relative"),
+            ("rsdw_item_source", "item_source"),
             ("rsdw_item_type", "item_type"),
             ("rsdw_item_name", "item_name"),
             ("rsdw_primary_model_ref", "primary_model_ref"),

@@ -35,7 +35,7 @@ Required upstream data includes:
 
 - Archive JSON output
 - Archive texture output
-- Archive item and BP data files
+- Archive item, plan, and BP data files
 - RSDWModel static and skeletal model data
 - RSDWModel `WebAssets\WebAssetManifest.json` for optimized PBR material builds
 
@@ -162,7 +162,8 @@ For `targets`, `smoke`, and `full`, the main stage order is:
 4. Prepare extension stage when required, after runtime data has been refreshed
 5. Reconcile building-piece catalog data
 6. Build building-piece targets
-7. Build unified asset targets
+7. Build unified asset targets, including `ItemData.json` items and
+   `PlanData.json` plan consumables as Items
 8. Verify target quality
 9. Write `blender_assets.cats.txt`
 10. Build the browser web index from target data and refreshed snap data

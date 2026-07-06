@@ -213,6 +213,7 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
     if args.web_assets_manifest is not None:
         web_assets_manifest = args.web_assets_manifest.resolve()
     item_data = args.item_data or (args.archive_root / "website" / "tools" / "ItemData" / "ItemData.json")
+    plan_data = args.plan_data or (args.archive_root / "website" / "tools" / "PlanData" / "PlanData.json")
     bp_data = args.bp_data or (args.archive_root / "website" / "tools" / "BPData" / "BPData.json")
     sm_data = model_version_root / "ModelData" / "SM_Data.json"
     sk_data = model_version_root / "ModelData" / "SK_Data.json"
@@ -226,6 +227,7 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
         "archive_texture_root": archive_texture_root,
         "web_assets_manifest": web_assets_manifest,
         "item_data": item_data,
+        "plan_data": plan_data,
         "bp_data": bp_data,
         "sm_data": sm_data,
         "sk_data": sk_data,
@@ -251,6 +253,11 @@ def resolve_inputs(args: argparse.Namespace) -> dict[str, Path | str | None]:
     item_version = str(item_doc.get("version") or "")
     if item_version and item_version != version:
         raise SystemExit(f"ItemData version {item_version!r} does not match requested {version!r}.")
+
+    plan_doc = load_json(plan_data)
+    plan_version = str(plan_doc.get("version") or "")
+    if plan_version and plan_version != version:
+        raise SystemExit(f"PlanData version {plan_version!r} does not match requested {version!r}.")
 
     bp_doc = load_json(bp_data)
     bp_json_root = str((bp_doc.get("_meta") or {}).get("jsonRoot") or "").replace("\\", "/")
@@ -1188,6 +1195,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--archive-root", type=Path, default=DEFAULT_ARCHIVE_ROOT)
     parser.add_argument("--model-root", type=Path, default=DEFAULT_MODEL_ROOT)
     parser.add_argument("--item-data", type=Path, default=None)
+    parser.add_argument("--plan-data", type=Path, default=None)
     parser.add_argument("--bp-data", type=Path, default=None)
     parser.add_argument("--build-root", type=Path, default=default_build_root())
     parser.add_argument("--extension-source-root", type=Path, default=default_extension_source_root())
@@ -1320,6 +1328,7 @@ def main(argv: list[str] | None = None) -> int:
         "model_version_root",
         "web_assets_manifest",
         "item_data",
+        "plan_data",
         "bp_data",
         "library_root",
     ):
@@ -1425,6 +1434,7 @@ def main(argv: list[str] | None = None) -> int:
         "--archive-json-root", Path(inputs["archive_json_root"]),
         "--archive-texture-root", Path(inputs["archive_texture_root"]),
         "--item-data", Path(inputs["item_data"]),
+        "--plan-data", Path(inputs["plan_data"]),
         "--bp-data", Path(inputs["bp_data"]),
         "--model-data", Path(inputs["sm_data"]),
         "--model-data", Path(inputs["sk_data"]),
