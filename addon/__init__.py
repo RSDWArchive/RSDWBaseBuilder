@@ -649,6 +649,66 @@ def _ue_transform_from_matrix(
     }
 
 
+def _store_imported_ue_transform(obj, row: dict) -> None:
+    for key in ("x", "y", "z", "pitch", "yaw", "roll", "scale_x", "scale_y", "scale_z"):
+        default = 0.0 if key in {"x", "y", "z", "pitch", "yaw", "roll"} else 1.0
+        try:
+            raw = row.get(key, default)
+            if raw is None or raw == "":
+                raw = default
+            obj[f"rsdw_import_{key}"] = float(raw)
+        except (TypeError, ValueError):
+            pass
+    try:
+        obj["rsdw_import_rotation_euler_xyz"] = [
+            float(obj.rotation_euler.x),
+            float(obj.rotation_euler.y),
+            float(obj.rotation_euler.z),
+        ]
+    except Exception:
+        pass
+
+
+def _stored_float_prop(obj, key: str):
+    try:
+        value = obj.get(key)
+    except Exception:
+        return None
+    if value is None or value == "":
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _rotation_matches_import(obj, *, eps: float = 1e-5) -> bool:
+    try:
+        stored = obj.get("rsdw_import_rotation_euler_xyz")
+    except Exception:
+        return False
+    if stored is None or len(stored) != 3:
+        return False
+    try:
+        return all(abs(float(obj.rotation_euler[i]) - float(stored[i])) <= eps for i in range(3))
+    except Exception:
+        return False
+
+
+def _ue_transform_from_object(obj, scale: float, ox: float, oy: float, oz: float) -> dict:
+    transform = _ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz)
+    # Blender can decompose the same world matrix into different Euler channel
+    # values around singularities. If an imported object's rotation was not
+    # edited, preserve the original JSON channels so web -> Blender -> export
+    # stays numerically stable.
+    if _rotation_matches_import(obj):
+        for key in ("pitch", "yaw", "roll"):
+            preserved = _stored_float_prop(obj, f"rsdw_import_{key}")
+            if preserved is not None:
+                transform[key] = _round_transform_value(preserved)
+    return transform
+
+
 def _unreal_asset_path_from_json_relative(json_relative: str, asset_name: str = "") -> str:
     rel = str(json_relative or "").replace("\\", "/")
     if rel.endswith(".json"):
@@ -949,6 +1009,7 @@ class RSDW_OT_ImportBuildingJson(Operator):
                 continue
 
             _apply_ue_transform(inst, pc, scale, ox, oy, oz)
+            _store_imported_ue_transform(inst, pc)
 
             # Stash original game data on the object so export is lossless
             # even if the user renames it or duplicates it.
@@ -995,6 +1056,7 @@ class RSDW_OT_ImportBuildingJson(Operator):
                 no_blend[stem] = no_blend.get(stem, 0) + 1
                 continue
             _apply_ue_transform(inst, item, scale, ox, oy, oz)
+            _store_imported_ue_transform(inst, item)
             inst["rsdw_asset_kind"] = "item"
             inst["rsdw_actor_name"] = str(item.get("actor_name") or inst.name)
             inst["rsdw_actor_class"] = str(item.get("actor_class") or "")
@@ -1025,6 +1087,7 @@ class RSDW_OT_ImportBuildingJson(Operator):
                 no_blend[stem] = no_blend.get(stem, 0) + 1
                 continue
             _apply_ue_transform(inst, actor, scale, ox, oy, oz)
+            _store_imported_ue_transform(inst, actor)
             inst["rsdw_asset_kind"] = "bp"
             inst["rsdw_actor_name"] = str(actor.get("actor_name") or inst.name)
             inst["rsdw_actor_class"] = actor_class
@@ -1204,8 +1267,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
                         f"{cls_short[:-2]}.{cls_short}"
                     )
 
-            mw = obj.matrix_world
-            transform = _ue_transform_from_matrix(mw, scale, ox, oy, oz)
+            transform = _ue_transform_from_object(obj, scale, ox, oy, oz)
 
             # Preserve the original piece_id when present so the game can
             # round-trip stable references; mint a fresh one beyond the max
@@ -1299,7 +1361,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 "item_asset_path": item_path,
                 "item_source": str(meta.get("rsdw_item_source") or "ItemData"),
                 "count": item_count,
-                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz),
+                **_ue_transform_from_object(obj, scale, ox, oy, oz),
             })
 
         for obj in all_objs:
@@ -1318,7 +1380,7 @@ class RSDW_OT_ExportBuildingJson(Operator):
                 "actor_name": str(meta.get("rsdw_actor_name") or obj.name),
                 "actor_class": actor_class,
                 "class_path": class_path,
-                **_ue_transform_from_matrix(obj.matrix_world, scale, ox, oy, oz),
+                **_ue_transform_from_object(obj, scale, ox, oy, oz),
             })
 
         if not pieces and not items and not actors:

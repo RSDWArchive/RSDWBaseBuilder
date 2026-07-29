@@ -326,6 +326,35 @@ def write_smoke_list(target_file: Path, out_path: Path, limit: int | None) -> li
     return ids
 
 
+def _target_matches_only(target: dict[str, Any], needle: str) -> bool:
+    low = needle.lower()
+    fields = (
+        "target_id",
+        "asset_stem",
+        "source_sm_stem",
+        "piece_data_name",
+        "display_name",
+        "catalog_path",
+        "planned_blend_rel",
+    )
+    return any(low in str(target.get(field) or "").lower() for field in fields)
+
+
+def write_only_list(target_file: Path, out_path: Path, only: str, limit: int | None) -> list[str]:
+    doc = load_json(target_file)
+    ids = [
+        str(target.get("target_id") or "")
+        for target in doc.get("targets") or []
+        if _target_matches_only(target, only)
+    ]
+    ids = [target_id for target_id in ids if target_id]
+    if limit is not None and limit >= 0:
+        ids = ids[:limit]
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("\n".join(ids) + ("\n" if ids else ""), encoding="utf-8")
+    return ids
+
+
 def load_git_plan_summary(path: Path) -> dict[str, Any]:
     if not path.is_file():
         return {}
@@ -1512,6 +1541,10 @@ def main(argv: list[str] | None = None) -> int:
         only_list = log_dir / "smoke_targets.txt"
         build_target_ids = write_smoke_list(unified_targets, only_list, args.limit)
         print(f"Smoke target count: {len(build_target_ids)}")
+    elif args.only:
+        only_list = log_dir / "only_targets.txt"
+        build_target_ids = write_only_list(unified_targets, only_list, args.only, args.limit)
+        print(f"Only target count: {len(build_target_ids)}")
 
     if args.mode != "targets":
         if args.material_mode in {"base-color", "none"}:

@@ -1,6 +1,6 @@
 {
   "schema": "RSDWBaseBuilder.WebIndex.v1",
-  "generated_at_utc": "2026-07-06T21:18:35.622615+00:00",
+  "generated_at_utc": "2026-07-06T21:31:15.327653+00:00",
   "version": "0.12.0.8",
   "sources": {
     "target_schema": "RSDWBaseBuilder.AssetLibraryTargets.v1",
@@ -25,8 +25,8 @@
       "model_inventory_entries": 5425,
       "buildable_targets": 771,
       "unresolved_targets": 0,
-      "current_blend_files": 3528,
-      "current_blends_not_in_catalog_targets": 2757,
+      "current_blend_files": 3651,
+      "current_blends_not_in_catalog_targets": 2880,
       "source_status_counts": {
         "missing_blend_file": 727,
         "missing_bpmap_entry": 42,

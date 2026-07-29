@@ -7,8 +7,8 @@
     "piece_data_map_unique_piece_data_names": 771,
     "bpmap_entries": 1491,
     "bpmap_unique_sm_stems": 1111,
-    "blend_files": 3528,
-    "blend_unique_sm_stems": 3528,
+    "blend_files": 3651,
+    "blend_unique_sm_stems": 3651,
     "status_counts": {
       "missing_blend_file": 727,
       "missing_bpmap_entry": 42,
@@ -18,7 +18,7 @@
     "shared_bp_classes": 2,
     "catalog_entries_using_shared_bp_classes": 4,
     "bpmap_stems_without_blend": 1111,
-    "blend_stems_without_bpmap": 3528
+    "blend_stems_without_bpmap": 3651
   },
   "pieces": [
     {

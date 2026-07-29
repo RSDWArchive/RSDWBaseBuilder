@@ -6,8 +6,8 @@
     "model_inventory_entries": 5425,
     "buildable_targets": 771,
     "unresolved_targets": 0,
-    "current_blend_files": 3528,
-    "current_blends_not_in_catalog_targets": 2757,
+    "current_blend_files": 3651,
+    "current_blends_not_in_catalog_targets": 2880,
     "source_status_counts": {
       "missing_blend_file": 727,
       "missing_bpmap_entry": 42,

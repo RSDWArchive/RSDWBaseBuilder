@@ -4902,7 +4902,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
       ]
     },
     {
@@ -4912,7 +4912,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
       ]
     },
     {
@@ -4922,7 +4922,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
       ]
     },
     {
@@ -14046,6 +14046,7 @@
     "RSDragonwilds/Content/Art/Item/Resources/Leather/SM_Scorch_Leather_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Planks/SM_Plank_Yew_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Thread/SM_Desert_Thread_01.uemodel": 4,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Skeleton/NPC/Humanoid/M_MED_Black_Knight_Melee_01/SK_M_MED_Black_Knight_Melee_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_LRG_Beast_Thane_01/SK_M_LRG_Beast_Thane_02.uemodel": 6,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_LRG_Beast_Thane_Shield_01/SM_M_LRG_Beast_Thane_Shield_01.uemodel": 4,
@@ -14311,7 +14312,6 @@
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/Death_01/SK_Death_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/Doric_01/SK_Doric_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_MED_Beast_Druid/SK_M_MED_Beast_Elder.uemodel": 9,
-    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Dragonkin_Props/Vault/Statues/SM_Dragonkin_Statue_02v3.uemodel": 23,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Orb_Stand/SM_Orb_Stand_Idle_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/SaradominTemple_Statue/SM_SaradominTemple_Statue_01_v3.uemodel": 7,
