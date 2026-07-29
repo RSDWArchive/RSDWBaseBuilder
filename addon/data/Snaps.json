@@ -1,6 +1,6 @@
 {
-  "count": 707,
-  "no_plugs": 40,
+  "count": 711,
+  "no_plugs": 43,
   "pieces": {
     "BP_BaseBuilding_ArcheryTarget_C": {
       "piece_tag": "",
@@ -649,6 +649,82 @@
       ]
     },
     "BP_BaseBuilding_Crate_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Agility_Orb_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Banner_Agility_Flag_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -4487,6 +4563,82 @@
       ]
     },
     "BP_BaseBuilding_Decoration_Headstone_02_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Agility_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Agility_Standing_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -112370,5 +112522,5 @@
       ]
     }
   },
-  "scanned": 747
+  "scanned": 754
 }

@@ -1,9 +1,9 @@
 {
   "manifest_schema": "RSDWBaseBuilder.MaterialInventory.v1",
   "source": "E:\\Github\\RSDWBaseBuilder\\tools\\AssetLibrary\\asset_library_targets.json",
-  "total_meshes": 1866,
-  "meshes_with_material": 1866,
-  "unique_count": 1470,
+  "total_meshes": 1892,
+  "meshes_with_material": 1892,
+  "unique_count": 1492,
   "materials": [
     {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim.json",
@@ -786,6 +786,16 @@
       ]
     },
     {
+      "key": "Engine/Content/EngineMaterials/WorldGridMaterial.json",
+      "stem": "WorldGridMaterial",
+      "ref_count": 51,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Roof_Triangle_Large_Inverted.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Beam_Thin_Large_Shallow.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Roof_Triangle_Shallow_Med_Inverted.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/Material/MI_Tier4_Trim.json",
       "stem": "MI_Tier4_Trim",
       "ref_count": 51,
@@ -796,23 +806,33 @@
       ]
     },
     {
-      "key": "Engine/Content/EngineMaterials/WorldGridMaterial.json",
-      "stem": "WorldGridMaterial",
-      "ref_count": 50,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Roof_Triangle_Large_Inverted.uemodel",
-        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Beam_Thin_Large_Shallow.uemodel",
-        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Roof_Triangle_Shallow_Med_Inverted.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/Architecture/Human/Temple/Materials/MI_Wood_Trim_01.json",
       "stem": "MI_Wood_Trim_01",
-      "ref_count": 45,
+      "ref_count": 46,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Guthix_01v2.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Single_Banner/SM_Single_Banner_Zamorak_01v2.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Armadyl_01v2.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Floor_Trap_01_v2_Baked.json",
+      "stem": "SM_Spike_Floor_Trap_01_v2_Baked",
+      "ref_count": 45,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SM_Vault_Staff_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Fire_Jet_Trap_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.json",
+      "stem": "SM_Spike_Wall_Trap_01_v2_Baked",
+      "ref_count": 45,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SM_Vault_Staff_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Fire_Jet_Trap_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.uemodel"
       ]
     },
     {
@@ -823,26 +843,6 @@
         "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Beam_Thick_Large_Steep.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/Torches/SM_Wall_Torch_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Beam_Thick_Large_Vertical.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Floor_Trap_01_v2_Baked.json",
-      "stem": "SM_Spike_Floor_Trap_01_v2_Baked",
-      "ref_count": 40,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SM_Vault_Staff_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Fire_Jet_Trap_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.json",
-      "stem": "SM_Spike_Wall_Trap_01_v2_Baked",
-      "ref_count": 40,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SM_Vault_Staff_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Fire_Jet_Trap_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Wall_Trap_01_v2_Baked.uemodel"
       ]
     },
     {
@@ -966,73 +966,13 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_AshBare_01_Imp.json",
-      "stem": "MI_FH_AshBare_01_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_AshBare_02_Imp.json",
-      "stem": "MI_FH_AshBare_02_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_AshBare_03_Imp.json",
-      "stem": "MI_FH_AshBare_03_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_Ash_01_Imp.json",
-      "stem": "MI_FH_Ash_01_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_Ash_02_Imp.json",
-      "stem": "MI_FH_Ash_02_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/MI_FH_Ash_03_Imp.json",
-      "stem": "MI_FH_Ash_03_Imp",
-      "ref_count": 27,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/Materials/MI_DK_Gold_Trim_01.json",
       "stem": "MI_DK_Gold_Trim_01",
-      "ref_count": 26,
+      "ref_count": 28,
       "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Orb_Stand/SM_Orb_Stand_Idle_01.uemodel",
         "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/SM_Dragons_Arena_Floor_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/Dragon_Arena_Imaru/SM_BossArena_Imaru.uemodel",
-        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/SM_Vault_4x4_Dmg_Wall_01_BREAKABLE.uemodel"
+        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/Dragon_Arena_Imaru/SM_BossArena_Imaru.uemodel"
       ]
     },
     {
@@ -1416,6 +1356,16 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Village_Props/Hitching_Post/Materials/MI_Village_Hitching_Post_01.json",
+      "stem": "MI_Village_Hitching_Post_01",
+      "ref_count": 18,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Guthix_01v2.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Armadyl_01v2.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Double_Banner/SM_Double_Banner_Guthix_02v2.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Item/Resources/Potions/Materials/MI_Sacred_Oil_01.json",
       "stem": "MI_Sacred_Oil_01",
       "ref_count": 18,
@@ -1563,16 +1513,6 @@
         "RSDragonwilds/Content/Marketplace/DepthsBelow/Geometry/Architecture/SM_PillarHuge01.uemodel",
         "RSDragonwilds/Content/Marketplace/DepthsBelow/Geometry/Architecture/SM_Ceiling02a.uemodel",
         "RSDragonwilds/Content/Marketplace/DepthsBelow/Geometry/Architecture/SM_BlindArcade01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Village_Props/Hitching_Post/Materials/MI_Village_Hitching_Post_01.json",
-      "stem": "MI_Village_Hitching_Post_01",
-      "ref_count": 17,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Guthix_01v2.uemodel",
-        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Armadyl_01v2.uemodel",
-        "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Double_Banner/SM_Double_Banner_Guthix_02v2.uemodel"
       ]
     },
     {
@@ -1766,43 +1706,23 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/MI_FH_OakTree_01_Imp.json",
-      "stem": "MI_FH_OakTree_01_Imp",
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Orange.json",
+      "stem": "MI_Orange",
       "ref_count": 14,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/MI_FH_OakTree_02_Imp.json",
-      "stem": "MI_FH_OakTree_02_Imp",
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Sagewort_Green.json",
+      "stem": "MI_Sagewort_Green",
       "ref_count": 14,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/MI_GF_OakTree_01_Imp.json",
-      "stem": "MI_GF_OakTree_01_Imp",
-      "ref_count": 14,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/MI_GF_OakTree_02_Imp.json",
-      "stem": "MI_GF_OakTree_02_Imp",
-      "ref_count": 14,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
@@ -1816,143 +1736,123 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Orange.json",
-      "stem": "MI_Orange",
-      "ref_count": 13,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Sagewort_Green.json",
-      "stem": "MI_Sagewort_Green",
-      "ref_count": 13,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Copper.json",
       "stem": "MI_Copper",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Cream.json",
       "stem": "MI_Cream",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Grey.json",
       "stem": "MI_Grey",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_LevelDesignMarker_White.json",
       "stem": "MI_LevelDesignMarker_White",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Opal.json",
       "stem": "MI_Opal",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Standard_Light_Brown.json",
       "stem": "MI_Standard_Light_Brown",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Tarrowmin.json",
       "stem": "MI_Tarrowmin",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Tin.json",
       "stem": "MI_Tin",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_BO_Melle_Beast.json",
       "stem": "M_BO_Melle_Beast",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Emerald.json",
       "stem": "M_Emerald",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Gold.json",
       "stem": "M_Gold",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
       "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Granite.json",
       "stem": "M_Granite",
-      "ref_count": 12,
+      "ref_count": 13,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
       ]
     },
     {
@@ -3396,6 +3296,16 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/Materials/MI_DK_Trims_02_Clean.json",
+      "stem": "MI_DK_Trims_02_Clean",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/SM_Vault_4x4_Dmg_Wall_01_BREAKABLE.uemodel",
+        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/SM_DK_VaultEntrance_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/Dragon_Arena_Fuzan/SM_Fuzan_Arena_Wall_01.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Item/Resources/Cloths/Materials/MI_Desert_Cloth_01.json",
       "stem": "MI_Desert_Cloth_01",
       "ref_count": 7,
@@ -3443,6 +3353,76 @@
         "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/Cooking_Range/SM_Cooking_Range_02.uemodel",
         "RSDragonwilds/Content/Art/Item/Resources/Herbs/Irit/SM_Irit_v2.uemodel",
         "RSDragonwilds/Content/Art/Item/Resources/Herbs/Snapdragon/SM_Snapdragon_v1.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Agility_Bronze_Napsack_01.json",
+      "stem": "MI_Agility_Bronze_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Agility_Gold_Napsack_01.json",
+      "stem": "MI_Agility_Gold_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Agility_Napsack_01.json",
+      "stem": "MI_Agility_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Agility_Silver_Napsack_01.json",
+      "stem": "MI_Agility_Silver_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Garou_Napsack_01.json",
+      "stem": "MI_Garou_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Goblin_Napsack_01.json",
+      "stem": "MI_Goblin_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Human_Napsack_01.json",
+      "stem": "MI_Human_Napsack_01",
+      "ref_count": 7,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
+        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
       ]
     },
     {
@@ -3583,16 +3563,6 @@
         "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Wall_Windowframe_Large_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Wall_Windowframe_Narrow_02.uemodel",
         "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Statues/SM_DR_Statue_LibraryBase_A_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/Materials/MI_DK_Trims_02_Clean.json",
-      "stem": "MI_DK_Trims_02_Clean",
-      "ref_count": 6,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Tomb/SM_Vault_4x4_Dmg_Wall_01_BREAKABLE.uemodel",
-        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/SM_DK_VaultEntrance_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/Dragon_Arena_Fuzan/SM_Fuzan_Arena_Wall_01.uemodel"
       ]
     },
     {
@@ -4078,16 +4048,6 @@
     {
       "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/Materials/MI_Sm_Plant_01.json",
       "stem": "MI_Sm_Plant_01",
-      "ref_count": 6,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Fox_Glove_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Sm_Plant_04.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_GF_Red_Bush_01_A.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/Materials/MI_Standard_Vegetation_Mushrooms_B_02.json",
-      "stem": "MI_Standard_Vegetation_Mushrooms_B_02",
       "ref_count": 6,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Fox_Glove_01.uemodel",
@@ -4716,6 +4676,16 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Human/Temple/Materials/MI_Wood_Trim_05.json",
+      "stem": "MI_Wood_Trim_05",
+      "ref_count": 4,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Fence_Hedge_End.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Fence_Hedge_Middle.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/SM_Coffin_Wooden_Closed.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Architecture/Umbral/Kalphite_Props/Materials/MI_Kalphite_Egg_01.json",
       "stem": "MI_Kalphite_Egg_01",
       "ref_count": 4,
@@ -4902,7 +4872,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
       ]
     },
     {
@@ -4912,7 +4882,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
       ]
     },
     {
@@ -4922,7 +4892,7 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_02.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Lore_Book_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel"
       ]
     },
     {
@@ -4973,6 +4943,16 @@
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Exploding_Plant_Trap_01/SM_Exploding_Plant_Trap_01.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Exploding_Plant_Trap_01/SM_Exploding_Plant_Trap_Flower_01.uemodel",
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Exploding_Plant_Trap_01/SM_Exploding_Plant_Trap_Flower_02.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/MI_Examination_Table.json",
+      "stem": "MI_Examination_Table",
+      "ref_count": 4,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Human_Torso.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Garou_Arms.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Goblin_Legs.uemodel"
       ]
     },
     {
@@ -5436,16 +5416,6 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Architecture/Human/Temple/Materials/MI_Wood_Trim_05.json",
-      "stem": "MI_Wood_Trim_05",
-      "ref_count": 3,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Fence_Hedge_End.uemodel",
-        "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Fence_Hedge_Middle.uemodel",
-        "RSDragonwilds/Content/Art/Env/Architecture/Human/Windmill/SM_Windmill_01v2_Blades.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/Cooking_Range/MI_Cooking_Range_01.json",
       "stem": "MI_Cooking_Range_01",
       "ref_count": 3,
@@ -5576,6 +5546,36 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/Materials/MI_AgilityMedal_Bronze_01.json",
+      "stem": "MI_AgilityMedal_Bronze_01",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Bronze_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Gold_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Silver_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/Materials/MI_AgilityMedal_Gold_01.json",
+      "stem": "MI_AgilityMedal_Gold_01",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Bronze_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Gold_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Silver_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/Materials/MI_AgilityMedal_Silver_01.json",
+      "stem": "MI_AgilityMedal_Silver_01",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Bronze_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Gold_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Silver_01.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/Window_Box/MI_Window_Box_01v2.json",
       "stem": "MI_Window_Box_01v2",
       "ref_count": 3,
@@ -5606,6 +5606,16 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/Materials/MI_Caltrop_Spike_Trap_1.json",
+      "stem": "MI_Caltrop_Spike_Trap_1",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v4.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v2.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v1.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vines/Materials/MI_Choppable_Vines.json",
       "stem": "MI_Choppable_Vines",
       "ref_count": 3,
@@ -5616,13 +5626,23 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/MI_Examination_Table.json",
-      "stem": "MI_Examination_Table",
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/MI_Fenkenstrain_Eye.json",
+      "stem": "MI_Fenkenstrain_Eye",
       "ref_count": 3,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Human_Torso.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Garou_Arms.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Goblin_Legs.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel",
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/SK_FenkenChicken_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Jar.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/MI_Human_Rowboat_Bottle_01.json",
+      "stem": "MI_Human_Rowboat_Bottle_01",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Lightning_Bottle.uemodel"
       ]
     },
     {
@@ -5723,36 +5743,6 @@
         "RSDragonwilds/Content/Art/Item/Resources/Mining_Nodes/Coal/SM_Mining_Ore_Coal_02.uemodel",
         "RSDragonwilds/Content/Art/Item/Resources/Mining_Nodes/Coal/SM_Mining_None_Large_Coal_01.uemodel",
         "RSDragonwilds/Content/Art/Item/Resources/Mining_Nodes/Coal/SM_Mining_Node_Medium_Coal_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Garou_Napsack_01.json",
-      "stem": "MI_Garou_Napsack_01",
-      "ref_count": 3,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Goblin_Napsack_01.json",
-      "stem": "MI_Goblin_Napsack_01",
-      "ref_count": 3,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Item/Resources/Napsack/Materials/MI_Human_Napsack_01.json",
-      "stem": "MI_Human_Napsack_01",
-      "ref_count": 3,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel",
-        "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel"
       ]
     },
     {
@@ -5946,6 +5936,16 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/TrainingDummy_01/Materials/MI_TrainingDummy_Red_01.json",
+      "stem": "MI_TrainingDummy_Red_01",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/TrainingDummy_01/SM_TrainingDummy_02.uemodel",
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/TrainingDummy_01/SK_TrainingDummy_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/ArrowSigns/SM_Arrow_Up_01.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Skeleton/Player/Body/Materials/MI_M_DefaultCharacter_Body.json",
       "stem": "MI_M_DefaultCharacter_Body",
       "ref_count": 3,
@@ -6133,6 +6133,16 @@
         "RSDragonwilds/Content/Art/Skeleton/Player/Invis/SK_M_MED_Invis_01.uemodel",
         "RSDragonwilds/Content/Art/Skeleton/Player/Invis/CompleteSkeletons/SK_M_MED_InvisComplete_Head_A_01.uemodel",
         "RSDragonwilds/Content/Art/Skeleton/Player/Invis/CompleteSkeletons/SK_F_MED_InvisComplete_Head_A_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Materials/Environment/MI_Standard_Black.json",
+      "stem": "MI_Standard_Black",
+      "ref_count": 3,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_OreNode_Stone.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Boulder_03.uemodel"
       ]
     },
     {
@@ -6628,6 +6638,33 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/Materials/MI_Kebbit_Burrow_01v1.json",
+      "stem": "MI_Kebbit_Burrow_01v1",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_02v1.uemodel",
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_01v1.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/Materials/MI_Kebbit_Burrow_Grass_01v1.json",
+      "stem": "MI_Kebbit_Burrow_Grass_01v1",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_02v1.uemodel",
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_01v1.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow_Umbral_Sands/Materials/MI_Kebbit_Burrow_Umbral_Sands_01.json",
+      "stem": "MI_Kebbit_Burrow_Umbral_Sands_01",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow_Umbral_Sands/SM_Kebbit_Burrow_Umbral_Sands_02.uemodel",
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow_Umbral_Sands/SM_Kebbit_Burrow_Umbral_Sands_01.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/Material/MI_Tier4_Columns.json",
       "stem": "MI_Tier4_Columns",
       "ref_count": 2,
@@ -6808,24 +6845,6 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/MI_BM_OakTree_IMP.json",
-      "stem": "MI_BM_OakTree_IMP",
-      "ref_count": 2,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_02_Components/MI_BM_OakTree_02_IMP.json",
-      "stem": "MI_BM_OakTree_02_IMP",
-      "ref_count": 2,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_02.uemodel",
-        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_02_Components/SM_BM_Oak_Tree_02_stump.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/Lighting/Materials/MI_GodRay.json",
       "stem": "MI_GodRay",
       "ref_count": 2,
@@ -6934,17 +6953,26 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/MI_Human_Rowboat_01.json",
-      "stem": "MI_Human_Rowboat_01",
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/MI_Fenkenstrain_Jar.json",
+      "stem": "MI_Fenkenstrain_Jar",
       "ref_count": 2,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel",
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Jar.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/MI_Human_Rowboat_Bottle_01.json",
-      "stem": "MI_Human_Rowboat_Bottle_01",
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/MI_Glass_Jar.json",
+      "stem": "MI_Glass_Jar",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Jar.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/MI_Human_Rowboat_01.json",
+      "stem": "MI_Human_Rowboat_01",
       "ref_count": 2,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel",
@@ -7291,6 +7319,15 @@
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/SM_Dec_Sewing_Kit.uemodel",
         "RSDragonwilds/Content/Art/Item/Resource/Textile/SM_Leather_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Chicken_01/Materials/MI_Chicken_01.json",
+      "stem": "MI_Chicken_01",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Chicken_01/SK_Chicken_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Chicken_Head/SM_ChickenHead_01.uemodel"
       ]
     },
     {
@@ -8284,6 +8321,15 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Materials/Book_1.json",
+      "stem": "Book_1",
+      "ref_count": 2,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Books/SM_Book_01.uemodel",
+        "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Models/SM_Scroll_2.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Marketplace/DepthsBelow/Geometry/Grave/MI_GraveRecess01.json",
       "stem": "MI_GraveRecess01",
       "ref_count": 2,
@@ -8302,12 +8348,12 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Materials/Environment/MI_Standard_Black.json",
-      "stem": "MI_Standard_Black",
+      "key": "RSDragonwilds/Content/Materials/Character/M_SimpleGlass.json",
+      "stem": "M_SimpleGlass",
       "ref_count": 2,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_OreNode_Stone.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Boulder_03.uemodel"
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Lightning_Bottle.uemodel"
       ]
     },
     {
@@ -9352,6 +9398,14 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Agility_Flag/Materials/MI_Agility_Flag.json",
+      "stem": "MI_Agility_Flag",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Agility_Flag/SM_Agility_Flag.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/Material/MI_Tier4_Windows.json",
       "stem": "MI_Tier4_Windows",
       "ref_count": 1,
@@ -9816,51 +9870,147 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_01_IMP.json",
-      "stem": "MI_Ash_Tree_01_IMP",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_01_IMP1.json",
+      "stem": "MI_Ash_Tree_01_IMP1",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_02_IMP.json",
-      "stem": "MI_Ash_Tree_02_IMP",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_02_IMP1.json",
+      "stem": "MI_Ash_Tree_02_IMP1",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_02.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_03_IMP.json",
-      "stem": "MI_Ash_Tree_03_IMP",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_Ash_Tree_03_IMP1.json",
+      "stem": "MI_Ash_Tree_03_IMP1",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_03.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_AshTree_01_Imp.json",
-      "stem": "MI_GF_AshTree_01_Imp",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_01_IMP.json",
+      "stem": "MI_FH_Ash_Tree_01_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_02_IMP1.json",
+      "stem": "MI_FH_Ash_Tree_02_IMP1",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_02.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_03_IMP.json",
+      "stem": "MI_FH_Ash_Tree_03_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_03.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_Bare_01_IMP.json",
+      "stem": "MI_FH_Ash_Tree_Bare_01_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_Bare_02_IMP.json",
+      "stem": "MI_FH_Ash_Tree_Bare_02_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_02.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_FH_Ash_Tree_Bare_03_IMP.json",
+      "stem": "MI_FH_Ash_Tree_Bare_03_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_03.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_Ash_Tree_01_IMP.json",
+      "stem": "MI_GF_Ash_Tree_01_IMP",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_01.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_AshTree_02_Imp.json",
-      "stem": "MI_GF_AshTree_02_Imp",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_Ash_Tree_02_IMP.json",
+      "stem": "MI_GF_Ash_Tree_02_IMP",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_02.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_AshTree_03_Imp.json",
-      "stem": "MI_GF_AshTree_03_Imp",
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/Impostors/MI_GF_Ash_Tree_03_IMP.json",
+      "stem": "MI_GF_Ash_Tree_03_IMP",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_03.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_BM_Oak_Tree_01_IMP.json",
+      "stem": "MI_BM_Oak_Tree_01_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_BM_Oak_Tree_02_IMP.json",
+      "stem": "MI_BM_Oak_Tree_02_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_02.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_FH_Oak_Tree_01_IMP.json",
+      "stem": "MI_FH_Oak_Tree_01_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_FH_Oak_Tree_02_IMP.json",
+      "stem": "MI_FH_Oak_Tree_02_IMP",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_02.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_GF_Oak_Tree_01_IMP1.json",
+      "stem": "MI_GF_Oak_Tree_01_IMP1",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/Impostors/MI_GF_Oak_Tree_02_IMP1.json",
+      "stem": "MI_GF_Oak_Tree_02_IMP1",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_02.uemodel"
       ]
     },
     {
@@ -10168,6 +10318,30 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/Materials/MI_Gravestone_01.json",
+      "stem": "MI_Gravestone_01",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/SM_Coffin_Wooden_Closed.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/Materials/MI_Gravestone_02.json",
+      "stem": "MI_Gravestone_02",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/SM_Coffin_Wooden_Closed.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/Materials/MI_Gravestone_03.json",
+      "stem": "MI_Gravestone_03",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/SM_Coffin_Wooden_Closed.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Ruin_Props/Pots/Materials/MI_Pots.json",
       "stem": "MI_Pots",
       "ref_count": 1,
@@ -10205,6 +10379,14 @@
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Posion_Rock/SM_Poison_Rock.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Fireball_trap/Materials/MI_Fireball_Trap.json",
+      "stem": "MI_Fireball_Trap",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Fireball_trap/SM_Fireball_Trap.uemodel"
       ]
     },
     {
@@ -10269,14 +10451,6 @@
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Lougrims_Shrine/SM_Lougrims_Shrine_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/MI_Fenkenstrain_Eye.json",
-      "stem": "MI_Fenkenstrain_Eye",
-      "ref_count": 1,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel"
       ]
     },
     {
@@ -11448,19 +11622,27 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Chicken_01/Materials/MI_Chicken_01.json",
-      "stem": "MI_Chicken_01",
-      "ref_count": 1,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Chicken_01/SK_Chicken_01.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Falcon_01/Materials/MI_Falcon_01.json",
       "stem": "MI_Falcon_01",
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/Falcon_01/SK_Falcon_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/Materials/MI_Chicken_01.json",
+      "stem": "MI_Chicken_01",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/SK_FenkenChicken_01.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/Materials/MI_M_MED_Zombie_01.json",
+      "stem": "MI_M_MED_Zombie_01",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/SK_FenkenChicken_01.uemodel"
       ]
     },
     {
@@ -12552,11 +12734,19 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Materials/Book_1.json",
-      "stem": "Book_1",
+      "key": "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Materials/Scrolls.json",
+      "stem": "Scrolls",
       "ref_count": 1,
       "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Books/SM_Book_01.uemodel"
+        "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Models/SM_Scroll_2.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Materials/Tablecloth.json",
+      "stem": "Tablecloth",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Models/SM_Scroll_2.uemodel"
       ]
     },
     {
@@ -12669,14 +12859,6 @@
       "ref_count": 1,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/BaseBuilding/Shared/SM_Placement.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Materials/Character/M_SimpleGlass.json",
-      "stem": "M_SimpleGlass",
-      "ref_count": 1,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel"
       ]
     },
     {
@@ -13333,6 +13515,7 @@
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Beam_Thin_Large_Horizontal.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Framed_Banner/SM_Framed_Banner_Guthix_01v2.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/Torches/SM_Standing_Torch_01v1.uemodel": 2,
+    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Orb_Stand/SM_Orb_Stand_Idle_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Beam_Thick_Med_Vertical.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Roof_Med.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Roof_Med_Shallow.uemodel": 7,
@@ -13525,7 +13708,7 @@
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Pallisades_Gate.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Roof_Large_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Beam_Thin_Med_Vertical.uemodel": 7,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Fox_Glove_01.uemodel": 49,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Fox_Glove_01.uemodel": 48,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Floor_Med.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/Farming/Compost_Bin/Super/SM_Compost_Super_01v1.uemodel": 5,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Floor_Med_02.uemodel": 2,
@@ -13537,7 +13720,7 @@
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_T1_Roof_Med_Hip_Shallow.uemodel": 10,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Stairs_OurterCornerCurve.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Single_Banner/SM_Single_Banner_Saradomin_01v2.uemodel": 16,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Sm_Plant_04.uemodel": 49,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_BM_Sm_Plant_04.uemodel": 48,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Roof_Triangle_Large_Inverted.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Foundation_Med_02.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/SM_Dec_Barrel_of_Sandstone.uemodel": 2,
@@ -13680,6 +13863,7 @@
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Wall_Large_Windowframe.uemodel": 10,
     "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/Smelter/SK_Smelter_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Extended_Roof_Large_Shallow.uemodel": 11,
+    "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/TrainingDummy_01/SM_TrainingDummy_02.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/SM_BB_T2_Wall_Slanted_Shallow_Med_Inverted.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/SM_BB_T1_Roof_Triangle_Shallow_Med.uemodel": 10,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Floor_Small_01.uemodel": 2,
@@ -13936,7 +14120,7 @@
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier4/SM_BB_T4_Floor_Triangle_Med_02.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier3/SM_BB_T3_Extended_Beam_Thin_Large_Steep.uemodel": 7,
     "RSDragonwilds/Content/Art/Item/Resources/Arrow_Stack/SM_Bolt_Stack_01.uemodel": 2,
-    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Human_Napsack_01.uemodel": 7,
     "RSDragonwilds/Content/Art/Item/Resources/Generic_Spectral_Drop/SM_Generic_Spectral_Drop_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Ranged/HuntersShortbow_OakWood_2H_01/SM_HuntersShortbow_OakWood_2H_02.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Tool/Bucket_2H_01/SM_Bucket_2H_01.uemodel": 2,
@@ -13965,8 +14149,8 @@
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Weak_Black_Potion.uemodel": 15,
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Lesser_Pink_Potion.uemodel": 15,
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Lesser_Black_Potion.uemodel": 15,
-    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel": 3,
-    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Garou_Napsack_01.uemodel": 7,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Goblin_Napsack_01.uemodel": 7,
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Lesser_Red_Potion.uemodel": 15,
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Weak_Red_Potion.uemodel": 15,
     "RSDragonwilds/Content/Art/Item/Resources/Wardstone/SM_Wardstone.uemodel": 2,
@@ -13984,7 +14168,7 @@
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Garou_Arms.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Goblin_Legs.uemodel": 2,
     "RSDragonwilds/Content/Art/Item/Resources/Potions/SM_Lesser_White_Potion.uemodel": 15,
-    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel": 2,
+    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Head.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/SaradominTemple_Key/SM_TempleKey.uemodel": 2,
     "RSDragonwilds/Content/Art/Item/Resources/Gemstones/SM_Gemstone_Ruby_01.uemodel": 9,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Human_Rowboat/SM_Human_Rowboat_Bottle_01.uemodel": 3,
@@ -14029,6 +14213,10 @@
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Campsite/SM_Chopped_Ash_log_01.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Campsite/SM_Chopped_Blight_log_01.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Campsite/SM_Chopped_Oak_Log_02.uemodel": 6,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Agility_Bronze_Napsack_01.uemodel": 7,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Agility_Gold_Napsack_01.uemodel": 7,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Agility_Silver_Napsack_01.uemodel": 7,
+    "RSDragonwilds/Content/Art/Item/Resources/Napsack/SM_Agility_Napsack_01.uemodel": 7,
     "RSDragonwilds/Content/Art/Skeleton/Prop/Template/SM_Torch_01.uemodel": 10,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Gameplay/Quests/Main/TempFishingAssets/SM_Fish_Unusual_Trout_01.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Skill_Tomes/SM_Skill_Tome_Titan_Slayer.uemodel": 2,
@@ -14036,6 +14224,7 @@
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Skill_Tomes/SM_Skill_Tome_Fishing.uemodel": 2,
     "RSDragonwilds/Content/Art/Item/Resources/Shrimp/SM_Shrimp_Raw_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SM_Vault_Staff_01.uemodel": 3,
+    "RSDragonwilds/Content/Marketplace/AlchemistsHouse/Assets/Models/SM_Scroll_2.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Gemstones/SM_Gemstone_Dragonstone_01.uemodel": 9,
     "RSDragonwilds/Content/Art/Item/Resources/Sandstone/SM_GypsumRock_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Cactus_Steak/SM_Cactus_Steak_01.uemodel": 3,
@@ -14046,7 +14235,6 @@
     "RSDragonwilds/Content/Art/Item/Resources/Leather/SM_Scorch_Leather_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Planks/SM_Plank_Yew_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Thread/SM_Desert_Thread_01.uemodel": 4,
-    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Skeleton/NPC/Humanoid/M_MED_Black_Knight_Melee_01/SK_M_MED_Black_Knight_Melee_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_LRG_Beast_Thane_01/SK_M_LRG_Beast_Thane_02.uemodel": 6,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_LRG_Beast_Thane_Shield_01/SM_M_LRG_Beast_Thane_Shield_01.uemodel": 4,
@@ -14111,6 +14299,7 @@
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/U_MED_Skeleton_Human_Mage_01/SK_U_MED_Skeleton_Human_Mage_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/U_MED_Skeleton_Human_Warrior_01/SK_U_MED_Skeleton_Human_Warrior_01.uemodel": 2,
     "RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Mechanical/M_LRG_Big_Xil_01/SK_M_LRG_Big_Xil_01.uemodel": 2,
+    "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/TrainingDummy_01/SK_TrainingDummy_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Botanical/WildJadeVine_01/SK_WildJadeVine_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Botanical/WildJadeVine_01/SM_WildJadeVine_Leaves.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Creatures/WolfElite_01/SK_WolfElite_01.uemodel": 3,
@@ -14120,25 +14309,33 @@
     "RSDragonwilds/Content/Art/Item/Resources/Boulders/SM_Small_Boulder_02.uemodel": 4,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/M_MED_Zombie_01/SK_M_MED_Zombie_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Skeleton/NPC/Creatures/Wolf_Hellhound_01/SK_Wolf_Hellhound_02.uemodel": 5,
+    "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Agility_Flag/SM_Agility_Flag.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel": 15,
+    "RSDragonwilds/Content/Marketplace/MultiplayerCraftingSystem/StaticMeshs/SM_Cube.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_02v1.uemodel": 2,
+    "RSDragonwilds/Content/Art/Env/Architecture/Scorned/Kebbit_Burrow/SM_Kebbit_Burrow_01v1.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Rune_Essence_Geyser/SM_Rune_Essence_Geyser.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Base_01v2.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Logo_01v2.uemodel": 6,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Ranged/Arrows/SM_ArrowBody_Wood_02.uemodel": 2,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel": 58,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_01.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Sapling_02.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_01.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Willow/SM_FH_Willow_Sapling_01.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Willow/SM_FH_Willow_Sapling_02.uemodel": 54,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_01_Components/SM_BM_Ash_Tree_01_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_02.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_02_Components/SM_BM_Ash_Tree_02_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_03.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_03_Components/SM_BM_Ash_Tree_03_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel": 59,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel": 59,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_02.uemodel": 59,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_02_Components/SM_BM_Oak_Tree_02_stump.uemodel": 59,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_01_Components/SM_BM_Ash_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_02_Components/SM_BM_Ash_Tree_02_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_Ash_Tree_03.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/BM_Ash_03_Components/SM_BM_Ash_Tree_03_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_01_Components/SM_BM_Oak_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/BM_OakTree_02_Components/SM_BM_Oak_Tree_02_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Bronze_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Gold_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/AgilityMedal/SM_Agility_Medal_Silver_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Storage/SM_Lumber_Storage_01.uemodel": 3,
     "RSDragonwilds/Content/Art/BaseBuilding/Crafting/SM_WeaponcraftingBench_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Env/Base_Building/Furniture/Cosiness/Window_Box/SM_Window_Box_01v1.uemodel": 2,
@@ -14204,7 +14401,6 @@
     "RSDragonwilds/Content/Art/Env/Landscape/Rocks/Withering/SM_WitherSpines_03.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/Landscape/Rocks/Withering/SM_WitherSpines_04.uemodel": 7,
     "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel": 15,
-    "RSDragonwilds/Content/Marketplace/MultiplayerCraftingSystem/StaticMeshs/SM_Cube.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Nightmare_Entrance_01/SM_Nightmare_Entrance_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Misc/Dungeon/Meshes/Refactor/SM_DungeonBrickDoor.uemodel": 9,
     "RSDragonwilds/Content/Art/Env/Misc/Dungeon/Meshes/Refactor/SM_DungeonDoor.uemodel": 12,
@@ -14220,21 +14416,21 @@
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Campsite/SM_Campfire_01_Ashes.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Campsite/SM_Campfire_01_Logs.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Garou_Props/Garou_Camp/Garou_Fire/SM_Garou_Firepit_Medium_01.uemodel": 2,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Sapling_01.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Sapling_02.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_01.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_01_Components/SM_FH_Ash_Tree_01_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_02.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_02_Components/SM_FH_Ash_Tree_02_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_03.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_03_Components/SM_FH_Ash_Tree_03_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_01.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_02.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_03.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_01.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/FH_OakTree_01_Components/SM_FH_Oak_Tree_01_stump.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_02.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/FH_OakTree_02_Components/SM_FH_Oak_Tree_02_stump.uemodel": 58,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Sapling_01.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Sapling_02.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_01_Components/SM_FH_Ash_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_02_Components/SM_FH_Ash_Tree_02_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_03.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/FH_Ash_03_Components/SM_FH_Ash_Tree_03_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_FH_Ash_Tree_Bare_03.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/FH_OakTree_01_Components/SM_FH_Oak_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_FH_Oak_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/FH_OakTree_02_Components/SM_FH_Oak_Tree_02_stump.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Willow/SM_Willow_01.uemodel": 55,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Willow/Willow_01_Components/SM_Willow_01_stump.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Willow/SM_Willow_02.uemodel": 55,
@@ -14266,8 +14462,8 @@
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Melee/GreatSword_Iron_2H_01/SK_GreatSword_Iron_2H_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Base_01v3.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Logo_01v3.uemodel": 6,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_03.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_03_Components/SM_GF_Ash_Tree_03_stump.uemodel": 60,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_03.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_03_Components/SM_GF_Ash_Tree_03_stump.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Misc/Dungeon/Meshes/Refactor/SM_DungeonR_Floor2x2.uemodel": 9,
     "RSDragonwilds/Content/Art/Skeleton/Prop/Template/SK_Sword_01.uemodel": 10,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Rune_Essence_Geyser/SM_Rune_Essence_04_Dynamic.uemodel": 3,
@@ -14306,14 +14502,17 @@
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Architecture/DowdunReach/Nexus/SM_DR_Nexus_Plinth_01.uemodel": 21,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Architecture/DowdunReach/Nexus/SM_Dreamstone_Hero_Broken.uemodel": 19,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Architecture/DowdunReach/Nexus/SM_Dreamstone_Hero_Whole.uemodel": 19,
+    "RSDragonwilds/Content/Art/Skeleton/NPC/Avian/FenkenChicken_01/SK_FenkenChicken_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Skeleton/NPC/Humanoid/M_MED_Zamorak_Mage_01/SM_M_MED_Zamorak_Mage_Dead_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_Papers_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Skeleton/Weapons/Faction/M_MED_Zamorak_Mage_Grimoire_1H_01/SM_M_MED_Zamorak_Mage_Grimoire_1H_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/Death_01/SK_Death_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/Doric_01/SK_Doric_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Faction/M_MED_Beast_Druid/SK_M_MED_Beast_Elder.uemodel": 9,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Lore_Book/SM_DR_Scroll_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Fenkenstrain/SM_Fenkenstrain_Jar.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Examination_Table/SM_Lightning_Bottle.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Dragonkin_Props/Vault/Statues/SM_Dragonkin_Statue_02v3.uemodel": 23,
-    "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/Orb_Stand/SM_Orb_Stand_Idle_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Narrative_Props/SaradominTemple_Statue/SM_SaradominTemple_Statue_01_v3.uemodel": 7,
     "RSDragonwilds/Content/Art/Item/Resources/Jewelers_Box_Open/SM_OpenJewelers_Box1.uemodel": 2,
     "RSDragonwilds/Content/Art/Item/Resources/Jewelers_Box_Open/SM_OpenJewelers_Box_Floor.uemodel": 2,
@@ -14342,7 +14541,7 @@
     "RSDragonwilds/Content/Art/VFX/Library/Env/Water/SM_VFX_Waterfall_VerySmall.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/WiseOldMan_01/SK_WiseOldMan_Cape_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/WiseOldMan_01/SK_WiseOldMan_01.uemodel": 6,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_GF_Red_Bush_01_A.uemodel": 49,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_GF_Red_Bush_01_A.uemodel": 48,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Humanoid/Zanik_01/SK_Zanik_01.uemodel": 7,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Tool/EyeOfOculus_01/SM_EyeOfOculus_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Mining_Nodes/Coal/SM_Mining_None_Large_Coal_01.uemodel": 2,
@@ -14430,9 +14629,9 @@
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Rune_Essence_Geyser/SM_Rune_Essence_02_Dynamic.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Rune_Essence_Geyser/SM_Rune_Essence_03_Dynamic.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Architecture/Dragonkin/Dragon_Arena/Dragon_Arena_Fuzan/SM_BossArena_Fuzan.uemodel": 5,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Sapling_01.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Sapling_02.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_02.uemodel": 58,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Sapling_01.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Sapling_02.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_BM_Oak_Tree_Sapling_02.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Yew/YewComponents/Yew_01/SM_Yew_01_canopy.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Logo_01v1.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/God_Statue/SM_God_Statue_Base_01v1.uemodel": 6,
@@ -14440,9 +14639,9 @@
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Staff/SK_Vault_Staff_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Shields/Kite_PoisonDragonfire_1H_01/SK_Kite_PoisonDragonfire_1H_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Skeleton/NPC/Mechanical/Vault_Guardian_Melee_01/SM_VaultGuardian_Melee_01_SM_VG_Base.uemodel": 3,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_01.uemodel": 50,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_02.uemodel": 50,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_03.uemodel": 50,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_01.uemodel": 49,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_02.uemodel": 49,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Woodlands/SM_Branches_03.uemodel": 49,
     "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Bone.uemodel": 14,
     "RSDragonwilds/Content/Art/Item/Resources/Cabbage/SM_Cabbage_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_OreNode_Clay.uemodel": 15,
@@ -14456,6 +14655,7 @@
     "RSDragonwilds/Content/Art/Item/Resources/Herbs/Toadflax/SM_Toadflax.uemodel": 12,
     "RSDragonwilds/Content/Art/VFX/Library/Env/Fellhollow/Withering/SpectralDoor/SM_VFX_SpectralDoor.uemodel": 2,
     "RSDragonwilds/Plugins/GameFeatures/FutureMajorVersion/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_Spectral_Room.uemodel": 2,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Observer_01/SM_Vault_Observer_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Skeleton/Weapons/Tool/LoggingAxe_Refined_2H_01/SM_SpectralLoggingAxe_Refined_2H_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Floor_Trap_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Spike_Floor_Trap_Door_64_01.uemodel": 3,
@@ -14477,12 +14677,12 @@
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Doors/SM_DR_Vaulted_Ceiling_12x12_Doorway_Double_Door_R_01.uemodel": 2,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Doors/SM_DR_Vaulted_Ceiling_12x12_Doorway_Double_Door_L_01.uemodel": 2,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Doors/SM_Dowdun_Wall_Arch_8x10_Doorway_02.uemodel": 3,
-    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Observer_01/SM_Vault_Observer_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Shock_Ray_01/SM_Vault_Shock_Ray_01.uemodel": 3,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Statues/SM_DR_Statue_LibraryBase_Door_A_01.uemodel": 2,
     "RSDragonwilds/Plugins/GameFeatures/DowdunReach/Content/Art/Env/Props/Env_Props/Interior/SM_Sconce_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Lane/SM_Vault_2m_Lane_01.uemodel": 4,
     "RSDragonwilds/Content/Marketplace/MultiplayerCraftingSystem/StaticMeshs/SM_Workbench_Table.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Env_Props/Human_Props/Graves/SM_Coffin_Wooden_Closed.uemodel": 4,
     "RSDragonwilds/Content/Art/Item/Resources/Irit_Plant/SM_Irit_Leaf_01.uemodel": 2,
     "RSDragonwilds/Content/Art/Env/Architecture/Fellhollow/Death_Temple/Temple_Chandelier_01/SM_Temple_Chandelier_01v1.uemodel": 6,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Dragonkin_Props/Vault/Lights/SM_Light_Source_02.uemodel": 23,
@@ -14495,17 +14695,22 @@
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_SM_Fire_Jet_Floor_Trap_16_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Fire_Jet_Floor_Trap_Cannon_16_01.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Fire_Jet_Floor_Trap_Door_16_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Fireball_trap/SM_Fireball_Trap.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Dart_Trap_01_v2.uemodel": 3,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Wall_Dart_Trap_01.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Flamethrower_Trap/SM_Flamethrower_Trap_01.uemodel": 4,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v4.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v2.uemodel": 3,
+    "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/SM_Caltrop_Spike_Trap/SM_Caltrop_Spike_Trap_01v1.uemodel": 4,
     "RSDragonwilds/Content/Art/Env/Misc/Dungeon/Meshes/Refactor/SM_DungeonDoorWall_ForPrefabs.uemodel": 11,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_01.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_01_Components/SM_GF_Ash_Tree_01_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_02.uemodel": 61,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_02_Components/SM_GF_Ash_Tree_02_stump.uemodel": 60,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_01.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/GF_OakTree_01_Components/SM_GF_Oak_Tree_01_stump.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_02.uemodel": 58,
-    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/GF_OakTree_02_Components/SM_GF_Oak_Tree_02_stump.uemodel": 58,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_01_Components/SM_GF_Ash_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/SM_GF_Ash_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Ash_Tree/GF_Ash_02_Components/SM_GF_Ash_Tree_02_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_01.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/GF_OakTree_01_Components/SM_GF_Oak_Tree_01_stump.uemodel": 54,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/SM_GF_Oak_Tree_02.uemodel": 55,
+    "RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Oak_Tree/GF_OakTree_02_Components/SM_GF_Oak_Tree_02_stump.uemodel": 54,
     "RSDragonwilds/Content/Art/Env/Props/Env_Props/Dragonkin_Props/Vault/Statues/SM_Dragonkin_Statue_02v1.uemodel": 23,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Gem_01/SM_Vault_Gem_01.uemodel": 5,
     "RSDragonwilds/Content/Art/Env/Props/Gameplay_Props/Vault_Traps/Vault_Mirror/SM_Vault_Mirror_Mid_Column_01.uemodel": 6,
