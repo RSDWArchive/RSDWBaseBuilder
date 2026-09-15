@@ -1,8 +1,8 @@
-Total meshes:               1892
-  with >=1 material:        1892
-  with no material JSON:    0
-  with >1 material slots:   1213
-Unique material JSONs:      1492
+Total meshes:               2036
+  with >=1 material:        2035
+  with no material JSON:    1
+  with >1 material slots:   1270
+Unique material JSONs:      1507
 
 Top 30 most-referenced materials:
     135  MI_Modular_Set_Tier_Trim                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim.json
@@ -18,9 +18,7 @@ Top 30 most-referenced materials:
     110  MI_Modular_Set_Tier1_Wall                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Wall.json
     109  MI_Modular_Set_Tier1_Extended_Roof                  RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Extended_Roof.json
     109  MI_Modular_Set_Tier1_Floor                          RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier1_Floor.json
-    109  MI_Modular_Set_Tier_Trim_DMG                        RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim_DMG.json
     109  MI_T1_Pallisade_Wall_01                             RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_T1_Pallisade_Wall_01.json
-    109  M_Green                                             RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/M_Green.json
     101  MI_Modular_Set_Tier2_Floor                          RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Floor.json
     101  MI_Modular_Set_Tier2_Foundation                     RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Foundation.json
     101  MI_Modular_Set_Tier2_Roof                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Roof.json
@@ -28,22 +26,24 @@ Top 30 most-referenced materials:
     101  MI_Modular_Set_Tier2_Wall                           RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_Modular_Set_Tier2_Wall.json
     101  MI_T2_Pallisade_Wall_01                             RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/Materials/MI_T2_Pallisade_Wall_01.json
     101  lambert1                                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier2/lambert1.json
-     65  MI_Ash_Branches                                     RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_Ash_Branches.json
-     62  MI_BM_AshTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Leaves.json
-     62  MI_BM_AshTree_Segments                              RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Segments.json
-     62  MI_BM_AshTree_Trunk                                 RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Trunk.json
-     62  MI_BM_Fallen_Log                                    RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_Fallen_Log.json
-     62  MI_BM_OakTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves.json
-     62  MI_BM_OakTree_Leaves_Saplings                       RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves_Saplings.json
+     67  MI_Ash_Branches                                     RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_Ash_Branches.json
+     64  MI_BM_AshTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Leaves.json
+     64  MI_BM_AshTree_Segments                              RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Segments.json
+     64  MI_BM_AshTree_Trunk                                 RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_AshTree_Trunk.json
+     64  MI_BM_Fallen_Log                                    RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_Fallen_Log.json
+     64  MI_BM_OakTree_Leaves                                RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves.json
+     64  MI_BM_OakTree_Leaves_Saplings                       RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTree_Leaves_Saplings.json
+     64  MI_BM_OakTrunk                                      RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BM_OakTrunk.json
+     64  MI_BloodwoodTree_Leaves                             RSDragonwilds/Content/Art/Env/Landscape/Foliage/Trees/Materials/MI_BloodwoodTree_Leaves.json
 
 Bottom 10 least-referenced:
-      1  MI_Kalphite_Queen_Flier_02                          RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Insectoid/Kalphite_Queen_Flier_01/Materials/MI_Kalphite_Queen_Flier_02.json
-      1  MI_Kalphite_Soldier_01                              RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Insectoid/Kalphite_Soldier_01/Materials/MI_Kalphite_Soldier_01.json
-      1  MI_Kalphite_Worker_01                               RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Insectoid/Kalphite_Worker_01/Materials/MI_Kalphite_Worker_01.json
-      1  MI_Kalphite_Worker_Eyes_01                          RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Insectoid/Kalphite_Worker_01/Materials/MI_Kalphite_Worker_Eyes_01.json
+      1  MI_Vulture_01                                       RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Avian/Vulture_01/Materials/MI_Vulture_01.json
+      1  MI_Goat_01                                          RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Creatures/Goat_01/Materials/MI_Goat_01.json
+      1  MI_Kebbit_03                                        RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Creatures/Kebbit_03/Materials/MI_Kebbit_03.json
+      1  MI_Icthlarin_body_01                                RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Humanoid/Icthlarin_01/Materials/MI_Icthlarin_body_01.json
+      1  MI_Icthlarin_outfit_01                              RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Humanoid/Icthlarin_01/Materials/MI_Icthlarin_outfit_01.json
+      1  MI_M_MED_KotHaar_Ket_01                             RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Humanoid/M_MED_KotHaar_Ket_01/Materials/MI_M_MED_KotHaar_Ket_01.json
+      1  MI_M_MED_KotHaar_Xil_01                             RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Humanoid/M_MED_KotHaar_Xil_01/Materials/MI_M_MED_KotHaar_Xil_01.json
       1  MI_M_LRG_Big_Xil_01                                 RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Mechanical/M_LRG_Big_Xil_01/Materials/MI_M_LRG_Big_Xil_01.json
       1  MI_M_LRG_Big_Xil_Back_01                            RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Mechanical/M_LRG_Big_Xil_01/Materials/MI_M_LRG_Big_Xil_Back_01.json
-      1  MI_Dragon_Lesser_Red_Body                           RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Reptilian/Dragon_Lesser_Red_01/Materials/MI_Dragon_Lesser_Red_Body.json
-      1  MI_Dragon_Lesser_Red_Head                           RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Reptilian/Dragon_Lesser_Red_01/Materials/MI_Dragon_Lesser_Red_Head.json
-      1  MI_Dragon_Lesser_Red_Wings_01                       RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/NPC/Reptilian/Dragon_Lesser_Red_01/Materials/MI_Dragon_Lesser_Red_Wings_01.json
       1  MI_Chakrams_Kothaar_1H_01                           RSDragonwilds/Plugins/GameFeatures/UmbralSands/Content/Art/Skeleton/Weapons/Faction/Chakrams_Kothaar_1H_01/Materials/MI_Chakrams_Kothaar_1H_01.json

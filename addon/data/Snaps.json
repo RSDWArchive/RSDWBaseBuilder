@@ -1,6 +1,6 @@
 {
-  "count": 711,
-  "no_plugs": 43,
+  "count": 771,
+  "no_plugs": 42,
   "pieces": {
     "BP_BaseBuilding_ArcheryTarget_C": {
       "piece_tag": "",
@@ -2511,6 +2511,2020 @@
       ]
     },
     "BP_BaseBuilding_Decoration_Coffin_02_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_Hills_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_LakeFlora_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_Swamp_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_Swamp_Toxic_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_Swamp_Toxic_Night_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Brynmoor_Valley_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Approach_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Courtyard_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Crystal_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Halls_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Library_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_DowdunReach_Temple_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_FellHollow_Arena_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_FellHollow_Imaru_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Caves_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Forest_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Highlands_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Meadows_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Toxic_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_Ghornfell_Water_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_UmbralSands_Arena_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_UmbralSands_Landscape_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_UmbralSands_Pit_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_UmbralSands_Ruins_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Painting_UmbralSands_Tower_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Pet_Chinchompa_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Pet_Dog_Muncher_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Abyssal_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_BlackDragon_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_BlueDragon_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_CarnivChinchompa_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_DireWolf_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_DragonWolf_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_GreenDragon_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_HellRat_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_KalphiteGuardian_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_KalphiteQueenWinged_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_KalphiteQueen_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_KalphiteSoldier_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_KalphiteWorker_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_RedDragon_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_RotriddenCow_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_RotriddenRat_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_RotswornZombie_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Skeleton_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Skeletons_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Terrorbird_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Wolf_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_ZogreHand_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_ZogreInfinity_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_Zogre_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_ZombieCow_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_DeluxeEdition_Trophy_ZombieRat_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -9274,6 +11288,196 @@
         }
       ]
     },
+    "BP_BaseBuilding_Decoration_UmS_Perch_Falcon_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_UmS_Perch_Magpie_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_UmS_Perch_Magpie_Spectral_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_UmS_Perch_Raven_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_UmS_Perch_Vulture_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
     "BP_BaseBuilding_Drink_Infusion_Blue_C": {
       "piece_tag": "",
       "plugs": [
@@ -9996,7 +12200,7 @@
         }
       ]
     },
-    "BP_BaseBuilding_LumberStorage_C": {
+    "BP_BaseBuilding_LougrimMemorialStone_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -10034,7 +12238,7 @@
         }
       ]
     },
-    "BP_BaseBuilding_Mug_C": {
+    "BP_BaseBuilding_LumberStorage_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -10149,6 +12353,44 @@
       ]
     },
     "BP_BaseBuilding_PersonalChest_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_PetBase_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -10836,44 +13078,6 @@
       ]
     },
     "BP_BaseBuilding_TrainingDummy_C": {
-      "piece_tag": "",
-      "plugs": [
-        {
-          "piece_ign": [
-            "BaseBuilding.PieceType.Window",
-            "BaseBuilding.PieceType.Prop",
-            "BaseBuilding.PieceType.None",
-            "BaseBuilding.PieceType.Foundation",
-            "BaseBuilding.PieceType.Door",
-            "BaseBuilding.PieceType.Beam",
-            "BaseBuilding.PieceType.Base"
-          ],
-          "piece_tag": "None",
-          "plug_ign": [
-            "BaseBuilding.PlugType.Surface",
-            "BaseBuilding.PlugType.None",
-            "BaseBuilding.PlugType.Hinge",
-            "BaseBuilding.PlugType.BeamSurface",
-            "BaseBuilding.PlugType.Beam",
-            "BaseBuilding.PlugType.BaseBeam",
-            "BaseBuilding.PlugType.Base"
-          ],
-          "plug_tag": "BaseBuilding.PlugType.Surface",
-          "pos": [
-            0.0,
-            0.0,
-            0.0
-          ],
-          "rot": [
-            0.0,
-            0.70710677,
-            0.0,
-            0.70710677
-          ]
-        }
-      ]
-    },
-    "BP_BaseBuilding_Vase_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -13426,6 +15630,44 @@
             0.0,
             0.0,
             1.0
+          ]
+        }
+      ]
+    },
+    "BP_Station_Spinning_Wheel_Advanced_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
           ]
         }
       ]
@@ -31737,6 +33979,188 @@
             0.0,
             -43.30127,
             37.5
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    "BP_T1_Roof_Thatch_Medium_Triangle_Shallow_Inverted_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Base",
+          "pos": [
+            0.0,
+            86.60254,
+            37.5
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.BaseBeam",
+          "pos": [
+            37.5,
+            21.65063,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Base",
+          "pos": [
+            75.0,
+            -43.30127,
+            -37.5
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.BaseBeam",
+          "pos": [
+            -37.5,
+            21.65063,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Base",
+          "pos": [
+            -75.0,
+            -43.30127,
+            -37.5
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Prop"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.HingeLarge",
+            "BaseBuilding.PlugType.WindowStatic"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.BaseBeam",
+          "pos": [
+            0.0,
+            -43.30127,
+            -37.5
           ],
           "rot": [
             0.0,
@@ -112522,5 +114946,5 @@
       ]
     }
   },
-  "scanned": 754
+  "scanned": 813
 }

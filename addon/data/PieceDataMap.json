@@ -1,8 +1,8 @@
 {
   "schema": "RSDWBaseBuilder.PieceDataMap.v1",
-  "count": 769,
+  "count": 718,
   "catalog_entries": 772,
-  "missing_archive_metadata": 0,
+  "missing_archive_metadata": 51,
   "missing_buildable_actor": 1,
   "shared_bp_class_count": 2,
   "shared_bp_classes": {
@@ -304,38 +304,6 @@
       "piece_data_index": 449,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Coffin_02.DA_BaseBuilding_Decoration_Coffin_02"
     },
-    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_01_C": {
-      "piece_data_index": 0,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_01.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_01"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_02_C": {
-      "piece_data_index": 414,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_02.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_02"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Gargoyle_03_C": {
-      "piece_data_index": 156,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_03.DA_BaseBuilding_Decoration_Dragonkin_Gargoyle_03"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_01_C": {
-      "piece_data_index": 95,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_01.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_01"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_02_C": {
-      "piece_data_index": 739,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_02.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_02"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Obelisk_03_C": {
-      "piece_data_index": 73,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Obelisk_03.DA_BaseBuilding_Decoration_Dragonkin_Obelisk_03"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Statue_01v1_C": {
-      "piece_data_index": 458,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Statue_01v1.DA_BaseBuilding_Decoration_Dragonkin_Statue_01v1"
-    },
-    "BP_BaseBuilding_Decoration_Dragonkin_Statue_02v1_C": {
-      "piece_data_index": 373,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Dragonkin_Statue_02v1.DA_BaseBuilding_Decoration_Dragonkin_Statue_02v1"
-    },
     "BP_BaseBuilding_Decoration_Fishing_Trophy_01_C": {
       "piece_data_index": 16,
       "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_01.DA_BaseBuilding_Decoration_Fishing_Trophy_01"
@@ -372,18 +340,6 @@
       "piece_data_index": 569,
       "piece_data_name": "BuildingPieceData /Fishing/Gameplay/BaseBuilding/BuildingPieces/Fishing/DA_BaseBuilding_Decoration_Fishing_Trophy_09.DA_BaseBuilding_Decoration_Fishing_Trophy_09"
     },
-    "BP_BaseBuilding_Decoration_Fishing_Trophy_10_C": {
-      "piece_data_index": 567,
-      "piece_data_name": "BuildingPieceData /UmbralSands/Gameplay/Buildpieces/Decorations/Recipes/DA_BaseBuilding_Decoration_Fishing_Trophy_10.DA_BaseBuilding_Decoration_Fishing_Trophy_10"
-    },
-    "BP_BaseBuilding_Decoration_Fishing_Trophy_11_C": {
-      "piece_data_index": 54,
-      "piece_data_name": "BuildingPieceData /UmbralSands/Gameplay/Buildpieces/Decorations/Recipes/DA_BaseBuilding_Decoration_Fishing_Trophy_11.DA_BaseBuilding_Decoration_Fishing_Trophy_11"
-    },
-    "BP_BaseBuilding_Decoration_Fishing_Trophy_12_C": {
-      "piece_data_index": 403,
-      "piece_data_name": "BuildingPieceData /UmbralSands/Gameplay/Buildpieces/Decorations/Recipes/DA_BaseBuilding_Decoration_Fishing_Trophy_12.DA_BaseBuilding_Decoration_Fishing_Trophy_12"
-    },
     "BP_BaseBuilding_Decoration_Food_Bowl_Onions_C": {
       "piece_data_index": 99,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Bowl_Onions.DA_BaseBuilding_Decoration_Food_Bowl_Onions"
@@ -395,66 +351,6 @@
     "BP_BaseBuilding_Decoration_Food_Bowl_Stack_01_C": {
       "piece_data_index": 354,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Food/DA_BaseBuilding_Decoration_Food_Bowl_Stack_01.DA_BaseBuilding_Decoration_Food_Bowl_Stack_01"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Banner_Wall_C": {
-      "piece_data_index": 131,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Banner_Wall.DA_BaseBuilding_Decoration_Garou_Banner_Wall"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Drum_C": {
-      "piece_data_index": 695,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Drum.DA_BaseBuilding_Decoration_Garou_Drum"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_01_C": {
-      "piece_data_index": 764,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_01.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_01"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_02_C": {
-      "piece_data_index": 397,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_02.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_02"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_03_C": {
-      "piece_data_index": 263,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_03.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_03"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Hanging_Ornament_04_C": {
-      "piece_data_index": 584,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_04.DA_BaseBuilding_Decoration_Garou_Hanging_Ornament_04"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Hanging_Pelt_01_C": {
-      "piece_data_index": 532,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Hanging_Pelt_01.DA_BaseBuilding_Decoration_Garou_Hanging_Pelt_01"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Stool_C": {
-      "piece_data_index": 47,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Stool.DA_BaseBuilding_Decoration_Garou_Stool"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Trophy_01_C": {
-      "piece_data_index": 378,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_01.DA_BaseBuilding_Decoration_Garou_Trophy_01"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Trophy_02_C": {
-      "piece_data_index": 251,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_02.DA_BaseBuilding_Decoration_Garou_Trophy_02"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Trophy_03_C": {
-      "piece_data_index": 280,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_03.DA_BaseBuilding_Decoration_Garou_Trophy_03"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Trophy_04_C": {
-      "piece_data_index": 519,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Trophy_04.DA_BaseBuilding_Decoration_Garou_Trophy_04"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Tusks_01_C": {
-      "piece_data_index": 112,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_01.DA_BaseBuilding_Decoration_Garou_Tusks_01"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Tusks_02_C": {
-      "piece_data_index": 452,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_02.DA_BaseBuilding_Decoration_Garou_Tusks_02"
-    },
-    "BP_BaseBuilding_Decoration_Garou_Tusks_03_C": {
-      "piece_data_index": 245,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Garou/DA_BaseBuilding_Decoration_Garou_Tusks_03.DA_BaseBuilding_Decoration_Garou_Tusks_03"
     },
     "BP_BaseBuilding_Decoration_General_EarlyAdopterTapestry_C": {
       "piece_data_index": 80,
@@ -472,42 +368,6 @@
       "piece_data_index": 10,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_SawHorse.DA_BaseBuilding_Decoration_General_SawHorse"
     },
-    "BP_BaseBuilding_Decoration_General_Wood_Barrel_01_C": {
-      "piece_data_index": 461,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_01.DA_BaseBuilding_Decoration_General_Wood_Barrel_01"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Barrel_02_C": {
-      "piece_data_index": 375,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_02.DA_BaseBuilding_Decoration_General_Wood_Barrel_02"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Keg_C": {
-      "piece_data_index": 250,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_Keg.DA_BaseBuilding_Decoration_General_Wood_Barrel_Keg"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Barrel_Pile_C": {
-      "piece_data_index": 273,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Barrel_Pile.DA_BaseBuilding_Decoration_General_Wood_Barrel_Pile"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_C": {
-      "piece_data_index": 513,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Bin_Empty.DA_BaseBuilding_Decoration_General_Wood_Bin_Empty"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack_C": {
-      "piece_data_index": 121,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack.DA_BaseBuilding_Decoration_General_Wood_Bin_Empty_Stack"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Crate_Broken_C": {
-      "piece_data_index": 103,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Broken.DA_BaseBuilding_Decoration_General_Wood_Crate_Broken"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_C": {
-      "piece_data_index": 701,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed.DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed"
-    },
-    "BP_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack_C": {
-      "piece_data_index": 428,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/General/DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack.DA_BaseBuilding_Decoration_General_Wood_Crate_Sealed_Stack"
-    },
     "BP_BaseBuilding_Decoration_Grave_01_C": {
       "piece_data_index": 643,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/AncientDragonkin/DA_BaseBuilding_Decoration_Grave_01.DA_BaseBuilding_Decoration_Grave_01"
@@ -524,25 +384,13 @@
       "piece_data_index": 346,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan.DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan"
     },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing_C": {
-      "piece_data_index": 610,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Artisan_Standing"
-    },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_C": {
       "piece_data_index": 732,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack.DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack"
     },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing_C": {
-      "piece_data_index": 613,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Attack_Standing"
-    },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_C": {
       "piece_data_index": 82,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction.DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction"
-    },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing_C": {
-      "piece_data_index": 582,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Construction_Standing"
     },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_C": {
       "piece_data_index": 40,
@@ -551,14 +399,6 @@
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing_C": {
       "piece_data_index": 605,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing"
-    },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying_C": {
-      "piece_data_index": 483,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying.DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Laying"
-    },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open_C": {
-      "piece_data_index": 424,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open.DA_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Open"
     },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Generic_Standing_C": {
       "piece_data_index": 712,
@@ -576,49 +416,21 @@
       "piece_data_index": 19,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining.DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining"
     },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing_C": {
-      "piece_data_index": 693,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Mining_Standing"
-    },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_C": {
       "piece_data_index": 691,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged.DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged"
-    },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing_C": {
-      "piece_data_index": 163,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Ranged_Standing"
     },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_C": {
       "piece_data_index": 735,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting.DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting"
     },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing_C": {
-      "piece_data_index": 265,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Runecrafting_Standing"
-    },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_C": {
       "piece_data_index": 157,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting.DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting"
     },
-    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing_C": {
-      "piece_data_index": 577,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Literature/DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing.DA_BaseBuilding_Decoration_Literature_Book_Tome_Woodcutting_Standing"
-    },
     "BP_BaseBuilding_Decoration_Material_Anima_Wild_C": {
       "piece_data_index": 486,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Anima_Wild.DA_BaseBuilding_Decoration_Material_Anima_Wild"
-    },
-    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Granite_C": {
-      "piece_data_index": 738,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Granite.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Granite"
-    },
-    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone_C": {
-      "piece_data_index": 264,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Sandstone"
-    },
-    "BP_BaseBuilding_Decoration_Material_Basic_Barrel_Stone_C": {
-      "piece_data_index": 356,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Barrel_Stone.DA_BaseBuilding_Decoration_Material_Basic_Barrel_Stone"
     },
     "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Bin_01_C": {
       "piece_data_index": 209,
@@ -631,10 +443,6 @@
     "BP_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small_C": {
       "piece_data_index": 533,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small.DA_BaseBuilding_Decoration_Material_Basic_Blurite_Nugget_Small"
-    },
-    "BP_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01_C": {
-      "piece_data_index": 351,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01.DA_BaseBuilding_Decoration_Material_Basic_Clay_Bin_01"
     },
     "BP_BaseBuilding_Decoration_Material_Basic_Clay_Nugget_Medium_C": {
       "piece_data_index": 74,
@@ -855,18 +663,6 @@
     "BP_BaseBuilding_Decoration_Material_Vault_Shard_C": {
       "piece_data_index": 381,
       "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Materials/Basic/DA_BaseBuilding_Decoration_Material_Vault_Shard.DA_BaseBuilding_Decoration_Material_Vault_Shard"
-    },
-    "BP_BaseBuilding_Decoration_Plants_Potted_Dwellberry_C": {
-      "piece_data_index": 91,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Dwellberry.DA_BaseBuilding_Decoration_Plants_Potted_Dwellberry"
-    },
-    "BP_BaseBuilding_Decoration_Plants_Potted_Onion_C": {
-      "piece_data_index": 102,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Onion.DA_BaseBuilding_Decoration_Plants_Potted_Onion"
-    },
-    "BP_BaseBuilding_Decoration_Plants_Potted_Redberry_C": {
-      "piece_data_index": 741,
-      "piece_data_name": "BuildingPieceData /Game/Gameplay/BaseBuilding_New/BuildingPieces/Decorations/Plants/DA_BaseBuilding_Decoration_Plants_Potted_Redberry.DA_BaseBuilding_Decoration_Plants_Potted_Redberry"
     },
     "BP_BaseBuilding_Decoration_Plants_Potted_Wintumber_Tree_C": {
       "piece_data_index": 395,
