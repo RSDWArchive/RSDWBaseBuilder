@@ -1,6 +1,6 @@
 {
   "count": 1609,
-  "json_root": "E:\\Github\\RSDWArchive\\1.0.0.2\\json",
+  "json_root": "E:\\Github\\RSDWArchive\\1.0.0.5\\json",
   "mapping": {
     "BP_AI_Biped_Faction_Large_Base_C": "SK_M_LRG_Beast_Thane_02",
     "BP_AI_Biped_Faction_Melee_Base_C": "SK_M_MED_Beast_Berserker_01",
@@ -1104,7 +1104,7 @@
     "BP_Station_Smelter_C": "SK_Smelter_01",
     "BP_Station_Spinning_Wheel_Advanced_C": "SK_Spinning_Wheel_01",
     "BP_Station_Spinning_Wheel_C": "SK_Spinning_Wheel_01",
-    "BP_Station_Stonecutter_C": "SM_Placement",
+    "BP_Station_Stonecutter_C": "SK_Stonecutter_01",
     "BP_Station_Tanner_C": "SK_Tanning_Rack_01",
     "BP_Statue_InfrontOfBarrier_Switchable_Armadyl_C": "SM_God_Statue_Base_01v2",
     "BP_Statue_InfrontOfBarrier_Switchable_Guthix_C": "SM_God_Statue_Base_01v3",

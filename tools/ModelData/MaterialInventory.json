@@ -3,7 +3,7 @@
   "source": "E:\\Github\\RSDWBaseBuilder\\tools\\AssetLibrary\\asset_library_targets.json",
   "total_meshes": 2036,
   "meshes_with_material": 2035,
-  "unique_count": 1507,
+  "unique_count": 1508,
   "materials": [
     {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim.json",
@@ -1826,26 +1826,6 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Orange.json",
-      "stem": "MI_Orange",
-      "ref_count": 12,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Sagewort_Green.json",
-      "stem": "MI_Sagewort_Green",
-      "ref_count": 12,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
       "key": "RSDragonwilds/Content/Art/Env/Props/Env_Props/Dragonkin_Props/Vault/Materials/MI_Dragonkin_Statue_02v1.json",
       "stem": "MI_Dragonkin_Statue_02v1",
       "ref_count": 12,
@@ -2126,73 +2106,23 @@
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Copper.json",
-      "stem": "MI_Copper",
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Orange.json",
+      "stem": "MI_Orange",
       "ref_count": 11,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
       ]
     },
     {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Cream.json",
-      "stem": "MI_Cream",
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Sagewort_Green.json",
+      "stem": "MI_Sagewort_Green",
       "ref_count": 11,
       "sample_meshes": [
         "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Grey.json",
-      "stem": "MI_Grey",
-      "ref_count": 11,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_LevelDesignMarker_White.json",
-      "stem": "MI_LevelDesignMarker_White",
-      "ref_count": 11,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Opal.json",
-      "stem": "MI_Opal",
-      "ref_count": 11,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Gold.json",
-      "stem": "M_Gold",
-      "ref_count": 11,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
-      ]
-    },
-    {
-      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Granite.json",
-      "stem": "M_Granite",
-      "ref_count": 11,
-      "sample_meshes": [
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel",
-        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel"
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
       ]
     },
     {
@@ -2613,6 +2543,76 @@
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Wall_Vertical_Banner/SM_Wall_Vertical_Banner_Saradomin_01v2.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Wall_Vertical_Banner/SM_Wall_Vertical_Banner_Bandos_01v2.uemodel",
         "RSDragonwilds/Content/Art/Env/Base_Building/Decorations/Banners/Wall_Vertical_Banner/SM_Wall_Vertical_Banner_Bandos_02v2.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Copper.json",
+      "stem": "MI_Copper",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Cream.json",
+      "stem": "MI_Cream",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Grey.json",
+      "stem": "MI_Grey",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_LevelDesignMarker_White.json",
+      "stem": "MI_LevelDesignMarker_White",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/MI_Opal.json",
+      "stem": "MI_Opal",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Gold.json",
+      "stem": "M_Gold",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
+      ]
+    },
+    {
+      "key": "RSDragonwilds/Content/Art/Env/LevelDesign/District1/Materials/M_Granite.json",
+      "stem": "M_Granite",
+      "ref_count": 10,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Opal.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Rock_Formation_01.uemodel",
+        "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Dragon_Head.uemodel"
       ]
     },
     {
@@ -10058,6 +10058,14 @@
       ]
     },
     {
+      "key": "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/Stonecutter/MI_Stonecutter_01.json",
+      "stem": "MI_Stonecutter_01",
+      "ref_count": 1,
+      "sample_meshes": [
+        "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/Stonecutter/SK_Stonecutter_01.uemodel"
+      ]
+    },
+    {
       "key": "RSDragonwilds/Content/Art/Env/Base_Building/Crafting_Stations/T2_Cooking_Station/MI_T2_Cooking_Station.json",
       "stem": "MI_T2_Cooking_Station",
       "ref_count": 1,
@@ -14309,7 +14317,6 @@
     "RSDragonwilds/Content/Art/Item/Resource/Key/SM_BossSoul_Inner_OuterDungeon.uemodel": 2,
     "RSDragonwilds/Content/Art/Item/Resources/Anima_Wild/SM_Anima_Wild_01.uemodel": 3,
     "RSDragonwilds/Content/Art/Item/Resources/Challenge_Horn/SM_ChallengeHorn.uemodel": 3,
-    "RSDragonwilds/Content/Art/Env/LevelDesign/District1/BlockoutMeshes/SM_BO_Ash_Branch.uemodel": 9,
     "RSDragonwilds/Content/Art/Item/Resources/Ingots/SM_Ingot_Adamantite_01.uemodel": 9,
     "RSDragonwilds/Content/Art/Item/Resources/Ores/SM_Adamantite_Ore_Small_01.uemodel": 18,
     "RSDragonwilds/Content/Art/Item/Resources/Ingots/SM_Blurite_01.uemodel": 9,
