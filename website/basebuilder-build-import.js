@@ -16,7 +16,6 @@ export function validateBuildImport(data) {
     }
   }
   if (!count) throw Error("This build contains no objects");
-  if (count > 100000) throw Error("Build exceeds the 100,000 object project limit");
 }
 
 export function relocateBuildState(state, pivot, destination) {
@@ -36,7 +35,6 @@ export function buildImportSnapshot(before, entries, { append, name, anchorEntry
     snapshot.unassigned_collection_collapsed = false; snapshot.anchor_piece_id = 0;
     snapshot.next_piece_id = 1; snapshot.next_ui_collection_id = 1;
   }
-  if (snapshot.placements.length + entries.length > 100000) throw Error("Combined build exceeds the 100,000 object project limit");
   const collectionId = `collection_${snapshot.next_ui_collection_id++}`;
   snapshot.ui_collections.push({ id: collectionId, name: String(name || "Imported Build").trim().slice(0, 200),
     order: snapshot.ui_collections.length, collapsed: false });

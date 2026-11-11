@@ -42,6 +42,19 @@ for (const mutate of invalid) {
 const empty = structuredClone(project);empty.build.placements = [];empty.build.selected_ids = [];empty.build.anchor_piece_id = 0;
 assert.deepEqual(validateProject(empty, catalog), empty);
 console.log(`Project documents: valid/empty/hidden-anchor/negative-scale round trips and ${invalid.length} nondestructive rejection cases passed`);
+
+const largeCount = 100_001;
+const large = structuredClone(project);
+const template = large.build.placements[0];
+large.build.placements = Array.from({length: largeCount}, (_, i) => ({...template,
+  id: `obj_${i + 1}`, metadata: {piece_id: i + 1}}));
+large.build.next_object_id = large.build.next_piece_id = largeCount + 1;
+assert.equal(validateProject(large, catalog, {copy: false}), large);
+const reopened = validateProject(JSON.parse(JSON.stringify(large)), catalog);
+assert.equal(reopened.build.placements.length, largeCount);
+assert.deepEqual(reopened.build.placements.at(-1), large.build.placements.at(-1));
+console.log("Project documents: save validation and JSON reopen above 100,000 placements passed");
+
 const legacy = structuredClone(project);
 legacy.schema = "RSDWBaseBuilder.Project.v1";
 legacy.workspace = { ...legacy.workspace.world_build, render_origin_cm: legacy.workspace.render_origin_cm,

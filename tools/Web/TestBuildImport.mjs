@@ -27,4 +27,15 @@ for (const bad of [null, {}, {schema: "rsdwtools.buildings.v1"}, {schema: "rsdwt
   {schema: "rsdwtools.buildings.v1", pieces: [{x: "100"}]}, {schema: "rsdwtools.buildings.v1", pieces: [{pitch: Infinity}]}]) {
   assert.throws(() => validateBuildImport(bad));
 }
-console.log("Build import: atomic snapshot, reserved IDs, collections, anchor, rigid yaw, validation passed");
+
+const largeCount = 100_001;
+validateBuildImport({schema: "rsdwtools.buildings.v1", pieces: Array(largeCount).fill(state)});
+const largeEntries = Array(largeCount).fill(entries[0]);
+const largeBuild = buildImportSnapshot(before, largeEntries, {append: false, name: "Large build"});
+assert.equal(largeBuild.placements.length, largeCount);
+assert.equal(largeBuild.placements.at(-1).metadata.piece_id, largeCount);
+const largeAppend = buildImportSnapshot(first, largeEntries.slice(first.placements.length), {append: true, name: "Large append"});
+assert.equal(largeAppend.placements.length, largeCount);
+assert.equal(largeAppend.anchor_piece_id, first.anchor_piece_id);
+assert.equal(new Set(largeAppend.placements.map(p => p.metadata.piece_id)).size, largeCount);
+console.log("Build import: atomic snapshot, reserved IDs, collections, anchor, rigid yaw, validation, and import/append above 100,000 passed");

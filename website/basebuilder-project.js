@@ -90,7 +90,7 @@ export function validateProject(document, catalog, { copy = true } = {}) {
   requireValue(typeof document.dataset.catalog_sha256 === "string" &&
     (document.dataset.world_sha256 === null || typeof document.dataset.world_sha256 === "string"), "Invalid dataset identity");
   const build = document.build, workspace = document.workspace;
-  requireValue(build && Array.isArray(build.placements) && build.placements.length <= 100000, "Invalid project placements");
+  requireValue(build && Array.isArray(build.placements), "Invalid project placements");
   requireValue(build.build_schema === "rsdwtools.buildings.v1", "Unsupported build schema");
   requireValue(typeof build.build_name === "string", "Invalid build name");
   requireValue(vector(workspace?.render_origin_cm), "Invalid render origin");
