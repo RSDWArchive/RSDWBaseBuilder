@@ -255,6 +255,12 @@ def _resolve_archive_asset_file(raw: Any, asset_root: Path, extensions: tuple[st
     for candidate in candidates:
         if candidate.is_file():
             return candidate.resolve()
+    # Same-directory data-asset rename used by newer building catalogs.
+    for candidate in candidates:
+        if candidate.suffix == ".json" and candidate.stem.startswith("DA_BaseBuilding_"):
+            renamed = candidate.with_name("BUILDPIECE_" + candidate.name)
+            if renamed.is_file():
+                return renamed.resolve()
     return None
 
 

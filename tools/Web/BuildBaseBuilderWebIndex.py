@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -29,6 +31,29 @@ def repo_root() -> Path:
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def compatible_catalog_hashes(previous: dict[str, Any], current: dict[str, Any]) -> list[str]:
+    """Only additive catalog updates may open existing world projects unchanged."""
+    if any(previous.get(k) != current.get(k) for k in ("schema", "version", "sources")):
+        return []
+    targets = {row["target_id"]: row for row in current["targets"]}
+    old_targets = previous.get("targets")
+    if not old_targets or any(targets.get(row["target_id"]) != row for row in old_targets):
+        return []
+    old_snaps, new_snaps = previous.get("snaps", {}), current.get("snaps", {})
+    for row in old_targets:
+        key = row.get("snap_class")
+        if key and old_snaps.get(key) != new_snaps.get(key):
+            return []
+    node = shutil.which("node")
+    if not node:
+        raise SystemExit("Node.js is required to preserve existing world-project catalog identities.")
+    # Match the browser's JSON.stringify exactly (not Python float/Unicode formatting).
+    script = "const fs=require('fs'),c=require('crypto');const v=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(c.createHash('sha256').update(JSON.stringify(v)).digest('hex'));"
+    result = subprocess.run([node, "-e", script], input=json.dumps(previous, ensure_ascii=True),
+                            text=True, encoding="utf-8", capture_output=True, check=True)
+    return sorted(set([result.stdout.strip(), *previous.get("compatible_catalog_sha256", [])]))
 
 
 def load_json(path: Path) -> Any:
@@ -320,6 +345,7 @@ def build_index(
     out_file: Path,
     bp_web_preview_root: Path | None = None,
     require_bp_web_previews: bool = False,
+    previous_indexes: list[Path] | None = None,
 ) -> dict[str, Any]:
     targets_doc = load_json(target_file)
     model_index = load_json(model_index_file)
@@ -454,6 +480,12 @@ def build_index(
     absolute_strings = _find_absolute_strings(out)
     if absolute_strings:
         raise SystemExit("Refusing to write web index with local absolute paths:\n  " + "\n  ".join(absolute_strings[:50]))
+    compatible = set()
+    for previous in dict.fromkeys([out_file, repo_root() / "website" / "basebuilder-index.json", *(previous_indexes or [])]):
+        if previous.is_file():
+            compatible.update(compatible_catalog_hashes(load_json(previous), out))
+    if compatible:
+        out["compatible_catalog_sha256"] = sorted(compatible)
     write_json(out_file, out)
     return out
 
@@ -467,6 +499,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", type=Path, default=root / "website" / "basebuilder-index.json")
     parser.add_argument("--bp-web-preview-root", type=Path, default=None)
     parser.add_argument("--require-bp-web-previews", action="store_true")
+    parser.add_argument("--previous-index", type=Path, action="append", default=[],
+                        help="Additional earlier index to verify for additive world-project compatibility.")
     return parser.parse_args()
 
 
@@ -479,6 +513,7 @@ def main() -> int:
         out_file=args.out.resolve(),
         bp_web_preview_root=args.bp_web_preview_root.resolve() if args.bp_web_preview_root else None,
         require_bp_web_previews=args.require_bp_web_previews,
+        previous_indexes=args.previous_index,
     )
     print(json.dumps({
         "out": str(args.out),

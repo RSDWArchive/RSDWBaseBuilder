@@ -90,6 +90,14 @@ def _archive_index_by_piece_data_name(archive_roots: list[tuple[Path, str]]) -> 
                     "archive_file": str(path).replace("\\", "/"),
                 }
                 break
+    # Some updates prefix a data asset with BUILDPIECE_ without changing its BP.
+    # Retain catalog identity and prefer an exact asset when both names exist.
+    for name, row in list(out.items()):
+        stem = row["asset_stem"]
+        if stem.startswith("BUILDPIECE_DA_"):
+            old_stem = stem.removeprefix("BUILDPIECE_")
+            alias = name.rsplit("/", 1)[0] + f"/{old_stem}.{old_stem}"
+            out.setdefault(alias, {**row, "asset_stem": old_stem})
     return out
 
 

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RSDW World Region</title>
+  <link rel="icon" href="../../../website/shared/assets/favicon_io/favicon.ico">
+  <link rel="stylesheet" href="./world.css">
+  <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.184.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.184.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <header>
+    <img src="../../../website/shared/assets/logo.png" alt="">
+    <strong>RSDW World Region</strong>
+    <span id="region-name">Fellhollow road &amp; ruins</span>
+    <span class="version">1.0.0.5 <span>Local prototype</span></span>
+  </header>
+  <main id="viewport" aria-label="World region viewport">
+    <div class="toolbar hud">
+      <fieldset id="layers"><legend>Layers</legend>
+        <label><input type="checkbox" data-layer="terrain" checked>Terrain</label>
+        <label><input type="checkbox" data-layer="trees" checked>Trees &amp; foliage</label>
+        <label><input type="checkbox" data-layer="buildings" checked>Buildings</label>
+        <label><input type="checkbox" data-layer="roads" checked>Roads</label>
+        <label><input type="checkbox" data-layer="scenery" checked>Scenery</label>
+        <label><input type="checkbox" data-layer="helpers">Blockouts</label>
+        <label><input type="checkbox" data-layer="bounds">Bounds</label>
+      </fieldset>
+      <div class="camera-controls">
+        <a id="world-link" href="?world=1">World</a>
+        <select id="view" aria-label="Camera viewpoint">
+          <option value="oblique">Oblique</option><option value="overhead">Overhead</option><option value="road">Road level</option>
+        </select>
+        <button id="frame" type="button" title="Frame the region">Frame Region</button>
+        <button id="bookmark" type="button">Save View</button>
+      </div>
+      <div id="world-browser" hidden>
+        <select id="world-biome" aria-label="World area"><option value="all">Whole world</option></select>
+        <select id="world-section" aria-label="World section"><option value="all">All sections</option></select>
+        <button id="world-load" type="button">Load Area</button>
+        <button id="world-overview" type="button">Area Overview</button>
+        <output id="world-status" role="status"></output>
+      </div>
+    </div>
+    <div id="loading" class="hud loading" role="status"><span id="phase">Reading region</span><progress id="progress" max="1" value="0"></progress></div>
+    <div id="error" class="hud error" role="alert" hidden></div>
+    <footer class="viewport-footer">
+      <div class="hud coordinates"><output id="coordinates">X -- Y -- Z --</output></div>
+      <div class="hud stats"><output id="stats">Preparing scene</output></div>
+    </footer>
+  </main>
+  <script type="module" src="./world.js"></script>
+</body>
+</html>

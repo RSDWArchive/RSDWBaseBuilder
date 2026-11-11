@@ -33,7 +33,7 @@ FISHING_FMODEL_SOURCE_ROOT = Path(r"C:/Users/NZXT/Desktop/RSDW_Modding/FModel/Fi
 LIBRARY_ROOT = REPO / "_build" / "extension"
 OUT_FILE = REPO / "tools" / "AssetLibrary" / "catalog_asset_targets.json"
 CUT_LIST_FILE = REPO / "tools" / "AssetLibrary" / "catalog_blends_to_cut.txt"
-BPMAP_FILE = REPO / "data" / "BPMap.json"
+BPMAP_FILE = REPO / "tools" / "ModelData" / "BPMap.json"
 ARCHIVE_JSON_ROOT = Path(r"E:/Github/RSDWArchive/0.11.2.2/json")
 TEXTURE_EXTENSIONS = {".png", ".tga", ".dds", ".jpg", ".jpeg", ".exr", ".bmp", ".hdr", ".webp"}
 

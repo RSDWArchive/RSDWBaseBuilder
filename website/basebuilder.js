@@ -1,3 +1,8 @@
+import { editorTransformFromJson, serializeBuildingJson } from "./basebuilder-serialization.js";
+import { validateBuildImport, buildImportSnapshot, relocateBuildState } from "./basebuilder-build-import.js";
+import { createInstanceStore } from "./basebuilder-instances.js";
+import { createSelectionOutline } from "./basebuilder-selection-outline.js";
+import { prepareStaticPoses, staticPoseGeometry, prepareEditablePoseRaycasts, disposeClonedSkeletons } from "./basebuilder-static-pose.js";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
@@ -12,18 +17,27 @@ import {
   UNIT_SCALE,
   componentTransformToThreeMatrix4,
   distanceSquared,
-  exportTransform,
   matrixTranslation,
   normalizeTransform,
+  normalizeDegrees,
   plugWorldMatrix,
   roundValue,
   threeVectorToUe,
+  ueTransformToThreeMatrix4,
   updateObjectFromState,
   updateStateFromObject,
 } from "./basebuilder-transforms.js";
 
 (function () {
   "use strict";
+
+  const WORLD_AVAILABLE = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+  const INITIAL_WORLD_REQUESTED = WORLD_AVAILABLE && new URLSearchParams(location.search).get("world") === "1";
+  let WORLD_MODE = false;
+  const PERFORMANCE_LEGACY = isLocalHost() && new URLSearchParams(location.search).get("performance") === "legacy";
+  const INSTANCE_CELL_CM = (isLocalHost() ? Math.max(16, Math.min(64, Number(new URLSearchParams(location.search).get("instanceCell")) || 64)) : 64) * 100;
+  let worldWorkspace = null;
+  let worldAuthoredBounds = null;
 
   const CONFIG_URL = "./data.config.json";
   const INDEX_URL = "./basebuilder-index.json";
@@ -38,7 +52,6 @@ import {
   const GIZMO_SCALE_SNAP = 0.1;
   const UNDO_LIMIT = 50;
   const GLTF_PRELOAD_CONCURRENCY = 8;
-  const IMPORT_RENDER_BATCH_SIZE = 100;
   const PLACED_LIST_LIMIT = 500;
   const UNASSIGNED_COLLECTION_ID = "";
   const SPATIAL_CELL_SIZE_CM = 1000;
@@ -66,7 +79,6 @@ import {
   const GROUND_GRID_MIN_DIVISIONS = 40;
   const GROUND_GRID_MAX_DIVISIONS = 240;
   const GROUND_GRID_Y = -0.001;
-  const INSTANCE_INITIAL_CAPACITY = 64;
   const SELECTION_PROMOTION_LIMIT = 250;
   const SHOW_ICON_URL = "./shared/assets/ShowHide/Show.png";
   const HIDE_ICON_URL = "./shared/assets/ShowHide/Hide.png";
@@ -167,6 +179,8 @@ import {
     collectionDialogField: document.getElementById("collection-dialog-field"),
     collectionDialogLabel: document.getElementById("collection-dialog-label"),
     collectionDialogInput: document.getElementById("collection-dialog-input"),
+    collectionDialogChoiceField: document.getElementById("collection-dialog-choice-field"),
+    collectionDialogChoice: document.getElementById("collection-dialog-choice"),
     collectionDialogCancel: document.getElementById("collection-dialog-cancel"),
     collectionDialogSecondary: document.getElementById("collection-dialog-secondary"),
     collectionDialogSubmit: document.getElementById("collection-dialog-submit"),
@@ -248,6 +262,7 @@ import {
   let selectionPivot = null;
   let pendingTransformUndo = null;
   let pendingTransformChanged = false;
+  const pendingSpatialUpdates = new Set();
   let activeGizmoMode = "";
   let gizmoSnapModifierActive = false;
   let duplicateNudgeModifierActive = false;
@@ -267,14 +282,16 @@ import {
   const targetVisualTemplateCache = new Map();
   const targetVisualResolvedCache = new Map();
   const targetInstanceTemplateCache = new Map();
-  const instanceBatches = new Map();
-  const promotedPlacementIds = new Set();
-  const placements = new Map();
+  let instanceStore = null;
+  let instanceStatsPending = false;
+  let promotedPlacementIds = new Set();
+  let placements = new Map();
   const referenceModels = new Map();
   const selectionBoxes = new Map();
+  let largeSelectionOutline = null;
   const referenceSelectionBoxes = new Map();
   const undoStack = [];
-  const spatialIndex = {
+  let spatialIndex = {
     cells: new Map(),
     placementCells: new Map(),
   };
@@ -390,7 +407,7 @@ import {
     if (els.gizmoHotkeys) els.gizmoHotkeys.hidden = gizmoHidden;
     if (els.previewHotkeys) els.previewHotkeys.hidden = !previewActive;
     if (els.previewPlaceLabel && previewActive) {
-      els.previewPlaceLabel.textContent = dragSession?.moveExisting ? "Release Move" : "Place Preview";
+      els.previewPlaceLabel.textContent = dragSession?.buildImport ? "Place Build" : dragSession?.moveExisting ? "Release Move" : "Place Preview";
     }
   }
 
@@ -853,8 +870,13 @@ import {
 
   function updateGroundGrid() {
     groundGridUpdateHandle = 0;
+    if (WORLD_MODE) { if (groundGrid) groundGrid.visible = false; return; }
     const box = placements.size ? buildPlacementsWorldBox() : null;
     installGroundGrid(groundGridMetricsForBox(box));
+    groundGrid.visible = true;
+    const height = ((worldWorkspace?.planeHeight() ?? viewOffset.z) - viewOffset.z) / 100;
+    groundGrid.position.y = height + GROUND_GRID_Y;
+    dragPlane.constant = -height;
     syncCameraRangeWithBox(box);
   }
 
@@ -872,6 +894,7 @@ import {
     camera.near = Math.max(0.01, Math.min(2, maxSize / 5000));
     camera.far = Math.max(1500, maxSize * 30, radius * 16, targetDistance + radius * 8);
     controls.maxDistance = Math.max(150, maxSize * 6, radius * 8);
+    if (WORLD_MODE) { camera.far = Math.max(camera.far, 50000); controls.maxDistance = Math.max(controls.maxDistance, 10000); }
     if (els.stage) {
       els.stage.dataset.cameraFar = String(roundValue(camera.far, 3));
       els.stage.dataset.controlsMaxDistance = String(roundValue(controls.maxDistance, 3));
@@ -1083,7 +1106,7 @@ import {
     camera = createViewportCamera("perspective");
     camera.position.set(6, 7, 8);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, logarithmicDepthBuffer: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1120,6 +1143,7 @@ import {
         pendingTransformChanged = false;
         syncTransformSnaps();
       } else {
+        flushPendingSpatialUpdates();
         if (pendingTransformUndo && pendingTransformChanged) pushUndoSnapshot(pendingTransformUndo);
         pendingTransformUndo = null;
         pendingTransformChanged = false;
@@ -1134,6 +1158,7 @@ import {
 
     rootGroup = new THREE.Group();
     scene.add(rootGroup);
+    instanceStore = makeInstanceStore(rootGroup);
     referenceGroup = new THREE.Group();
     referenceGroup.name = "Reference Models";
     scene.add(referenceGroup);
@@ -1145,6 +1170,7 @@ import {
     scene.add(selectionPivot);
 
     installGroundGrid();
+    if (WORLD_MODE) groundGrid.visible = false;
 
     const hemi = new THREE.HemisphereLight(0xfff4df, 0x6f7d72, 2.3);
     scene.add(hemi);
@@ -1155,6 +1181,12 @@ import {
     fill.position.set(-7, 5, -4);
     scene.add(fill);
     normalSceneLights.push(hemi, key, fill);
+    if (WORLD_MODE) {
+      hemi.color.set(0xe4efff); hemi.groundColor.set(0x676058); hemi.intensity = 1.4;
+      key.color.set(0xfff3dd); key.intensity = 2.4; key.position.set(-100, 230, -80); fill.intensity = 0;
+      renderer.toneMappingExposure = 1; defaultToneMappingExposure = 1; scene.environmentIntensity = 0.55;
+      scene.background = new THREE.Color(0x303b40);
+    }
 
     const solidHemi = new THREE.HemisphereLight(0xffffff, 0x747878, 1.85);
     solidHemi.visible = false;
@@ -1182,6 +1214,7 @@ import {
     els.stage.appendChild(selectionMarquee);
     createOrientationNudgeOverlay();
     window.addEventListener("resize", resize);
+    new ResizeObserver(resize).observe(els.stage);
     resize();
     animate();
   }
@@ -1203,16 +1236,18 @@ import {
       viewHelper.update(delta);
     }
     controls.update();
+    instanceStore?.flush(camera);
     syncSolidViewLights();
     updateOrientationNudgeOverlay();
     renderer.clear();
-    renderer.render(scene, camera);
+    if (worldWorkspace) worldWorkspace.render(scene);
+    else renderer.render(scene, camera);
     renderViewHelper();
   }
 
   async function loadGltf(gltfPath) {
     if (!gltfCache.has(gltfPath)) {
-      gltfCache.set(gltfPath, loader.loadAsync(assetUrl(gltfPath)));
+      gltfCache.set(gltfPath, loader.loadAsync(assetUrl(gltfPath)).catch(error => { gltfCache.delete(gltfPath); throw error; }));
     }
     return gltfCache.get(gltfPath);
   }
@@ -1305,6 +1340,11 @@ import {
 
   function applySolidViewLighting() {
     if (!scene || !renderer) return;
+    if (WORLD_MODE) {
+      setLightGroupVisible(normalSceneLights, true); setLightGroupVisible(solidSceneLights, false);
+      scene.environment = defaultEnvironmentTexture; renderer.toneMapping = defaultToneMapping;
+      renderer.toneMappingExposure = 1; return;
+    }
     setLightGroupVisible(normalSceneLights, !solidViewEnabled);
     setLightGroupVisible(solidSceneLights, solidViewEnabled);
     scene.environment = solidViewEnabled
@@ -1396,11 +1436,12 @@ import {
   async function visualTemplateForTarget(target) {
     const key = targetCacheKey(target);
     if (!targetVisualTemplateCache.has(key)) {
-      const promise = buildVisualTemplate(target).then((template) => {
+      const promise = buildVisualTemplate(target).then(async (template) => {
         template.updateMatrixWorld(true);
+        if (!PERFORMANCE_LEGACY) await prepareStaticPoses(template);
         targetVisualResolvedCache.set(key, template);
         return template;
-      });
+      }).catch(error => { targetVisualTemplateCache.delete(key); throw error; });
       targetVisualTemplateCache.set(key, promise);
     }
     return targetVisualTemplateCache.get(key);
@@ -1414,6 +1455,7 @@ import {
     const template = resolvedVisualTemplateForTarget(target);
     if (!template) return null;
     const visual = cloneScene(template);
+    if (!PERFORMANCE_LEGACY) prepareEditablePoseRaycasts(template, visual);
     visual.name = target.asset_stem || target.target_id;
     setObjectSolidView(visual, solidViewEnabled);
     return visual;
@@ -1433,15 +1475,18 @@ import {
     const descriptors = [];
     const bounds = new THREE.Box3();
     let eligible = true;
+    let hasSkeleton = false, hasTransparency = false;
     template.traverse((obj) => {
-      if (obj.isSkinnedMesh) {
+      if (obj.isSkinnedMesh) hasSkeleton = true;
+      if (obj.isSkinnedMesh && !staticPoseGeometry(obj)) {
         eligible = false;
         return;
       }
       if (!obj.isMesh || !obj.geometry || !obj.material) return;
+      if ([obj.material].flat().some(material => material.transparent)) hasTransparency = true;
       obj.updateMatrixWorld(true);
       descriptors.push({
-        geometry: obj.geometry,
+        geometry: staticPoseGeometry(obj) || obj.geometry,
         material: obj.material,
         localMatrix: obj.matrixWorld.clone(),
       });
@@ -1450,7 +1495,8 @@ import {
     });
     const instanceTemplate = {
       key,
-      eligible: eligible && descriptors.length > 0 && !bounds.isEmpty(),
+      // Previously unbatched transparent skeletons must keep per-object sorting.
+      eligible: eligible && !(hasSkeleton && hasTransparency) && descriptors.length > 0 && !bounds.isEmpty(),
       descriptors,
       bounds,
     };
@@ -1458,15 +1504,8 @@ import {
     return instanceTemplate;
   }
 
-  function createHiddenInstanceMatrix() {
-    return new THREE.Matrix4().makeScale(0, 0, 0);
-  }
-
-  function placementRootMatrix(placement) {
-    const object = new THREE.Object3D();
-    updateObjectFromState(object, placement.state, viewOffset);
-    object.updateMatrix();
-    return object.matrix.clone();
+  function placementRootMatrix(placement, offset = viewOffset, out) {
+    return ueTransformToThreeMatrix4(placement.state, offset, out);
   }
 
   function instancingEligibleForPlacement(placement) {
@@ -1474,174 +1513,53 @@ import {
     return Boolean(instanceTemplate?.eligible);
   }
 
-  function ensureInstanceBatch(target) {
-    const instanceTemplate = instanceTemplateForTarget(target);
-    if (!instanceTemplate?.eligible) return null;
-    if (instanceBatches.has(instanceTemplate.key)) return instanceBatches.get(instanceTemplate.key);
-    const batch = {
-      key: instanceTemplate.key,
-      target,
-      template: instanceTemplate,
-      meshes: [],
-      placementSlots: new Map(),
-      slotIds: [],
-      count: 0,
-      capacity: 0,
-    };
-    instanceBatches.set(instanceTemplate.key, batch);
-    growInstanceBatch(batch, INSTANCE_INITIAL_CAPACITY);
-    return batch;
-  }
-
-  function growInstanceBatch(batch, minCapacity) {
-    const nextCapacity = Math.max(INSTANCE_INITIAL_CAPACITY, batch.capacity ? batch.capacity * 2 : 0, minCapacity);
-    const previousMeshes = batch.meshes;
-    const nextMeshes = batch.template.descriptors.map((descriptor, index) => {
-      const mesh = new THREE.InstancedMesh(descriptor.geometry, descriptor.material, nextCapacity);
-      mesh.name = `${batch.target.asset_stem || batch.target.target_id} Instances ${index + 1}`;
-      mesh.frustumCulled = false;
-      mesh.count = batch.count;
-      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      mesh.userData.instanceBatchKey = batch.key;
-      if (previousMeshes[index]) {
-        const matrix = new THREE.Matrix4();
-        for (let slot = 0; slot < batch.count; slot += 1) {
-          previousMeshes[index].getMatrixAt(slot, matrix);
-          mesh.setMatrixAt(slot, matrix);
-        }
-      }
-      mesh.instanceMatrix.needsUpdate = true;
-      rootGroup.add(mesh);
-      setMeshSolidView(mesh, solidViewEnabled);
-      return mesh;
-    });
-    for (const mesh of previousMeshes) {
-      rootGroup.remove(mesh);
-      mesh.dispose?.();
-    }
-    batch.meshes = nextMeshes;
-    batch.capacity = nextCapacity;
+  function makeInstanceStore(root, offset = null) {
+    return createInstanceStore({ root, templateForTarget: instanceTemplateForTarget,
+      matrixForPlacement: (p,out) => placementRootMatrix(p, offset || viewOffset,out),
+      isVisible: placementVisualRenderable, prepareMesh: mesh => setMeshSolidView(mesh, solidViewEnabled),
+      cellCm: INSTANCE_CELL_CM, legacy: PERFORMANCE_LEGACY });
   }
 
   function addPlacementToInstanceBatch(placement) {
-    const batch = ensureInstanceBatch(placement.target);
-    if (!batch) return false;
-    if (batch.count >= batch.capacity) growInstanceBatch(batch, batch.count + 1);
-    const slot = batch.count;
-    batch.count += 1;
-    batch.placementSlots.set(placement.id, slot);
-    batch.slotIds[slot] = placement.id;
-    for (const mesh of batch.meshes) mesh.count = batch.count;
-    const visual = ensurePlacementVisualState(placement);
-    visual.backend = "instanced";
-    visual.root = null;
-    visual.batchKey = batch.key;
-    visual.instanceSlot = slot;
-    visual.localBounds = batch.template.bounds.clone();
-    visual.visible = true;
-    placement.group = null;
-    updateInstancePlacementTransform(placement);
+    ensurePlacementVisualState(placement);
+    if (!instanceStore.add(placement)) return false;
     syncInstanceStatsDataset();
     return true;
   }
 
   function removePlacementFromInstanceBatch(placement) {
-    const visual = ensurePlacementVisualState(placement);
-    if (visual.backend !== "instanced" || !visual.batchKey) return false;
-    const batch = instanceBatches.get(visual.batchKey);
-    if (!batch) return false;
-    const slot = batch.placementSlots.get(placement.id);
-    if (slot === undefined) return false;
-    const lastSlot = batch.count - 1;
-    const hiddenMatrix = createHiddenInstanceMatrix();
-    if (slot !== lastSlot) {
-      const movedId = batch.slotIds[lastSlot];
-      const matrix = new THREE.Matrix4();
-      for (const mesh of batch.meshes) {
-        mesh.getMatrixAt(lastSlot, matrix);
-        mesh.setMatrixAt(slot, matrix);
-        mesh.setMatrixAt(lastSlot, hiddenMatrix);
-        mesh.instanceMatrix.needsUpdate = true;
-      }
-      batch.slotIds[slot] = movedId;
-      batch.placementSlots.set(movedId, slot);
-      const moved = placements.get(movedId);
-      if (moved?.visual) moved.visual.instanceSlot = slot;
-    } else {
-      for (const mesh of batch.meshes) {
-        mesh.setMatrixAt(lastSlot, hiddenMatrix);
-        mesh.instanceMatrix.needsUpdate = true;
-      }
-    }
-    batch.slotIds.pop();
-    batch.placementSlots.delete(placement.id);
-    batch.count -= 1;
-    for (const mesh of batch.meshes) mesh.count = batch.count;
-    visual.backend = "";
-    visual.batchKey = "";
-    visual.instanceSlot = -1;
+    if (!instanceStore.remove(placement)) return false;
     syncInstanceStatsDataset();
     return true;
   }
 
   function updateInstancePlacementTransform(placement) {
-    const visual = ensurePlacementVisualState(placement);
-    if (visual.backend !== "instanced" || !visual.batchKey) return;
-    const batch = instanceBatches.get(visual.batchKey);
-    if (!batch) return;
-    const slot = batch.placementSlots.get(placement.id);
-    if (slot === undefined) return;
-    const rootMatrix = placementVisualRenderable(placement) ? placementRootMatrix(placement) : createHiddenInstanceMatrix();
-    const matrix = new THREE.Matrix4();
-    batch.template.descriptors.forEach((descriptor, index) => {
-      matrix.copy(rootMatrix).multiply(descriptor.localMatrix);
-      batch.meshes[index].setMatrixAt(slot, matrix);
-      batch.meshes[index].instanceMatrix.needsUpdate = true;
-    });
+    instanceStore.update(placement);
   }
 
   function instanceBatchMeshesForPlacements(candidates) {
-    const keys = new Set();
-    for (const placement of candidates) {
-      const visual = ensurePlacementVisualState(placement);
-      if (visual.backend === "instanced" && visual.batchKey) keys.add(visual.batchKey);
-    }
-    return Array.from(keys)
-      .map((key) => instanceBatches.get(key))
-      .filter(Boolean)
-      .flatMap((batch) => batch.meshes);
+    return instanceStore.candidates(candidates);
   }
 
   function placementIdFromInstanceHit(hit) {
-    const key = hit?.object?.userData?.instanceBatchKey;
-    if (!key || hit.instanceId === undefined) return "";
-    const batch = instanceBatches.get(key);
-    return batch?.slotIds?.[hit.instanceId] || "";
+    return instanceStore.hitId(hit);
   }
 
   function instanceStats() {
-    let meshCount = 0;
-    let instanceCount = 0;
-    for (const batch of instanceBatches.values()) {
-      if (!batch.count) continue;
-      meshCount += batch.meshes.length;
-      instanceCount += batch.count;
-    }
-    return {
-      batches: Array.from(instanceBatches.values()).filter((batch) => batch.count > 0).length,
-      meshes: meshCount,
-      instances: instanceCount,
-      promoted: promotedPlacementIds.size,
-    };
+    return { ...instanceStore.stats(), promoted: promotedPlacementIds.size };
   }
 
   function syncInstanceStatsDataset() {
-    if (!els.stage) return;
-    const stats = instanceStats();
-    els.stage.dataset.instanceBatches = String(stats.batches);
-    els.stage.dataset.instanceMeshes = String(stats.meshes);
-    els.stage.dataset.instancePlacements = String(stats.instances);
-    els.stage.dataset.promotedPlacements = String(stats.promoted);
+    if (!els.stage || instanceStatsPending) return;
+    instanceStatsPending = true;
+    requestAnimationFrame(() => {
+      instanceStatsPending = false;
+      const stats = instanceStats();
+      els.stage.dataset.instanceBatches = String(stats.batches);
+      els.stage.dataset.instanceMeshes = String(stats.meshes);
+      els.stage.dataset.instancePlacements = String(stats.instances);
+      els.stage.dataset.promotedPlacements = String(stats.promoted);
+    });
   }
 
   function resetVisibleAssetResults() {
@@ -1953,6 +1871,8 @@ import {
   }
 
   function startAssetPointer(event, target) {
+    if (dragSession?.buildImport) return;
+    if (worldWorkspace?.isMap()) { showViewportNotice("Choose a world location or Return to Build"); return; }
     if (event.button !== undefined && event.button !== 0) return;
     event.preventDefault();
     dragCandidate = {
@@ -2010,6 +1930,7 @@ import {
   }
 
   function beginDragPlacement(target, event) {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     const pointerId = dragCandidate?.pointerId ?? event.pointerId;
     dragCandidate = null;
     clearActiveGizmo();
@@ -2044,6 +1965,7 @@ import {
   }
 
   function beginSmartDuplicatePlacement() {
+    if (worldWorkspace?.isMap()) { showViewportNotice("Return to Build to place objects"); return false; }
     const placement = selectedPlacement();
     if (!placement || dragSession) return false;
     clearActiveGizmo();
@@ -2132,7 +2054,7 @@ import {
   async function buildDragGhost(target, token) {
     try {
       const ghost = await buildVisualGroup(target);
-      if (!dragSession || dragSession.token !== token) return;
+      if (!dragSession || dragSession.token !== token) { disposeClonedSkeletons(ghost); return; }
       prepareGhostObject(ghost);
       scene.add(ghost);
       dragSession.ghost = ghost;
@@ -2176,6 +2098,7 @@ import {
     els.stage.classList.toggle("is-drop-ready", dragSession.canDrop);
     if (!baseState) {
       if (dragSession.ghost) dragSession.ghost.visible = false;
+      if (WORLD_MODE) els.assetStatus.textContent = "No placement surface at cursor";
       return;
     }
     const resolved = resolveDragPreviewState(baseState);
@@ -2248,6 +2171,9 @@ import {
     const state = {
       ...baseState,
       yaw: normalizeYaw(dragSession?.yawOffset || baseState.yaw || 0),
+    };
+    if (dragSession?.buildImport) return {
+      state: { ...state, z: state.z + dragSession.zOffset }, snapped: false,
     };
     const snapped = snapStateForTarget(dragSession.target, state, dragSession.sourcePlacementId || "");
     const surfaceAligned = alignDragStateVisualBottomToSurface(snapped.state);
@@ -2337,7 +2263,12 @@ import {
     pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const surfacePoint = placementSurfacePointFromRay();
+    const surfacePoint = dragSession?.buildImport && !dragSession.buildImport.append ? null : placementSurfacePointFromRay();
+    if (WORLD_MODE) {
+      const worldHit = worldWorkspace?.surface(raycaster.ray);
+      if (worldHit && (!surfacePoint || worldHit.distance < raycaster.ray.origin.distanceTo(surfacePoint))) return worldHit.point.clone();
+      return surfacePoint || null;
+    }
     if (surfacePoint) return surfacePoint;
     const point = new THREE.Vector3();
     return raycaster.ray.intersectPlane(dragPlane, point) ? point : null;
@@ -2350,15 +2281,9 @@ import {
     const roots = candidates
       .map((placement) => getVisualRoot(placement))
       .filter(Boolean);
-    if (roots.length) {
-      const hits = raycaster.intersectObjects(roots, true);
-      const hit = hits.find((row) => {
-        const id = row.object.userData.placedId;
-        return id && !excludedIds.has(id) && !row.object.userData.dragGhost && objectTreeVisible(row.object);
-      });
-      if (hit?.point) return hit.point.clone();
-    }
-    return placementSurfacePointFromBounds(candidates, excludedIds);
+    const hits = raycaster.intersectObjects([...roots, ...instanceBatchMeshesForPlacements(candidates)], true);
+    const ids = new Set(candidates.map(p => p.id));
+    return hits.find(hit => ids.has(hit.object.userData.placedId || placementIdFromInstanceHit(hit)) && objectTreeVisible(hit.object))?.point.clone() || null;
   }
 
   function placementSurfacePointFromBounds(candidates, excludedIds) {
@@ -2396,6 +2321,10 @@ import {
   }
 
   function endDragPlacement() {
+    if (dragSession?.buildImport?.moveBuild) {
+      rootGroup.visible = true;
+      updateSelectionBoxes();
+    }
     if (dragSession?.moveExisting && dragSession.sourcePlacementId) {
       const placement = placements.get(dragSession.sourcePlacementId);
       if (placement) setVisualVisible(placement, true);
@@ -2403,8 +2332,15 @@ import {
       if (helper) helper.visible = true;
     }
     if (dragSession?.ghost) {
-      scene.remove(dragSession.ghost);
+      const ghost = dragSession.ghost;
+      scene.remove(ghost); disposeClonedSkeletons(ghost);
+      setObjectSolidView(ghost, false);
+      const materials = new Set();
+      ghost.traverse(obj => { if (obj.material) for (const material of [obj.material].flat()) materials.add(material); });
+      for (const material of materials) material.dispose();
     }
+    dragSession?.ghostStore?.dispose();
+    for (const [element, wasInert] of dragSession?.lockedPanels || []) element.inert = wasInert;
     dragSession = null;
     dragCandidate = null;
     document.body.classList.remove("is-dragging-asset");
@@ -2446,6 +2382,18 @@ import {
     const session = dragSession;
     const state = session.state ? { ...session.state } : null;
     const canDrop = Boolean(session.canDrop && state);
+    if (session.buildImport) {
+      if (!canDrop) return true;
+      const { before, snapshot, startIndex, pivot, count, append, moveBuild } = session.buildImport;
+      for (let i = moveBuild ? 0 : startIndex; i < snapshot.placements.length; i++) {
+        snapshot.placements[i].state = relocateBuildState(snapshot.placements[i].state, pivot, state);
+      }
+      // Ghosts are never part of placements, undo, autosave, or export.
+      endDragPlacement();
+      try { await commitWorldBuildImport(before, snapshot, { count, append, frame: false, moveBuild }); }
+      catch (error) { console.error(error); showViewportNotice(`Import failed: ${error.message}`); }
+      return true;
+    }
     endDragPlacement();
     if (!canDrop) return true;
     pushUndoSnapshot();
@@ -2561,6 +2509,7 @@ import {
       placement.group = root;
       return false;
     }
+    disposeClonedSkeletons(root);
     promotedPlacementIds.delete(placement.id);
     syncInstanceStatsDataset();
     markPlacementBoundsDirty(placement);
@@ -2581,13 +2530,15 @@ import {
   }
 
   function disposeVisual(placement) {
+    pendingSpatialUpdates.delete(placement);
+    worldAuthoredBounds = null;
     removePlacementFromSpatialIndex(placement.id);
     const visual = ensurePlacementVisualState(placement);
     if (visual.backend === "instanced") {
       removePlacementFromInstanceBatch(placement);
     } else {
       const root = getVisualRoot(placement);
-      if (root) rootGroup.remove(root);
+      if (root) { rootGroup.remove(root); disposeClonedSkeletons(root); }
     }
     visual.root = null;
     visual.backend = "";
@@ -2598,8 +2549,8 @@ import {
   function setVisualTransform(placement, { updateIndex = true } = {}) {
     const visual = ensurePlacementVisualState(placement);
     if (visual.backend === "instanced") {
-      updateInstancePlacementTransform(placement);
       markPlacementBoundsDirty(placement);
+      updateInstancePlacementTransform(placement);
       if (updateIndex) updatePlacementSpatialIndex(placement);
       return;
     }
@@ -2615,6 +2566,7 @@ import {
   function setVisualVisible(placement, visible) {
     const visual = ensurePlacementVisualState(placement);
     visual.visible = visible;
+    if (selectedPlacedIds.size > SELECTION_PROMOTION_LIMIT) updateSelectionBoxes();
     if (visual.backend === "instanced") {
       updateInstancePlacementTransform(placement);
       return;
@@ -2645,13 +2597,14 @@ import {
 
   function setPlacementHidden(placement, hidden) {
     if (!placement) return;
+    worldAuthoredBounds = null;
     placement.hidden = Boolean(hidden);
     applyPlacementRenderVisibility(placement);
-    syncSelectionBoxes();
   }
 
   function markPlacementBoundsDirty(placement) {
     if (!placement) return;
+    worldAuthoredBounds = null;
     const visual = ensurePlacementVisualState(placement);
     visual.worldBoundsDirty = true;
     visual.screenBoundsRevision = -1;
@@ -2767,17 +2720,30 @@ import {
   }
 
   function updatePlacementSpatialIndex(placement) {
+    const bounds=placementSpatialBounds(placement),visual=ensurePlacementVisualState(placement),range=visual.spatialRange;
+    const x0=spatialCell(bounds.minX),x1=spatialCell(bounds.maxX),y0=spatialCell(bounds.minY),y1=spatialCell(bounds.maxY);
+    const previous = spatialIndex.placementCells.get(placement.id);
+    if(previous&&range&&range[0]===x0&&range[1]===x1&&range[2]===y0&&range[3]===y1)return;
+    visual.spatialRange=[x0,x1,y0,y1];
+    const next = cellsForSpatialBounds(bounds);
+    if (previous?.length === next.length && previous.every((key,i) => key === next[i])) return;
     removePlacementFromSpatialIndex(placement.id);
-    insertPlacementInSpatialIndex(placement);
+    spatialIndex.placementCells.set(placement.id,next);
+    for (const key of next) {
+      if (!spatialIndex.cells.has(key)) spatialIndex.cells.set(key,new Set());
+      spatialIndex.cells.get(key).add(placement.id);
+    }
   }
 
   function rebuildSpatialIndex() {
+    pendingSpatialUpdates.clear();
     spatialIndex.cells.clear();
     spatialIndex.placementCells.clear();
     for (const placement of placements.values()) insertPlacementInSpatialIndex(placement);
   }
 
   function spatialCandidateIdsForBounds(bounds) {
+    flushPendingSpatialUpdates();
     const ids = new Set();
     for (const key of cellsForSpatialBounds(bounds)) {
       const bucket = spatialIndex.cells.get(key);
@@ -2785,6 +2751,13 @@ import {
       for (const id of bucket) ids.add(id);
     }
     return ids;
+  }
+
+  function flushPendingSpatialUpdates() {
+    for (const placement of pendingSpatialUpdates) {
+      if (placements.get(placement.id) === placement) updatePlacementSpatialIndex(placement);
+    }
+    pendingSpatialUpdates.clear();
   }
 
   function queryBounds(bounds) {
@@ -2852,11 +2825,23 @@ import {
   }
 
   function raycastPlacementCandidates(ray, { radius = SPATIAL_PICK_RADIUS_CM, excludeIds = new Set(), useRayPath = false } = {}) {
-    const source = useRayPath
-      ? placementPickCandidatesFromRay(ray, radius)
-      : placementQueryCandidatesFromRay(ray, radius);
+    const source = worldPlacementCandidatesFromRay(ray, radius);
     return source
       .filter((placement) => !excludeIds.has(placement.id) && placementPickable(placement));
+  }
+
+  function worldPlacementCandidatesFromRay(ray, radius) {
+    if (!placements.size) return [];
+    if (!worldAuthoredBounds) worldAuthoredBounds = buildPlacementsWorldBox().expandByScalar(0.01);
+    const bounds = worldAuthoredBounds;
+    if (bounds.isEmpty()) return [];
+    const start = bounds.containsPoint(ray.origin) ? ray.origin : ray.intersectBox(bounds, new THREE.Vector3());
+    if (!start) return [];
+    // Clip the broad-phase segment to authored bounds, not an arbitrary zero-height plane.
+    const sphere = bounds.getBoundingSphere(new THREE.Sphere());
+    const far = ray.at(ray.origin.distanceTo(sphere.center) + sphere.radius + 1, new THREE.Vector3());
+    const end = new THREE.Ray(far, ray.direction.clone().negate()).intersectBox(bounds, new THREE.Vector3());
+    return end ? querySegmentRadius(uePointFromThreePoint(start), uePointFromThreePoint(end), radius) : [];
   }
 
   function marqueePlacementCandidates(rect) {
@@ -2864,6 +2849,11 @@ import {
   }
 
   async function createPlacement(target, transform, metadata = {}, options = {}) {
+    if (target.asset_kind === "building_piece") {
+      const supplied = Number(metadata.piece_id);
+      const id = Number.isSafeInteger(supplied) && supplied > 0 ? supplied : allocatePieceId();
+      metadata = { ...metadata, piece_id: id };
+    }
     const id = options.id || `obj_${nextObjectId++}`;
     const placement = {
       id,
@@ -2982,7 +2972,7 @@ import {
     syncSelectionHotkeys();
     if (options.render !== false) {
       renderInspector();
-      renderPlacedList();
+      renderPlacedList({ selectionOnly: true });
       updateCounters();
     }
   }
@@ -3059,6 +3049,8 @@ import {
     const selected = selectedPlacements();
     if (!selected.length) return;
     pendingTransformChanged = true;
+    let translation = null;
+    const deferIndex = Boolean(pendingTransformUndo) && selected.length > SELECTION_PROMOTION_LIMIT;
     const stateUpdateOptions = transformStateUpdateOptions();
     if (selected.length === 1) {
       const placement = selected[0];
@@ -3070,10 +3062,33 @@ import {
       const previousMatrix = selectionPivot.userData.previousMatrix;
       const currentMatrix = selectionPivot.matrixWorld.clone();
       const deltaMatrix = currentMatrix.clone().multiply(previousMatrix.clone().invert());
+      if(activeGizmoMode==="translate")translation=new THREE.Vector3().setFromMatrixPosition(deltaMatrix);
+      const e=deltaMatrix.elements;
+      const yawOnly=activeGizmoMode==="rotate"&&Math.abs(e[1])+Math.abs(e[4])+Math.abs(e[6])+Math.abs(e[9])+Math.abs(e[5]-1)<1e-12;
+      const yawDelta=yawOnly?THREE.MathUtils.radToDeg(Math.atan2(e[2],e[0])):0;
+      const position=new THREE.Vector3();
       for (const placement of selected) {
+        if(deferIndex)pendingSpatialUpdates.add(placement);
+        if (activeGizmoMode === "translate") {
+          placement.state = { ...placement.state,
+            x: placement.state.x + deltaMatrix.elements[12] / UNIT_SCALE,
+            y: placement.state.y + deltaMatrix.elements[14] / UNIT_SCALE,
+            z: placement.state.z + deltaMatrix.elements[13] / UNIT_SCALE };
+          if(placement.visual.backend==="instanced"){
+            instanceStore.translate(placement,translation);worldAuthoredBounds=null;if(!deferIndex)updatePlacementSpatialIndex(placement);
+          }else setVisualTransform(placement,{updateIndex:!deferIndex});
+          continue;
+        }
+        const state=placement.state;
+        if(yawOnly&&state.scale_x>0&&state.scale_y>0&&state.scale_z>0&&Math.abs(state.pitch)<89.99&&Math.abs(state.roll)<=180&&Math.abs(state.yaw)<=180){
+          position.set((state.x-viewOffset.x)*UNIT_SCALE,(state.z-viewOffset.z)*UNIT_SCALE,(state.y-viewOffset.y)*UNIT_SCALE).applyMatrix4(deltaMatrix);
+          placement.state={...state,x:position.x/UNIT_SCALE+viewOffset.x,y:position.z/UNIT_SCALE+viewOffset.y,z:position.y/UNIT_SCALE+viewOffset.z,
+            yaw:Math.abs(yawDelta)<=.0001?state.yaw:normalizeDegrees(state.yaw+yawDelta)};
+          setVisualTransform(placement,{updateIndex:!deferIndex});continue;
+        }
         const root = getVisualRoot(placement);
         if (root) root.updateMatrixWorld(true);
-        const currentWorldMatrix = root ? root.matrixWorld.clone() : placementRootMatrix(placement);
+        const currentWorldMatrix = root ? root.matrixWorld.clone() : placement.visual?.rootMatrix?.clone() || placementRootMatrix(placement);
         const nextWorldMatrix = currentWorldMatrix.premultiply(deltaMatrix);
         if (root) {
           applyWorldMatrixToObject(root, nextWorldMatrix);
@@ -3081,15 +3096,15 @@ import {
         } else {
           placement.state = stateFromWorldMatrix(placement, nextWorldMatrix, stateUpdateOptions);
         }
-        markPlacementBoundsDirty(placement);
-        setVisualTransform(placement);
+        setVisualTransform(placement,{updateIndex:!deferIndex});
       }
       previousMatrix.copy(currentMatrix);
     }
-    syncSelectionBoxes();
-    renderInspector();
-    renderPlacedList();
-    updateCounters();
+    if(translation&&selected.length>SELECTION_PROMOTION_LIMIT&&largeSelectionOutline&&!PERFORMANCE_LEGACY)largeSelectionOutline.translate(translation);
+    else updateSelectionBoxes(selected);
+    if (selected.length === 1) renderInspector();
+    renderPlacedList({ selectionOnly: true, transformsOnly: true });
+    scheduleAutosave();
   }
 
   function transformStateUpdateOptions() {
@@ -3110,14 +3125,31 @@ import {
     object.updateMatrixWorld(true);
   }
 
+  const transformScratchObject = new THREE.Object3D();
   function stateFromWorldMatrix(placement, worldMatrix, options = {}) {
-    const object = new THREE.Object3D();
+    if(options.updateRotation===false){
+      const e=worldMatrix.elements,state={...placement.state,x:e[12]/UNIT_SCALE+viewOffset.x,y:e[14]/UNIT_SCALE+viewOffset.y,z:e[13]/UNIT_SCALE+viewOffset.z};
+      if(options.updateScale!==false){
+        state.scale_x=Math.sqrt(e[0]*e[0]+e[1]*e[1]+e[2]*e[2])*(worldMatrix.determinant()<0?-1:1);
+        state.scale_y=Math.sqrt(e[8]*e[8]+e[9]*e[9]+e[10]*e[10]);
+        state.scale_z=Math.sqrt(e[4]*e[4]+e[5]*e[5]+e[6]*e[6]);
+      }
+      return state;
+    }
+    const object = transformScratchObject;
     worldMatrix.decompose(object.position, object.quaternion, object.scale);
-    object.updateMatrixWorld(true);
     return updateStateFromObject(object, placement.state, viewOffset, options);
   }
 
   function syncSelectionBoxes() {
+    if (!PERFORMANCE_LEGACY && selectedPlacedIds.size > SELECTION_PROMOTION_LIMIT) {
+      for (const helper of selectionBoxes.values()) { helper.removeFromParent(); helper.geometry.dispose(); helper.material.dispose(); }
+      selectionBoxes.clear();
+      if (!largeSelectionOutline) largeSelectionOutline = createSelectionOutline(scene);
+      updateSelectionBoxes();
+      return;
+    }
+    if (largeSelectionOutline) largeSelectionOutline.object.visible = false;
     for (const [id, helper] of selectionBoxes) {
       if (!selectedPlacedIds.has(id) || !placements.has(id)) {
         scene.remove(helper);
@@ -3156,6 +3188,18 @@ import {
     updateSelectionBoxes();
   }
 
+  let selectionShaderWarmup;
+  function prepareSelectionShaders() {
+    if(!selectionShaderWarmup){
+      const helper=new THREE.BoxHelper();
+      helper.material.depthTest=false;helper.material.transparent=true;helper.material.opacity=.96;
+      // Keep one tiny template alive for the renderer lifetime, including after the
+      // last visible selection helper is disposed, to retain the compiled program.
+      selectionShaderWarmup={helper,ready:renderer.compileAsync(helper,camera,scene)};
+    }
+    return selectionShaderWarmup.ready;
+  }
+
   function syncReferenceSelectionBoxes() {
     for (const [id, helper] of referenceSelectionBoxes) {
       if (!selectedReferenceIds.has(id) || !referenceModels.has(id)) {
@@ -3189,7 +3233,11 @@ import {
     }
   }
 
-  function updateSelectionBoxes() {
+  function updateSelectionBoxes(selected = null) {
+    if (!PERFORMANCE_LEGACY && selectedPlacedIds.size > SELECTION_PROMOTION_LIMIT && largeSelectionOutline) {
+      largeSelectionOutline.update(selected || selectedPlacements(), getWorldBounds, placementPickable);
+      return;
+    }
     for (const [id, helper] of selectionBoxes) {
       const placement = placements.get(id);
       if (!placement) continue;
@@ -3726,6 +3774,8 @@ import {
     secondaryValue = "secondary",
     cancelLabel = "Cancel",
     showInput = true,
+    choices = [],
+    choiceValue = "",
     danger = false,
   }) {
     if (!els.collectionDialog) return Promise.resolve(null);
@@ -3736,6 +3786,11 @@ import {
     els.collectionDialogLabel.textContent = label;
     els.collectionDialogInput.value = defaultValue;
     els.collectionDialogField.hidden = !showInput;
+    els.collectionDialogChoiceField.hidden = !choices.length;
+    els.collectionDialogChoice.replaceChildren(...choices.map(choice => {
+      const option = document.createElement("option"); option.value = choice.value; option.textContent = choice.label; return option;
+    }));
+    els.collectionDialogChoice.value = choiceValue || choices[0]?.value || "";
     els.collectionDialogCancel.textContent = cancelLabel;
     els.collectionDialogSubmit.textContent = confirmLabel;
     els.collectionDialogSecondary.textContent = secondaryLabel;
@@ -3747,6 +3802,7 @@ import {
       activeCollectionDialog = {
         resolve,
         showInput,
+        hasChoices: choices.length > 0,
         confirmValue,
         secondaryValue,
         previousFocus: document.activeElement,
@@ -3755,6 +3811,8 @@ import {
         if (showInput) {
           els.collectionDialogInput.focus();
           els.collectionDialogInput.select();
+        } else if (choices.length) {
+          els.collectionDialogChoice.focus();
         } else {
           els.collectionDialogSubmit.focus();
         }
@@ -3985,6 +4043,7 @@ import {
       selectReference(id);
       focusCameraOnReference(ref, { notify: false });
       showViewportNotice("Reference Imported");
+      worldWorkspace?.markChanged();
       els.assetStatus.textContent = `Imported reference ${primary.name}`;
     } catch (error) {
       for (const url of objectUrls.values()) URL.revokeObjectURL(url);
@@ -4149,6 +4208,7 @@ import {
     if (!affected.length) return;
     if (recordUndo) pushUndoSnapshot();
     for (const placement of affected) setPlacementHidden(placement, hidden);
+    syncSelectionBoxes();
     renderInspector();
     renderPlacedList();
     scheduleGroundGridUpdate();
@@ -4176,8 +4236,33 @@ import {
     setPlacementsHidden(selected, shouldHide);
   }
 
+  const visiblePlacedRows = new Set();
+  let placedRowsObserver;
+  function refreshPlacedRowCoordinates(row,placement) {
+    const text = `${roundValue(placement.state.x)}, ${roundValue(placement.state.y)}, ${roundValue(placement.state.z)}`;
+    const meta = row.querySelector(".placed-meta");
+    if (meta.textContent !== text) meta.textContent = text;
+  }
+
+  function observePlacedRow(row) {
+    if(typeof IntersectionObserver === "undefined")return;
+    placedRowsObserver ||= new IntersectionObserver(entries=>{
+      for(const entry of entries){
+        const element=entry.target;
+        if(entry.isIntersecting&&els.placedList.contains(element)){
+          visiblePlacedRows.add(element);
+          const placement=placements.get(element.dataset.placementId);
+          if(placement)refreshPlacedRowCoordinates(element,placement);
+        }else visiblePlacedRows.delete(element);
+      }
+    },{root:els.placedList,rootMargin:"100px 0px"});
+    placedRowsObserver.observe(row);
+  }
+
   function renderPlacedRow(placement) {
     const row = document.createElement("div");
+    row.dataset.placementId = placement.id;
+    observePlacedRow(row);
     row.className = `placed-row${hasSelection(placement.id) ? " is-active" : ""}${placement.hidden ? " is-hidden" : ""}`;
 
     const selectButton = document.createElement("button");
@@ -4316,6 +4401,7 @@ import {
   function renderPlacedCollection(section, rowState) {
     const isOpen = !section.collapsed;
     const wrapper = document.createElement("section");
+    wrapper.dataset.collectionId = section.id;
     wrapper.className = `placed-group placed-collection${section.isUnassigned ? " placed-collection--unassigned" : ""}${isOpen ? " is-open" : ""}${section.selectedCount ? " is-active" : ""}`;
     const header = document.createElement("div");
     header.className = "placed-group-header";
@@ -4380,8 +4466,32 @@ import {
     els.placedList.appendChild(wrapper);
   }
 
-  function renderPlacedList() {
+  function renderPlacedList({ selectionOnly = false, transformsOnly = false } = {}) {
+    // Selection changes need highlights/counts, not hundreds of rebuilt controls.
+    if (selectionOnly && els.placedList.dataset.placementCount === String(placements.size)) {
+      if (!transformsOnly) syncCollectionControls();
+      const rows=transformsOnly&&placedRowsObserver?visiblePlacedRows:els.placedList.querySelectorAll("[data-placement-id]");
+      for (const row of rows) {
+        const placement = placements.get(row.dataset.placementId);
+        if (!placement) continue;
+        if (transformsOnly && !hasSelection(placement.id)) continue;
+        if (!transformsOnly) row.classList.toggle("is-active", hasSelection(placement.id));
+        refreshPlacedRowCoordinates(row,placement);
+      }
+      if (transformsOnly) return;
+      const sections = new Map(makePlacedCollectionSections().map(section => [section.id, section]));
+      for (const wrapper of els.placedList.querySelectorAll("[data-collection-id]")) {
+        const section = sections.get(wrapper.dataset.collectionId);
+        if (!section) continue;
+        wrapper.classList.toggle("is-active", section.selectedCount > 0);
+        wrapper.querySelector(".placed-group-select .placed-meta").textContent =
+          `${section.placements.length.toLocaleString()} placed${section.hiddenCount ? `, ${section.hiddenCount.toLocaleString()} hidden` : ""}${section.selectedCount ? `, ${section.selectedCount.toLocaleString()} selected` : ""}`;
+      }
+      return;
+    }
+    placedRowsObserver?.disconnect();visiblePlacedRows.clear();
     els.placedList.textContent = "";
+    els.placedList.dataset.placementCount = String(placements.size);
     syncCollectionControls();
     renderReferenceList();
     const rowState = { shownRows: 0, capped: false };
@@ -4441,6 +4551,7 @@ import {
   }
 
   async function onPointerDown(event) {
+    if (worldWorkspace?.isMap()) return;
     if (dragSession?.clickToPlace) {
       await commitClickPreviewPlacement(event);
       return;
@@ -4656,6 +4767,7 @@ import {
 
   function scheduleAutosave() {
     if (!autosaveReady || restoringSnapshot || bulkMutationActive) return;
+    if (worldWorkspace) { worldWorkspace.markChanged(); return; }
     if (autosaveTimer) window.clearTimeout(autosaveTimer);
     const delay = placements.size >= 10000
       ? 3000
@@ -4667,6 +4779,7 @@ import {
 
   function saveAutosave() {
     if (!autosaveReady || restoringSnapshot || bulkMutationActive) return;
+    if (worldWorkspace) { worldWorkspace.markChanged(); worldWorkspace.saveNow().catch(() => {}); return; }
     if (autosaveTimer) {
       window.clearTimeout(autosaveTimer);
       autosaveTimer = 0;
@@ -4694,6 +4807,13 @@ import {
   }
 
   async function restoreBuildSnapshot(snapshot) {
+    if (worldWorkspace && !PERFORMANCE_LEGACY) {
+      const history = [...undoStack];
+      const staged = await prepareInstancedWorldRestore(snapshot);
+      commitInstancedWorldRestore(staged, snapshot);
+      undoStack.push(...history);
+      return;
+    }
     const collectionState = uiCollectionStateFromSnapshot(snapshot);
     const entries = [];
     for (const row of snapshot.placements || []) {
@@ -4759,49 +4879,64 @@ import {
   async function undoLastAction() {
     if (restoringSnapshot || !undoStack.length) return;
     const snapshot = undoStack.pop();
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    shell.inert = true;
     restoringSnapshot = true;
     setLoading(true);
     try {
       await restoreBuildSnapshot(snapshot);
     } catch (error) {
+      undoStack.push(snapshot);
       console.error(error);
       els.selectionMeta.textContent = `Undo failed: ${error.message}`;
     } finally {
       restoringSnapshot = false;
+      shell.inert = wasInert;
       setLoading(false);
       saveAutosave();
     }
   }
 
   async function duplicateSelected() {
+    if (bulkMutationActive || restoringSnapshot) return;
     const selected = selectedPlacements();
     if (!selected.length) return;
     pushUndoSnapshot();
     const newIds = [];
+    const allocateDuplicateId = createPieceIdAllocator();
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    bulkMutationActive = true; shell.inert = true;
+    let sliceStarted = performance.now();
     setLoading(true);
     try {
       for (const placement of selected) {
         const transform = { ...placement.state };
         const metadata = { ...placement.metadata };
         delete metadata.piece_id;
+        if (placement.target.asset_kind === "building_piece") metadata.piece_id = allocateDuplicateId();
         const duplicated = await createPlacement(placement.target, transform, metadata, {
           select: false,
+          render: false,
+          updateGrid: false,
           uiCollectionId: placement.uiCollectionId,
         });
         newIds.push(duplicated.id);
+        if (performance.now() - sliceStarted >= 5) { await nextFrame(); sliceStarted = performance.now(); }
       }
-      setSelection(newIds);
+      setSelection(newIds, { render: false });
       showViewportNotice(newIds.length === 1 ? "Duplicated" : `Duplicated ${newIds.length}`);
     } catch (error) {
       console.error(error);
       els.selectionMeta.textContent = `Duplicate failed: ${error.message}`;
     } finally {
+      bulkMutationActive = false; shell.inert = wasInert;
+      scheduleGroundGridUpdate(); renderPlacedList(); renderInspector(); updateCounters(); scheduleAutosave();
       setLoading(false);
     }
   }
 
   async function smartDuplicateNudge(directionId) {
-    if (smartDuplicateNudgeActive || dragSession) return;
+    if (smartDuplicateNudgeActive || dragSession || bulkMutationActive || restoringSnapshot) return;
     const selected = selectedPlacements();
     if (!selected.length) return;
     const offset = smartDuplicateNudgeOffset(directionId);
@@ -4810,6 +4945,10 @@ import {
     pushUndoSnapshot();
     const duplicatedPlacements = [];
     const newIds = [];
+    const allocateDuplicateId = createPieceIdAllocator();
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    bulkMutationActive = true; shell.inert = true;
+    let sliceStarted = performance.now();
     setLoading(true);
     try {
       for (const placement of selected) {
@@ -4821,15 +4960,19 @@ import {
         };
         const metadata = { ...placement.metadata };
         delete metadata.piece_id;
+        if (placement.target.asset_kind === "building_piece") metadata.piece_id = allocateDuplicateId();
         const duplicated = await createPlacement(placement.target, transform, metadata, {
           select: false,
+          render: false,
+          updateGrid: false,
           uiCollectionId: placement.uiCollectionId,
         });
         duplicatedPlacements.push(duplicated);
         newIds.push(duplicated.id);
+        if (performance.now() - sliceStarted >= 5) { await nextFrame(); sliceStarted = performance.now(); }
       }
-      setSelection(newIds);
-      const snapResult = snapPlacements(duplicatedPlacements, {
+      setSelection(newIds, { render: false });
+      const snapResult = await snapPlacements(duplicatedPlacements, {
         excludedIds: new Set(newIds),
         recordUndo: false,
       });
@@ -4840,6 +4983,8 @@ import {
       els.selectionMeta.textContent = `Smart duplicate failed: ${error.message}`;
     } finally {
       smartDuplicateNudgeActive = false;
+      bulkMutationActive = false; shell.inert = wasInert;
+      scheduleGroundGridUpdate(); renderPlacedList(); renderInspector(); updateCounters(); scheduleAutosave();
       setLoading(false);
     }
   }
@@ -4905,7 +5050,9 @@ import {
       return true;
     }
     if (event.code === "Home" || event.code === "Digit0" || event.code === "Numpad0") {
-      if (placements.size) focusCameraOnBuild();
+      if (worldWorkspace?.isMap()) worldWorkspace.frame();
+      else if (placements.size) focusCameraOnBuild();
+      else if (worldWorkspace) worldWorkspace.frame();
       else showViewportNotice("No objects to frame");
       return true;
     }
@@ -4955,7 +5102,7 @@ import {
     nextUiCollectionId = 1;
     anchorPieceId = 0;
     nextPieceId = 1;
-    if (resetOffset) viewOffset = { x: 0, y: 0, z: 0 };
+    if (resetOffset && !worldWorkspace) viewOffset = { x: 0, y: 0, z: 0 };
     transformControls.detach();
     syncSelectionBoxes();
     syncSelectionHotkeys();
@@ -4979,21 +5126,38 @@ import {
   }
 
   function allocatePieceId() {
+    return createPieceIdAllocator()();
+  }
+
+  function createPieceIdAllocator() {
+    // A bulk action owns one used-ID set, preserving the existing collision rules.
     const used = new Set();
     for (const placement of placements.values()) {
       const pid = Number(placement.metadata.piece_id || 0);
       if (pid > 0) used.add(pid);
     }
-    while (used.has(nextPieceId)) nextPieceId += 1;
-    return nextPieceId++;
+    return () => {
+      while (used.has(nextPieceId)) nextPieceId += 1;
+      const id = nextPieceId++; used.add(id); return id;
+    };
   }
 
-  function snapSelected() {
+  async function snapSelected() {
+    if (bulkMutationActive || restoringSnapshot) return;
     const selected = selectedPlacements();
     const movers = selected.filter((placement) => placement.target.asset_kind === "building_piece");
     if (!movers.length) return;
     const excludedIds = movers.length > 1 ? new Set(selectedPlacedIds) : new Set([movers[0].id]);
-    const result = snapPlacements(movers, { excludedIds });
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    bulkMutationActive = true; shell.inert = true;
+    let result;
+    try {
+      result = await snapPlacements(movers, { excludedIds });
+    } catch (error) {
+      console.error(error); showViewportNotice(`Snap failed: ${error.message}`); return;
+    } finally {
+      bulkMutationActive = false; shell.inert = wasInert; scheduleAutosave();
+    }
     if (!result.snapped) {
       els.selectionMeta.textContent = "No compatible snap in range";
       showViewportNotice("No snap found");
@@ -5005,13 +5169,15 @@ import {
     }
   }
 
-  function snapPlacements(movers, { excludedIds = null, recordUndo = true } = {}) {
+  async function snapPlacements(movers, { excludedIds = null, recordUndo = true } = {}) {
     const pieces = movers.filter((placement) => placement?.target.asset_kind === "building_piece");
     const excludeSet = excludedIds ? toIdSet(excludedIds) : new Set(pieces.map((placement) => placement.id));
     const snapPlans = [];
+    let sliceStarted = performance.now();
     for (const mover of pieces) {
       const best = findCompatibleSnap(mover.target, mover.state, excludeSet);
       if (best) snapPlans.push({ mover, best });
+      if (performance.now() - sliceStarted >= 5) { await nextFrame(); sliceStarted = performance.now(); }
     }
     if (!snapPlans.length) return { snapped: 0, total: pieces.length };
     if (recordUndo) pushUndoSnapshot();
@@ -5020,6 +5186,7 @@ import {
       mover.state.y += best.candidatePos.y - best.moverPos.y;
       mover.state.z += best.candidatePos.z - best.moverPos.z;
       applyPlacementTransform(mover);
+      if (performance.now() - sliceStarted >= 5) { await nextFrame(); sliceStarted = performance.now(); }
     }
     scheduleGroundGridUpdate();
     renderInspector();
@@ -5105,8 +5272,8 @@ import {
     let skipped = 0;
     for (const row of data.pieces || []) {
       const target =
-        targetLookup.byPieceClass.get(shortenClass(row.class_name)) ||
-        targetLookup.byPieceDataName.get(pieceDataStem(row.piece_data_name));
+        targetLookup.byPieceDataName.get(pieceDataStem(row.piece_data_name)) ||
+        targetLookup.byPieceClass.get(shortenClass(row.class_name));
       if (!target) {
         skipped += 1;
         continue;
@@ -5157,6 +5324,7 @@ import {
   }
 
   async function createPlacementsBulk(entries, { statusPrefix = "Importing" } = {}) {
+    let sliceStarted = performance.now();
     for (let index = 0; index < entries.length; index += 1) {
       const entry = entries[index];
       await createPlacement(entry.target, entry.transform, entry.metadata, {
@@ -5167,9 +5335,10 @@ import {
         render: false,
       });
       const completed = index + 1;
-      if (completed === entries.length || completed % IMPORT_RENDER_BATCH_SIZE === 0) {
+      if (completed === entries.length || performance.now() - sliceStarted >= 5) {
         els.assetStatus.textContent = `${statusPrefix} ${completed.toLocaleString()} of ${entries.length.toLocaleString()}`;
         await nextFrame();
+        sliceStarted = performance.now();
       }
     }
     updateGroundGrid();
@@ -5178,10 +5347,11 @@ import {
   function remapAppendPieceIds(entries, importedAnchor) {
     const sourceAnchorPieceId = Number(importedAnchor?.piece_id || 0);
     let appendedAnchorPieceId = 0;
+    const allocateAppendedId = createPieceIdAllocator();
     for (const entry of entries) {
       if (entry.target.asset_kind !== "building_piece") continue;
       const sourcePieceId = Number(entry.metadata.piece_id || 0);
-      const nextId = allocatePieceId();
+      const nextId = allocateAppendedId();
       entry.metadata = {
         ...entry.metadata,
         piece_id: nextId,
@@ -5199,6 +5369,10 @@ import {
     try {
       els.assetStatus.textContent = "Parsing import";
       const data = JSON.parse(await file.text());
+      if (worldWorkspace) {
+        await importWorldBuildingJson(data, file.name, appendMode);
+        return;
+      }
       pushUndoSnapshot();
       const hadPlacements = placements.size > 0;
       const rows = [...(data.pieces || []), ...(data.items || []), ...(data.actors || [])];
@@ -5259,7 +5433,7 @@ import {
       const col = i % columns;
       const row = Math.floor(i / columns);
       entries.push({
-        id: `bench_${i + 1}`,
+        id: `obj_${i + 1}`,
         target,
         transform: {
           x: roundValue((col - columns / 2) * spacing),
@@ -5290,6 +5464,7 @@ import {
       buildSchema = "rsdwtools.buildings.v1";
       anchorPieceId = 0;
       await createPlacementsBulk(entries, { statusPrefix: "Benchmark importing" });
+      nextObjectId = count + 1;
     } finally {
       bulkMutationActive = false;
       setLoading(false);
@@ -5364,25 +5539,6 @@ import {
 
     return null;
   }
-
-  function editorTransformFromJson(row) {
-    const transform = normalizeTransform(row);
-    return {
-      ...transform,
-      pitch: -transform.pitch,
-      roll: -transform.roll,
-    };
-  }
-
-  function jsonTransformFromEditorState(state) {
-    const transform = exportTransform(state);
-    return {
-      ...transform,
-      pitch: roundValue(-transform.pitch),
-      roll: roundValue(-transform.roll),
-    };
-  }
-
   function medianOffset(rows) {
     if (!rows.length) return { x: 0, y: 0, z: 0 };
     const xs = rows.map((row) => Number(row.x || 0)).sort((a, b) => a - b);
@@ -5392,76 +5548,32 @@ import {
     return { x: xs[mid] || 0, y: ys[mid] || 0, z: zs[mid] || 0 };
   }
 
-  function exportBuildingJson() {
-    const pieces = [];
-    const items = [];
-    const actors = [];
-    const usedPieceIds = new Set();
-    for (const placement of placements.values()) {
-      if (placement.hidden) continue;
-      if (placement.target.asset_kind !== "building_piece") continue;
-      let pid = Number(placement.metadata.piece_id || 0);
-      if (pid <= 0 || usedPieceIds.has(pid)) {
-        pid = allocatePieceId();
-        placement.metadata.piece_id = pid;
-      }
-      usedPieceIds.add(pid);
-    }
+  async function exportBuildingJson() {
+    if (dragSession || restoringSnapshot || bulkMutationActive) { showViewportNotice("Finish the current edit first"); return; }
+    const { validateProject } = await import("./basebuilder-project.js");
+    try { validateProject(worldWorkspace.capture(), index, { copy: false }); }
+    catch (error) { showViewportNotice(`Export unavailable: ${error.message}`); return; }
+    const anchor = [...placements.values()].find(p => !p.hidden && p.target.asset_kind === "building_piece" && p.metadata.piece_id === anchorPieceId);
+    const intent = await openCollectionDialog({ eyebrow: "Game Export", title: "Delivery Location", showInput: false,
+      message: `Catalog ${index.version}. Saved XYZ bounds (cm): ${savedBuildBoundsLabel()}. Saved World Location: use RSDWTools Deliver Build. Place Using Anchor: use Deliver via Preview. Both export the same JSON. ${WORLD_MODE ? "" : "For a free-space prefab, use World Build > Place Build in World or set absolute XYZ before saved-location delivery. "}Original game captures without version metadata remain unverified.`,
+      confirmLabel: worldWorkspace.deliveryMode() === "anchor" && anchor ? "Place Using Anchor" : "Saved World Location",
+      confirmValue: worldWorkspace.deliveryMode() === "anchor" && anchor ? "anchor" : "saved_world_location",
+      secondaryLabel: anchor ? (worldWorkspace.deliveryMode() === "anchor" ? "Saved World Location" : "Place Using Anchor") : "",
+      secondaryValue: worldWorkspace.deliveryMode() === "anchor" ? "saved_world_location" : "anchor" });
+    if (!intent) return;
+    worldWorkspace.setDeliveryMode(intent);
+    downloadJson(serializeBuildingJson({placements, buildSchema, buildName, anchorPieceId, allocatePieceId: createPieceIdAllocator()}), `${safeFileName(buildName || "browser_build")}.json`);
+    showViewportNotice(intent === "anchor" ? "Use RSDWTools: Deliver via Preview" : "Use RSDWTools: Deliver Build");
+  }
 
-    for (const placement of placements.values()) {
-      if (placement.hidden) continue;
-      const target = placement.target;
-      const transform = jsonTransformFromEditorState(placement.state);
-      if (target.asset_kind === "building_piece") {
-        pieces.push({
-          piece_id: Number(placement.metadata.piece_id || allocatePieceId()),
-          piece_data_index: Number(target.export.piece_data_index || 0),
-          piece_data_name: target.export.piece_data_name || "",
-          class_name: target.export.class_name || "",
-          ...transform,
-          stability: Number(placement.metadata.stability || target.export.default_stability || 3000),
-          is_ghosted: Boolean(placement.metadata.is_ghosted),
-          ...(placement.metadata.spud_guid ? { spud_guid: placement.metadata.spud_guid } : {}),
-        });
-      } else if (target.asset_kind === "item") {
-        items.push({
-          actor_name: placement.metadata.actor_name || target.asset_stem,
-          actor_class: placement.metadata.actor_class || target.export.actor_class || ITEM_ACTOR_CLASS,
-          item_asset_name: target.export.item_asset_name || target.asset_stem,
-          item_asset_path: target.export.item_asset_path || "",
-          item_source: placement.metadata.item_source || target.export.item_source || "ItemData",
-          count: Number(placement.metadata.item_count || target.export.item_count || 1),
-          ...transform,
-        });
-      } else if (target.asset_kind === "bp") {
-        actors.push({
-          actor_name: placement.metadata.actor_name || target.asset_stem,
-          actor_class: target.export.actor_class || "",
-          class_path: target.export.class_path || target.export.runtime_path || "",
-          ...transform,
-        });
-      }
-    }
-
-    const out = {
-      schema: buildSchema,
-      name: buildName,
-      generated_unix: Math.floor(Date.now() / 1000),
-      count: pieces.length,
-      skipped: 0,
-      item_count: items.length,
-      item_skipped: 0,
-      hidden: 0,
-      pieces,
-      items,
-      actors,
-    };
-    if (anchorPieceId && pieces.some((piece) => Number(piece.piece_id) === Number(anchorPieceId))) {
-      const anchorPiece = pieces.find((piece) => Number(piece.piece_id) === Number(anchorPieceId));
-      out.anchor_piece_id = Number(anchorPieceId);
-      out.anchor_piece_data_index = Number(anchorPiece.piece_data_index || 0);
-    }
-    downloadJson(out, `${safeFileName(buildName || "browser_build")}.json`);
+  function savedBuildBoundsLabel() {
+    const rows = [...placements.values()].filter(p => !p.hidden);
+    if (!rows.length) return "empty build";
+    return ["x", "y", "z"].map(axis => {
+      let min = Infinity, max = -Infinity;
+      for (const p of rows) { min = Math.min(min, p.state[axis]); max = Math.max(max, p.state[axis]); }
+      return `${axis.toUpperCase()} ${Math.round(min)} to ${Math.round(max)}`;
+    }).join(", ");
   }
 
   function downloadJson(data, filename) {
@@ -5544,6 +5656,7 @@ import {
 
   function focusCameraOnBuild({ notify = true } = {}) {
     if (!placements.size) return;
+    worldWorkspace?.beforeFrameBuild();
     const box = buildPlacementsWorldBox();
     focusCameraOnBox(box, { notify });
   }
@@ -5579,7 +5692,7 @@ import {
         closeCollectionDialog(value);
         return;
       }
-      closeCollectionDialog(activeCollectionDialog.confirmValue);
+      closeCollectionDialog(activeCollectionDialog.hasChoices ? els.collectionDialogChoice.value : activeCollectionDialog.confirmValue);
     });
     els.collectionDialogCancel?.addEventListener("click", (event) => {
       event.preventDefault();
@@ -5714,10 +5827,20 @@ import {
       setDuplicateNudgeModifier(false);
     });
     window.addEventListener("keydown", (event) => {
+      if (restoringSnapshot || bulkMutationActive) { event.preventDefault(); return; }
       updateGizmoSnapModifierFromEvent(event);
       if (isCollectionDialogOpen()) return;
       if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
       const key = event.key.toLowerCase();
+      if (dragSession?.buildImport) {
+        if (key === "escape") { event.preventDefault(); endDragPlacement(); showViewportNotice("Import canceled"); }
+        else if (key === "r") { event.preventDefault(); cycleDragRotateStep(); }
+        else if (key === "f") { event.preventDefault(); flipDragPreviewYaw(); }
+        else if (key === "t") { event.preventDefault(); toggleSolidView(); }
+        else if (handleViewportViewShortcut(event)) event.preventDefault();
+        else event.preventDefault();
+        return;
+      }
       if (key === "d") setDuplicateNudgeModifier(true);
       const smartNudgeDirection = smartDuplicateNudgeDirectionFromEvent(event);
       if (duplicateNudgeModifierActive && smartNudgeDirection) {
@@ -5802,6 +5925,370 @@ import {
     });
   }
 
+  async function importWorldBuildingJson(data, filename, append) {
+    if (dragSession || restoringSnapshot || bulkMutationActive) throw Error("Finish the current edit before importing");
+    validateBuildImport(data);
+    const { entries, skipped } = buildImportPlacementEntries(data);
+    if (skipped) throw Error(`Import has ${skipped} unavailable targets; current project retained`);
+    setLoading(false);
+    const location = await openCollectionDialog({
+      eyebrow: "Build Import", title: "Import Location",
+      message: `${filename} (${entries.length.toLocaleString()} objects). Original Location keeps the saved coordinates. Place Here previews the whole build${worldWorkspace.isMap() ? " at your current build location" : " before placement"}.`,
+      confirmLabel: "Original Location", confirmValue: "original",
+      secondaryLabel: "Place Here", secondaryValue: "here", showInput: false,
+    });
+    if (!location) return;
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    if (location === "here" && worldWorkspace.isMap()) {
+      await worldWorkspace.returnToBuild();
+    }
+    const before = captureBuildSnapshot();
+    const anchor = importedAnchorPiece(data);
+    const anchorEntry = anchor ? entries[(data.pieces || []).indexOf(anchor)] : null;
+    const snapshot = buildImportSnapshot(before, entries, { append,
+      name: data.name || filename.replace(/\.json$/i, ""), anchorEntry });
+    const { validateProject } = await import("./basebuilder-project.js");
+    validateProject({...worldWorkspace.capture(),build:snapshot},index);
+    if (location === "here") {
+      await beginWorldBuildPreview({ before, snapshot, entries, anchorEntry, append });
+    } else await commitWorldBuildImport(before, snapshot, { count: entries.length, append });
+  }
+
+  async function commitWorldBuildImport(before, snapshot, { count, append, frame = true, moveBuild = false }) {
+    const staged = await prepareWorldProjectRestore(snapshot);
+    const history = [...undoStack];
+    commitWorldProjectRestore(staged, snapshot);
+    undoStack.push(...history); pushUndoSnapshot(before);
+    if (frame) focusCameraOnBuild({notify:false});
+    scheduleAutosave();
+    els.assetStatus.textContent = `${moveBuild ? "Moved build:" : append ? "Appended" : "Imported"} ${count.toLocaleString()} objects`;
+    showViewportNotice(els.assetStatus.textContent);
+  }
+
+  async function beginPlaceBuildInWorld() {
+    if (dragSession || restoringSnapshot || bulkMutationActive) throw Error("Finish the current edit first");
+    if (!placements.size) { showViewportNotice("Add or import a build first"); return; }
+    if (worldWorkspace.isMap()) await worldWorkspace.returnToBuild();
+    const before = captureBuildSnapshot();
+    const entries = before.placements.filter(p => !p.hidden).map(p => ({ target: targetLookup.byId.get(p.target_id), transform: { ...p.state } }));
+    if (!entries.length) { showViewportNotice("Show at least one actor before placing the build"); return; }
+    const anchor = before.placements.find(p => !p.hidden && p.metadata.piece_id === anchorPieceId && targetLookup.byId.get(p.target_id)?.asset_kind === "building_piece");
+    const anchorEntry = anchor ? { transform: anchor.state } : null;
+    await beginWorldBuildPreview({ before, snapshot: structuredClone(before), entries, anchorEntry, append: false, moveBuild: true });
+  }
+
+  async function beginWorldBuildPreview({ before, snapshot, entries, anchorEntry, append, moveBuild = false }) {
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    const ghost = new THREE.Group();
+    let store = null, preparedGhost = false;
+    shell.inert = true; setLoading(true); bulkMutationActive = true;
+    try {
+      const targets = [...new Map(entries.map(e => [e.target.target_id, e.target])).values()];
+      await preloadGltfsForTargets(targets, { statusPrefix: "Preparing build preview" });
+      for (const target of targets) { await visualTemplateForTarget(target); instanceTemplateForTarget(target); }
+      const bounds = new THREE.Box3(), matrix = new THREE.Matrix4(), box = new THREE.Box3();
+      let slice = performance.now();
+      for (const entry of entries) {
+        const template = instanceTemplateForTarget(entry.target);
+        bounds.union(box.copy(template.bounds).applyMatrix4(ueTransformToThreeMatrix4(entry.transform, viewOffset, matrix)));
+        if (performance.now() - slice >= 5) { await nextFrame(); slice = performance.now(); }
+      }
+      if (bounds.isEmpty()) throw Error("Build has no preview geometry");
+      const bottom = bounds.getCenter(new THREE.Vector3()); bottom.y = bounds.min.y;
+      const pivot = anchorEntry ? { x: anchorEntry.transform.x, y: anchorEntry.transform.y, z: anchorEntry.transform.z }
+        : threeVectorToUe(bottom, viewOffset);
+      // Static instance matrices are relative to a movable parent. No per-object
+      // transform, picking index, or material update is needed on mouse movement.
+      store = createInstanceStore({ root: ghost, legacy: true, templateForTarget: instanceTemplateForTarget,
+        matrixForPlacement: (p, out) => placementRootMatrix(p, pivot, out), isVisible: () => true });
+      store.reserve(entries.map(entry => ({ target: entry.target, state: entry.transform })));
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        const p = { id: `preview_${i}`, target: entry.target, state: entry.transform, visual: {} };
+        if (!store.add(p)) {
+          const clone = cloneResolvedVisualGroup(p.target);
+          if (!clone) throw Error(`Unable to preview ${p.target.display_name}`);
+          setObjectSolidView(clone, false);
+          updateObjectFromState(clone, p.state, pivot); ghost.add(clone);
+        }
+        if (performance.now() - slice >= 5) {
+          els.assetStatus.textContent = `Preparing preview ${i + 1} of ${entries.length}`;
+          await nextFrame(); slice = performance.now();
+        }
+      }
+      store.flush(); prepareGhostObject(ghost); preparedGhost = true;
+      ghost.visible = false; ghost.name = "Whole build preview";
+      clearActiveGizmo();
+      const lockedPanels = [...document.querySelectorAll(".asset-panel, .inspector, .toolbar, #world-workspace")].map(el => [el, el.inert]);
+      for (const [element] of lockedPanels) element.inert = true;
+      dragSession = { token: Symbol("build-import"), ghost, ghostStore: store, lockedPanels,
+        buildImport: { before, snapshot, startIndex: snapshot.placements.length - entries.length, pivot, count: entries.length, append, moveBuild },
+        state: null, baseState: null, yawOffset: 0, zOffset: 0, rotateStepIndex: 0,
+        clickToPlace: true, canDrop: false, snapped: false, sourcePlacementId: "" };
+      scene.add(ghost);
+      if (moveBuild) {
+        rootGroup.visible = false;
+        for (const helper of selectionBoxes.values()) helper.visible = false;
+        if (largeSelectionOutline) largeSelectionOutline.object.visible = false;
+      }
+      document.body.classList.add("is-dragging-asset"); els.stage.classList.add("is-drag-target");
+      disablePreviewZoom(); renderControlsHud();
+      window.addEventListener("pointermove", onClickPreviewPointerMove);
+      window.addEventListener("wheel", onPreviewWheel, { passive: false });
+      renderPreviewRotationStatus(`Place ${entries.length.toLocaleString()} objects`);
+    } catch (error) {
+      if (preparedGhost) {
+        setObjectSolidView(ghost, false);
+        const materials = new Set();
+        ghost.traverse(obj => { if (obj.material) for (const m of [obj.material].flat()) materials.add(m); });
+        for (const material of materials) material.dispose();
+      }
+      store?.dispose(); disposeClonedSkeletons(ghost); ghost.clear(); throw error;
+    } finally { shell.inert = wasInert; bulkMutationActive = false; setLoading(false); }
+  }
+
+  async function prepareWorldProjectRestore(snapshot) {
+    if (!PERFORMANCE_LEGACY) return prepareInstancedWorldRestore(snapshot);
+    restoringSnapshot = true;
+    document.querySelector(".builder-shell").inert = true;
+    setLoading(true);
+    try {
+      const rows = snapshot.placements.map(row => ({ ...row, target: targetLookup.byId.get(row.target_id) }));
+      if (rows.some(row => !row.target)) throw Error("Project contains missing targets");
+      const unique = [...new Map(rows.map(row => [row.target.target_id, row.target])).values()];
+      await preloadGltfsForTargets(unique, { statusPrefix: "Preparing project" });
+      for (const target of unique) {
+        const template = await visualTemplateForTarget(target);
+        // Instanced actors become editable meshes on selection. Prepare that shader
+        // variant during project loading instead of on the user's first click.
+        await renderer.compileAsync(template, camera, scene);
+        await worldWorkspace?.layer.prepareEditable?.(template,scene);
+      }
+      await prepareSelectionShaders();
+      const staged = [];
+      for (const row of rows) {
+        const group = cloneResolvedVisualGroup(row.target);
+        if (!group) throw Error("Unable to prepare " + row.target.target_id);
+        attachRootUserData(group, row.id);
+        staged.push({ id: row.id, target: row.target, state: { ...row.state }, metadata: { ...row.metadata },
+          hidden: row.hidden, uiCollectionId: row.ui_collection_id || "", group, visual: null });
+        if (staged.length % 100 === 0) await nextFrame();
+      }
+      return staged;
+    } finally { restoringSnapshot = false; document.querySelector(".builder-shell").inert = false; setLoading(false); }
+  }
+
+  function commitWorldProjectRestore(staged, snapshot) {
+    if (!Array.isArray(staged)) return commitInstancedWorldRestore(staged, snapshot);
+    bulkMutationActive = true;
+    try {
+      endDragPlacement();
+      clearBuild({ resetOffset: false, render: false });
+      applyUiCollectionState(uiCollectionStateFromSnapshot(snapshot));
+      viewOffset = { ...snapshot.view_offset };
+      buildName = snapshot.build_name;
+      buildSchema = snapshot.build_schema;
+      anchorPieceId = snapshot.anchor_piece_id;
+      nextObjectId = snapshot.next_object_id;
+      nextPieceId = snapshot.next_piece_id;
+      nextUiCollectionId = snapshot.next_ui_collection_id;
+      for (const placement of staged) {
+        placements.set(placement.id, placement);
+        rootGroup.add(placement.group);
+        const visual = ensurePlacementVisualState(placement);
+        visual.backend = "real"; visual.root = placement.group;
+        promotedPlacementIds.add(placement.id);
+        setVisualTransform(placement);
+      }
+      undoStack.length = 0;
+      setSelection(snapshot.selected_ids || [], { render: false });
+    } finally { bulkMutationActive = false; }
+    renderInspector(); renderPlacedList(); updateCounters(); updateGroundGrid();
+  }
+
+  async function prepareInstancedWorldRestore(snapshot) {
+    const root = new THREE.Group(), offset = { ...snapshot.view_offset };
+    const store = makeInstanceStore(root, offset), stagedPlacements = new Map(), promoted = new Set();
+    const stagedIndex = { cells: new Map(), placementCells: new Map() };
+    const selected = new Set(snapshot.selected_ids || []);
+    const previousRestoring = restoringSnapshot;
+    const shell = document.querySelector(".builder-shell"), wasInert = shell.inert;
+    restoringSnapshot = true;
+    shell.inert = true; setLoading(true);
+    try {
+      const rows = snapshot.placements.map(row => ({ ...row, target: targetLookup.byId.get(row.target_id) }));
+      if (rows.some(row => !row.target)) throw Error("Project contains missing targets");
+      const targets = [...new Map(rows.map(row => [row.target.target_id, row.target])).values()];
+      await preloadGltfsForTargets(targets, { statusPrefix: "Preparing project" });
+      for (const target of targets) {
+        const template = await visualTemplateForTarget(target);
+        instanceTemplateForTarget(target);
+        await renderer.compileAsync(template, camera, scene);
+        await worldWorkspace?.layer.prepareEditable?.(template,scene);
+      }
+      await prepareSelectionShaders();
+      store.reserve(rows);
+      let slice = performance.now();
+      for (const row of rows) {
+        const p = { id: row.id, target: row.target, state: { ...row.state }, metadata: { ...row.metadata },
+          hidden: row.hidden, uiCollectionId: row.ui_collection_id || "", group: null, visual: null };
+        const visual = ensurePlacementVisualState(p);
+        if ((selected.size <= SELECTION_PROMOTION_LIMIT && selected.has(p.id)) || !store.add(p)) {
+          p.group = cloneResolvedVisualGroup(p.target);
+          if (!p.group) throw Error("Unable to prepare " + p.target.target_id);
+          attachRootUserData(p.group, p.id);
+          updateObjectFromState(p.group, p.state, offset);
+          p.group.updateMatrixWorld(true); p.group.visible = !p.hidden; root.add(p.group);
+          visual.backend = "real"; visual.root = p.group;
+          visual.worldBounds.setFromObject(p.group);
+          if (instancingEligibleForPlacement(p)) promoted.add(p.id);
+        } else visual.worldBounds.copy(visual.localBounds).applyMatrix4(placementRootMatrix(p, offset));
+        visual.worldBoundsDirty = false;
+        stagedPlacements.set(p.id, p);
+        const box = visual.worldBounds;
+        const cells = cellsForSpatialBounds({ minX: box.min.x / UNIT_SCALE + offset.x, maxX: box.max.x / UNIT_SCALE + offset.x,
+          minY: box.min.z / UNIT_SCALE + offset.y, maxY: box.max.z / UNIT_SCALE + offset.y });
+        stagedIndex.placementCells.set(p.id, cells);
+        for (const key of cells) { if (!stagedIndex.cells.has(key)) stagedIndex.cells.set(key, new Set()); stagedIndex.cells.get(key).add(p.id); }
+        if (performance.now() - slice >= 5) { await nextFrame(); slice = performance.now(); }
+      }
+      store.flush(camera);
+      await renderer.compileAsync(root, camera, scene);
+      return { root, store, placements: stagedPlacements, promoted, index: stagedIndex };
+    } catch (error) {
+      store.dispose(); disposeClonedSkeletons(root); root.clear(); throw error;
+    } finally {
+      restoringSnapshot = previousRestoring;
+      shell.inert = wasInert; setLoading(previousRestoring);
+    }
+  }
+
+  function commitInstancedWorldRestore(staged, snapshot) {
+    pendingSpatialUpdates.clear();
+    bulkMutationActive = true;
+    const oldRoot = rootGroup, oldStore = instanceStore;
+    try {
+      endDragPlacement(); transformControls.detach();
+      for (const helper of selectionBoxes.values()) { helper.removeFromParent(); helper.geometry.dispose(); helper.material.dispose(); }
+      selectionBoxes.clear();
+      if (largeSelectionOutline) largeSelectionOutline.object.visible = false;
+      selectedPlacedIds.clear(); activePlacementId = ""; activeGizmoMode = "";
+      rootGroup = staged.root; instanceStore = staged.store; placements = staged.placements;
+      promotedPlacementIds = staged.promoted; spatialIndex = staged.index;
+      viewOffset = { ...snapshot.view_offset }; worldAuthoredBounds = null;
+      oldRoot.removeFromParent(); scene.add(rootGroup);
+      oldStore.dispose(); disposeClonedSkeletons(oldRoot); oldRoot.clear();
+      applyUiCollectionState(uiCollectionStateFromSnapshot(snapshot));
+      buildName = snapshot.build_name; buildSchema = snapshot.build_schema; anchorPieceId = snapshot.anchor_piece_id;
+      nextObjectId = snapshot.next_object_id; nextPieceId = snapshot.next_piece_id; nextUiCollectionId = snapshot.next_ui_collection_id;
+      undoStack.length = 0;
+      setSelection(snapshot.selected_ids || [], { render: false });
+      invalidateAllScreenBounds(); syncInstanceStatsDataset();
+    } finally { bulkMutationActive = false; }
+    renderInspector(); renderPlacedList(); updateCounters(); updateGroundGrid();
+  }
+
+  async function initializeWorldWorkspace() {
+    document.body.classList.add("world-editor");
+    els.exportJson.textContent = "Export Build";
+    const { createBuilderWorkspace } = await import("./basebuilder-workspace.js");
+    worldWorkspace = await createBuilderWorkspace({
+      catalog: index, renderer, scene, controls, getCamera: () => camera,
+      getOrigin: () => [viewOffset.x, viewOffset.y, viewOffset.z],
+      setOrigin(value) { viewOffset = { x: value[0], y: value[1], z: value[2] }; },
+      captureCamera: () => ({ position_cm: Object.values(threeVectorToUe(camera.position, viewOffset)),
+        target_cm: Object.values(threeVectorToUe(controls.target, viewOffset)), projection: cameraProjectionMode, size: orthographicViewSize }),
+      resetView() { switchCameraProjection("perspective", {notify:false}); camera.position.set(6,7,8); controls.target.set(0,0.4,0); controls.update(); },
+      hasReferences: () => referenceModels.size > 0,
+      clearReferences() { for (const ref of [...referenceModels.values()]) disposeReference(ref); renderInspector(); renderPlacedList(); },
+      async prepareWorldShaders(layer) {
+        const targets = [...new Map([...placements.values()].map(p => [p.target.target_id, p.target])).values()];
+        for (const target of targets) await layer.prepareEditable(await visualTemplateForTarget(target), scene);
+        await layer.prepareEditable(rootGroup, scene);
+      },
+      placeBuild: beginPlaceBuildInWorld,
+      setAuthoringMode(mode, free) {
+        WORLD_MODE = mode === "world";
+        els.stage.dataset.workspaceMode = mode;
+        els.importReference.disabled = WORLD_MODE;
+        els.importReference.title = WORLD_MODE ? "Reference models are not included in project saves" : "Reference models are not saved; re-import them after reload";
+        referenceGroup.visible = !WORLD_MODE;
+        const [hemi, key, fill] = normalSceneLights;
+        hemi.color.set(WORLD_MODE ? 0xe4efff : 0xfff4df); hemi.groundColor.set(WORLD_MODE ? 0x676058 : 0x6f7d72); hemi.intensity = WORLD_MODE ? 1.4 : 2.3;
+        key.color.set(WORLD_MODE ? 0xfff3dd : 0xffe3bd); key.intensity = WORLD_MODE ? 2.4 : 2.1;
+        key.position.set(...(WORLD_MODE ? [-100,230,-80] : [8,10,6])); fill.intensity = WORLD_MODE ? 0 : 0.85;
+        defaultToneMappingExposure = WORLD_MODE ? 1 : 1.05; scene.environmentIntensity = WORLD_MODE ? 0.55 : 1;
+        scene.background = WORLD_MODE ? new THREE.Color(0x303b40) : null;
+        applySolidViewLighting(); updateGroundGrid();
+        if (!WORLD_MODE && groundGrid) { groundGrid.position.y = (free.plane_z_cm - viewOffset.z) / 100 + GROUND_GRID_Y; dragPlane.constant = -(free.plane_z_cm - viewOffset.z) / 100; }
+        resize();
+      },
+      getOrientation: () => orientationMode, getOrthoSize: () => orthographicViewSize,
+      captureBuild: captureBuildSnapshot, prepareRestore: prepareWorldProjectRestore, commitRestore: commitWorldProjectRestore,
+      count: () => placements.size, name: () => safeFileName(buildName),
+      frameBuild: () => focusCameraOnBuild({notify:false}),
+      getBuildBounds: () => placements.size ? buildPlacementsWorldBox() : null,
+      setMapMode(value) { document.body.classList.toggle("world-map-view",value); transformControls.enabled=!value; },
+      busy: () => Boolean(restoringSnapshot || bulkMutationActive || dragSession || selectionGesture || pendingTransformUndo || smartDuplicateNudgeActive || isCollectionDialogOpen()),
+      setProjectBusy(value) { restoringSnapshot = value; document.querySelector(".builder-shell").inert = value; setLoading(value); },
+      notice: showViewportNotice, dialog: openCollectionDialog, download: downloadJson,
+      clearProject() { clearBuild(); for (const ref of [...referenceModels.values()]) disposeReference(ref); renderInspector(); renderPlacedList(); nextObjectId = 1; buildName = "New Build"; undoStack.length = 0; },
+      restoreView(workspace) {
+        orientationMode = workspace.orientation; syncOrientationUi();
+        switchCameraProjection(workspace.camera.projection, { notify: false });
+        orthographicViewSize = workspace.camera.size;
+        const convert = p => new THREE.Vector3((p[0]-viewOffset.x)/100,(p[2]-viewOffset.z)/100,(p[1]-viewOffset.y)/100);
+        camera.position.copy(convert(workspace.camera.position_cm));
+        controls.target.copy(convert(workspace.camera.target_cm));
+        const distance = camera.position.distanceTo(controls.target);
+        camera.far = Math.max(50000, distance * 4); controls.maxDistance = Math.max(10000, distance * 1.5);
+        updateCameraProjection(); controls.update(); invalidateAllScreenBounds();
+      },
+      frameWorld(box, focus) {
+        const size = box.getSize(new THREE.Vector3());
+        const extent = Math.max(size.x, size.z, 20);
+        const frameBox = new THREE.Box3().setFromCenterAndSize(focus, new THREE.Vector3(extent, extent * 0.25, extent));
+        focusCameraOnBox(frameBox, { notify: false });
+      },
+      frameDestination(box,focus) {
+        camera.position.copy(focus).add(new THREE.Vector3(65,75,90));controls.target.copy(focus);
+        focusCameraOnBox(box,{notify:false});
+      },
+      frameMap(box) {
+        const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+        camera.position.copy(center).add(new THREE.Vector3(0,100,0.01));controls.target.copy(center);
+        focusCameraOnBox(new THREE.Box3().setFromCenterAndSize(center,new THREE.Vector3(size.x,1,size.z)),{notify:false});
+      },
+    }, { defaultMode: INITIAL_WORLD_REQUESTED ? "world" : "free", worldAvailable: WORLD_AVAILABLE });
+    resize();
+    if (new URLSearchParams(location.search).has("debug")) {
+      window.worldBuilderDebug = {
+        workspace: worldWorkspace, catalog: index, camera: () => camera, controls, renderer, scene,
+        snapshot: captureBuildSnapshot, export: () => serializeBuildingJson({placements, buildSchema, buildName, anchorPieceId, allocatePieceId: createPieceIdAllocator()}, 0),
+        add: (id, state) => createPlacement(targetLookup.byId.get(id), state),
+        select: ids => setSelection(ids), undo: undoLastAction, clear: () => clearBuild({recordUndo:true}),
+        anchor: setSelectedAnchor, duplicate: duplicateSelected, hide: toggleSelectedHidden,
+        placeBuild: beginPlaceBuildInWorld,
+        collection: createUiCollection, snap: snapSelected, focus: focusCameraOnBuild,
+        surface: ray => worldWorkspace.surface(ray), busy: () => Boolean(dragSession || restoringSnapshot || bulkMutationActive),
+        pick: hitPlacementId,
+        gizmo: () => transformControls,
+        marquee: selectByMarquee,
+        preview: () => dragSession ? { state: { ...dragSession.state }, canDrop: dragSession.canDrop, snapped: dragSession.snapped, step: dragSession.rotateStepIndex,
+          buildCount: dragSession.buildImport?.count, pivot: dragSession.buildImport?.pivot } : null,
+        state: () => ({ placements: placements.size, world: worldWorkspace.layer.getStatus(), undo: undoStack.length,
+          visualRoots: rootGroup.children.length, selected: [...selectedPlacedIds], instances: instanceStore.batches.size, gizmo: activeGizmoMode }),
+        performance: () => instanceStore.stats(camera),
+        pendingSpatialCount: () => pendingSpatialUpdates.size,
+        querySpatialCenter(id) {
+          const placement=placements.get(id);
+          return placement ? queryPointRadius(uePointFromThreePoint(getWorldBounds(placement).getCenter(new THREE.Vector3())),1).map(p=>p.id) : [];
+        },
+      };
+    }
+    await worldWorkspace.start();
+  }
+
   async function init() {
     bindEvents();
     config = { ...config, ...(await loadJson(CONFIG_URL).catch(() => ({}))) };
@@ -5818,11 +6305,8 @@ import {
     renderControlsHud();
     installDebugHelpers();
     const benchmarkOptions = debugBenchmarkOptionsFromUrl();
-    if (benchmarkOptions) {
-      await debugGenerateSyntheticBuild(benchmarkOptions);
-    } else {
-      await restoreAutosavedBuild();
-    }
+    await initializeWorldWorkspace();
+    if (benchmarkOptions) await debugGenerateSyntheticBuild(benchmarkOptions);
     renderInspector();
     updateCounters();
     autosaveReady = true;

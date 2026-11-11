@@ -1,0 +1,17 @@
+{
+  "schema": "RSDW.WorldRegionConfig.v1",
+  "id": "fellhollow-road-ruins",
+  "version": "1.0.0.5",
+  "world_package": "RSDragonwilds/Content/Maps/World/L_World",
+  "candidate_cell": "AH1KHVYOKGH2CP54XNL3JAWTA",
+  "bounds_cm": {"min": [226800, -25200, -14000], "max": [252000, 0, 20000]},
+  "halo_cm": 2500,
+  "origin_cm": [239400, -12600, 0],
+  "focus_cm": [232400, -20600, -3000],
+  "viewpoints": {
+    "oblique": {"position_cm": [242400, -37600, 10000], "target_cm": [232400, -20600, -3000]},
+    "road": {"position_cm": [228500, -21000, -2500], "target_cm": [230300, -21000, -2800]}
+  },
+  "exclude_landscape_material_patterns": ["Cave"],
+  "workers": 8
+}

@@ -164,8 +164,16 @@ export function ueMatrixRowsToThreeMatrix4(rows, offset = {}) {
   return out;
 }
 
-export function ueTransformToThreeMatrix4(row = {}, offset = {}) {
-  return ueMatrixRowsToThreeMatrix4(ueMatrixFromTransform(row), offset);
+export function ueTransformToThreeMatrix4(row = {}, offset = {}, out = new THREE.Matrix4()) {
+  // Same UE Z/Y/X rotation and basis swap, without nested temporary matrices.
+  const p=degToRad(row.pitch),y=degToRad(row.yaw),r=degToRad(row.roll);
+  const cp=Math.cos(p),sp=Math.sin(p),cy=Math.cos(y),sy=Math.sin(y),cr=Math.cos(r),sr=Math.sin(r);
+  const sx=numberOr(row.scale_x,1),sz=numberOr(row.scale_z,1),scaleY=numberOr(row.scale_y,1);
+  return out.set(
+    cy*cp*sx,(cy*sp*cr+sy*sr)*sz,(cy*sp*sr-sy*cr)*scaleY,(numberOr(row.x)-numberOr(offset.x))*UNIT_SCALE,
+    -sp*sx,cp*cr*sz,cp*sr*scaleY,(numberOr(row.z)-numberOr(offset.z))*UNIT_SCALE,
+    sy*cp*sx,(sy*sp*cr-cy*sr)*sz,(sy*sp*sr+cy*cr)*scaleY,(numberOr(row.y)-numberOr(offset.y))*UNIT_SCALE,
+    0,0,0,1);
 }
 
 export function componentTransformToThreeMatrix4(transform = {}, options = {}) {
@@ -205,9 +213,9 @@ function stableAngle(next, previous, epsilon = 0.0001) {
 export function updateStateFromObject(object, previous = {}, offset = {}, options = {}) {
   const prev = normalizeTransform(previous);
   const pos = threeVectorToUe(object.position, offset);
-  const rot = ueRotatorFromThreeQuaternion(object.quaternion);
   const updateRotation = options.updateRotation !== false;
   const updateScale = options.updateScale !== false;
+  const rot = updateRotation ? ueRotatorFromThreeQuaternion(object.quaternion) : prev;
   return {
     ...prev,
     x: pos.x,
@@ -223,27 +231,18 @@ export function updateStateFromObject(object, previous = {}, offset = {}, option
 }
 
 export function ueRotatorFromThreeQuaternion(quaternion) {
-  const matrix = new THREE.Matrix4().makeRotationFromQuaternion(quaternion);
-  const e = matrix.elements;
-  const t = [
-    [e[0], e[4], e[8]],
-    [e[1], e[5], e[9]],
-    [e[2], e[6], e[10]],
-  ];
-  const r = [
-    [t[0][0], t[0][2], t[0][1]],
-    [t[2][0], t[2][2], t[2][1]],
-    [t[1][0], t[1][2], t[1][1]],
-  ];
-  const pitch = Math.asin(Math.max(-1, Math.min(1, -r[2][0])));
+  const {x,y,z,w}=quaternion,x2=x+x,y2=y+y,z2=z+z;
+  const e0=1-(y*y2+z*z2),e1=x*y2+w*z2,e2=x*z2-w*y2;
+  const e5=1-(x*x2+z*z2),e8=x*z2+w*y2,e9=y*z2-w*x2,e10=1-(x*x2+y*y2);
+  const pitch = Math.asin(Math.max(-1, Math.min(1, -e1)));
   const cp = Math.cos(pitch);
   let yaw = 0;
   let roll = 0;
   if (Math.abs(cp) > 1e-6) {
-    yaw = Math.atan2(r[1][0], r[0][0]);
-    roll = Math.atan2(r[2][1], r[2][2]);
+    yaw = Math.atan2(e2, e0);
+    roll = Math.atan2(e9, e5);
   } else {
-    yaw = Math.atan2(-r[0][1], r[1][1]);
+    yaw = Math.atan2(-e8, e10);
   }
   return {
     pitch: normalizeDegrees(radToDeg(pitch)),

@@ -1,6 +1,6 @@
 {
-  "count": 771,
-  "no_plugs": 42,
+  "count": 796,
+  "no_plugs": 44,
   "pieces": {
     "BP_BaseBuilding_ArcheryTarget_C": {
       "piece_tag": "",
@@ -5322,6 +5322,158 @@
         }
       ]
     },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_13_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_14_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_15_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Fishing_Trophy_16_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
     "BP_BaseBuilding_Decoration_Food_Bowl_Onions_C": {
       "piece_tag": "",
       "plugs": [
@@ -6045,6 +6197,82 @@
       ]
     },
     "BP_BaseBuilding_Decoration_General_Hanging_Tools_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_General_Penguin_RS3_Tapestry_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_General_PolarBear_RS3_Tapestry_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -6957,6 +7185,158 @@
       ]
     },
     "BP_BaseBuilding_Decoration_Literature_Book_Tome_Cooking_Standing_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Farming_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Farming_Standing_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Fishing_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Literature_Book_Tome_Fishing_Standing_C": {
       "piece_tag": "",
       "plugs": [
         {
@@ -10034,6 +10414,82 @@
         }
       ]
     },
+    "BP_BaseBuilding_Decoration_Rug_GreenCircular_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Decoration_Rug_GreenRectangular_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
     "BP_BaseBuilding_Decoration_Rune_Air_C": {
       "piece_tag": "",
       "plugs": [
@@ -11782,6 +12238,44 @@
         }
       ]
     },
+    "BP_BaseBuilding_FishingRack_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
     "BP_BaseBuilding_Food_Dinner_Omelette_Pungent_C": {
       "piece_tag": "",
       "plugs": [
@@ -12347,6 +12841,462 @@
             0.0,
             0.0,
             -0.70710677,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Bronze_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Coin_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Copper_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Gold_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Hidden_01_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Hidden_02_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Hidden_03_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Hidden_04_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Silver_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Statue_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Stone_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
+            0.70710677
+          ]
+        }
+      ]
+    },
+    "BP_BaseBuilding_Penguin_Tin_C": {
+      "piece_tag": "",
+      "plugs": [
+        {
+          "piece_ign": [
+            "BaseBuilding.PieceType.Window",
+            "BaseBuilding.PieceType.Prop",
+            "BaseBuilding.PieceType.None",
+            "BaseBuilding.PieceType.Foundation",
+            "BaseBuilding.PieceType.Door",
+            "BaseBuilding.PieceType.Beam",
+            "BaseBuilding.PieceType.Base"
+          ],
+          "piece_tag": "None",
+          "plug_ign": [
+            "BaseBuilding.PlugType.Surface",
+            "BaseBuilding.PlugType.None",
+            "BaseBuilding.PlugType.Hinge",
+            "BaseBuilding.PlugType.BeamSurface",
+            "BaseBuilding.PlugType.Beam",
+            "BaseBuilding.PlugType.BaseBeam",
+            "BaseBuilding.PlugType.Base"
+          ],
+          "plug_tag": "BaseBuilding.PlugType.Surface",
+          "pos": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rot": [
+            0.0,
+            0.70710677,
+            0.0,
             0.70710677
           ]
         }
@@ -114946,5 +115896,5 @@
       ]
     }
   },
-  "scanned": 813
+  "scanned": 840
 }

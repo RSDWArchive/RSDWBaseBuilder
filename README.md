@@ -38,6 +38,27 @@ builds and tests with.
 
 ## Repository Layout
 
+### Local World Builder Preview
+
+The opt-in local browser workspace combines the existing editor with one
+read-only whole-world overview and nearby section streaming, project downloads, shared autosave/recovery and
+unchanged game JSON export. See [the local testing guide](tools/Web/WORLD_BUILDER_LOCAL.md)
+and [Milestone 2 plan](WORLD_BUILDER_MILESTONE_2_PLAN.md). This is not deployed and
+does not change the Blender release pipeline.
+
+The [Milestone 3 performance pass](WORLD_BUILDER_MILESTONE_3_PLAN.md) is available
+for local 10k testing. Building, persistence and visual regression checks pass;
+wide views and move-all are substantially faster, while full-selection rotation
+and scale remain performance follow-ups. See the plan for measured limits.
+
+The local [Milestone 4](WORLD_BUILDER_MILESTONE_4_PLAN.md) adds Free Build / World
+Build switching, shared Project.v2 saves, old-save migration and whole-build placement.
+Game export coordinates remain unchanged. Exact-location in-game delivery and
+save/reload acceptance are pending; the verification pack is under ignored
+`_build/world-builder-m4/game-verification/`.
+
+### Source and Outputs
+
 The public repo contains reproducible source and small metadata:
 
 - `addon/` contains the Blender extension source, runtime `data/`, and

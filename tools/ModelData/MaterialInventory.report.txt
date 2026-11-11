@@ -1,8 +1,8 @@
-Total meshes:               2036
-  with >=1 material:        2035
+Total meshes:               2062
+  with >=1 material:        2061
   with no material JSON:    1
-  with >1 material slots:   1269
-Unique material JSONs:      1508
+  with >1 material slots:   1278
+Unique material JSONs:      1522
 
 Top 30 most-referenced materials:
     135  MI_Modular_Set_Tier_Trim                            RSDragonwilds/Content/Art/Env/Base_Building/BuildingKit/Tier1/Materials/MI_Modular_Set_Tier_Trim.json

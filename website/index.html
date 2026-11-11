@@ -129,6 +129,57 @@
         </div>
       </header>
 
+      <div id="project-workspace" class="project-workspace">
+        <div class="workspace-modes" role="group" aria-label="Workspace">
+          <button type="button" data-workspace-mode="free" aria-pressed="true">Free Build</button>
+          <button type="button" data-workspace-mode="world" aria-pressed="false">World Build</button>
+        </div>
+        <details class="project-menu">
+          <summary>Project</summary>
+          <div class="project-menu-actions">
+            <button id="project-new" type="button">New Project</button>
+            <button id="project-open" type="button">Open Project</button>
+            <button id="project-save" type="button">Save Project</button>
+            <button id="project-copy" type="button">Save Copy</button>
+          </div>
+        </details>
+        <input id="project-file" type="file" accept=".json,application/json" hidden />
+        <label id="free-plane-field">Plane Z <input id="free-plane-z" type="number" step="10" value="0" aria-label="Free Build plane height in centimeters" /></label>
+        <button id="place-build-world" type="button" hidden>Place Build in World</button>
+        <span id="project-save-status" role="status">Unsaved</span>
+      <div id="world-workspace" class="world-workspace" hidden>
+        <button id="world-map" type="button">World Map</button>
+        <button id="world-return-build" type="button">Return to Build</button>
+        <select id="world-area" aria-label="World area"><option value="all">All Areas</option></select>
+        <details class="project-menu world-location-menu">
+          <summary>Locations</summary>
+          <div class="project-menu-actions">
+            <input id="world-search" type="search" placeholder="Find location" aria-label="Find location" />
+            <select id="world-section-select" size="7" aria-label="World section"></select>
+            <button id="world-load-section" type="button">Build Here</button>
+          </div>
+        </details>
+        <details class="project-menu world-advanced-menu">
+          <summary>World Settings</summary>
+          <div class="project-menu-actions">
+            <label><input id="world-streaming" type="checkbox" checked /> Nearby streaming</label>
+            <button id="world-unload-section" type="button">Unload</button>
+            <button id="world-resume" type="button">Load / Retry</button>
+            <button id="world-frame-section" type="button">Frame Section</button>
+          </div>
+        </details>
+        <details class="project-menu">
+          <summary>Layers</summary>
+          <div class="project-menu-actions">
+            <label><input type="checkbox" data-world-layer="terrain" checked /> Terrain</label>
+            <label><input type="checkbox" data-world-layer="trees" checked /> Trees</label>
+            <label><input type="checkbox" data-world-layer="buildings" checked /> Buildings</label>
+            <label><input type="checkbox" data-world-layer="scenery" checked /> Scenery</label>
+          </div>
+        </details>
+        <span id="world-load-status" role="status">World unloaded</span>
+      </div>
+      </div>
             <section id="builder-stage" class="builder-stage" aria-label="3D editor">
                 <div id="stage-loading" class="stage-loading">Loading...</div>
                 <div class="viewport-hotkey-row viewport-hotkey-row--navigation viewport-hotkey-panel" aria-hidden="true">
@@ -314,6 +365,10 @@
           <span id="collection-dialog-label">Collection Name</span>
           <input id="collection-dialog-input" type="text" autocomplete="off" maxlength="64" />
         </label>
+        <label id="collection-dialog-choice-field" class="themed-dialog__field" hidden>
+          <span>Saved Project</span>
+          <select id="collection-dialog-choice" aria-label="Saved project"></select>
+        </label>
         <div class="themed-dialog__actions">
           <button id="collection-dialog-cancel" class="themed-dialog__button" type="button">Cancel</button>
           <button id="collection-dialog-secondary" class="themed-dialog__button" type="button" hidden>Append</button>
@@ -323,6 +378,6 @@
     </section>
   </div>
 
-  <script type="module" src="./basebuilder.js?v=20260622-import-dialog-title"></script>
+  <script type="module" src="./basebuilder.js?v=20261017-workspace-4"></script>
 </body>
 </html>

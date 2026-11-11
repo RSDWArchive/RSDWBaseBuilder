@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import { applySurfaceSettings, surfaceSettingsIssues } from "./preview/world-surface.js";
+
+const material={color:{rgb:[.9,.9,.9],setRGB(...rgb){this.rgb=rgb;},toArray(){return this.rgb;}},
+  opacity:1,emissiveIntensity:2,roughness:.9,metalness:0,roughnessMap:{},metalnessMap:{}};
+const settings={surface_color:{multiplier:[.12,.1,.08],unapplied_brightness:6},surface_pbr:{roughness:.7,metalness:.7}};
+assert.equal(surfaceSettingsIssues(material,settings).length,3);
+applySurfaceSettings(material,settings);
+assert.deepEqual(material.color.rgb,[.12,.1,.08]);
+assert.deepEqual(surfaceSettingsIssues(material,settings),[]);
+assert.equal(material.roughnessMap,null);
+assert.equal(material.opacity,1);
+assert.equal(material.emissiveIntensity,2);
+applySurfaceSettings(material,settings);
+assert.deepEqual(material.color.rgb,[.12,.1,.08]);
+applySurfaceSettings(material,{});
+assert.deepEqual(material.color.rgb,[.12,.1,.08]);
+applySurfaceSettings(material,{surface_color:{multiplier:[0,0,0],unapplied_brightness:2}});
+assert.deepEqual(material.color.rgb,[0,0,0]);
+material.map={};material.normalMap={};material.transparent=true;
+const disabled={base_color_enabled:false,normal_enabled:false,surface_opacity:.05};
+assert.equal(surfaceSettingsIssues(material,disabled).length,3);
+applySurfaceSettings(material,disabled);
+assert.equal(material.map,null);
+assert.equal(material.normalMap,null);
+assert.equal(material.opacity,.05);
+assert.deepEqual(surfaceSettingsIssues(material,disabled),[]);
+material.transparent=false;material.opacity=1;
+applySurfaceSettings(material,{surface_opacity:.05});
+assert.equal(material.opacity,1);
+assert.deepEqual(surfaceSettingsIssues(material,{surface_opacity:.05}),[]);
+console.log("Surface settings: linear RGB, idempotent tint, unapplied brightness, PBR and untouched alpha/emission pass");

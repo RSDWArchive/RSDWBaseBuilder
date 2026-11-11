@@ -45,6 +45,12 @@ BaseBuilder owns its packaged snap metadata. During the BaseBuilder pipeline,
 `addon\data\Snaps.json` before the extension is staged or the browser index is
 built. RSDWArchive should not write this file directly.
 
+The browser web-index stage requires Node.js on PATH when preserving prior world-project
+catalog identities. It records compatible earlier hashes only after verifying that all
+existing targets and their referenced snap data are unchanged. Keep the committed
+`website/basebuilder-index.json` available when generating into a staging directory;
+`--previous-index <path>` can supply another earlier index for the same verification.
+
 Blender is resolved in this order:
 
 1. `E:\Github\RSDWBaseBuilder\_local\blender-5.0.0-windows-x64\blender.exe`

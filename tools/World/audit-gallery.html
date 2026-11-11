@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Material Review</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box;letter-spacing:0}body{margin:0;background:#15171a;color:#eee;font:14px "Segoe UI",sans-serif}header{padding:16px 24px;border-bottom:2px solid #c6ac73;position:sticky;top:0;background:#15171a;z-index:1}h1{font-size:20px;margin:0 0 12px}nav{display:flex;gap:12px;flex-wrap:wrap;align-items:center}input,select,button{font:inherit;padding:8px;border:1px solid #82745d;border-radius:4px;color:inherit;background:#22272b}input{flex:1;min-width:180px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(520px,100%),1fr));gap:18px;padding:24px}article{border:1px solid #59564d;border-radius:5px;overflow:hidden}article img{width:100%;aspect-ratio:3;object-fit:contain;display:block;background:#303b40}section{padding:12px}h2{font-size:15px;margin:0 0 8px;overflow-wrap:anywhere}p{margin:6px 0;overflow-wrap:anywhere;color:#c9c9c9}a{color:#e0c896}small{color:#bcbcbc}footer{padding:12px 24px 24px;text-align:center}article select{width:100%;margin-top:8px}.warning{color:#ffcd91}
+</style>
+<header><h1>World Material Review</h1><nav><input id="search" type="search" placeholder="Search models, materials, issues" aria-label="Search models, materials, issues"><select id="filter" aria-label="Review filter"><option value="flagged">Flagged</option><option value="surface_mapping">Surface mapping</option><option value="pixels">White / pale / invisible</option><option value="unreconstructed_effect">Unreconstructed effects</option><option value="all">All variants</option><option value="pending">Manual review pending</option><option value="errors">Load errors</option></select><span id="count"></span></nav><p id="run"></p></header>
+<main id="results"></main><footer><button id="more">Show More</button></footer>
+<script type="module">
+const report=await fetch('VisualAudit.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json();});
+const key='rsdw-world-material-review:'+report.fingerprint;
+let reviews={};try{reviews=JSON.parse(localStorage.getItem(key)||'{}');}catch{}
+let limit=48;const search=document.querySelector('#search'),filter=document.querySelector('#filter');
+document.querySelector('#run').textContent=report.status+' | '+report.variants.length+' variants | In-game comparison pending';
+function text(parent,tag,value,cls){const e=document.createElement(tag);e.textContent=value;if(cls)e.className=cls;parent.append(e);return e;}
+function render(){
+ const q=search.value.toLowerCase();const rows=report.variants.filter(r=>JSON.stringify([r.source,r.materials,r.source_issues,r.flags,r.review_notes,r.white_review,r.source_review]).toLowerCase().includes(q)).filter(r=>filter.value==='all'||filter.value==='flagged'&&(r.errors.length||r.flags?.length||r.source_issues.length)||filter.value==='pending'&&!reviews[r.asset]||filter.value==='errors'&&r.errors.length||filter.value==='white'&&r.white_review||filter.value==='source_checked'&&r.source_review||filter.value==='pixels'&&r.flags?.length||filter.value===r.review_bucket);
+ const root=document.querySelector('#results');root.replaceChildren();
+ document.querySelector('#count').textContent=rows.length+' variants';
+ for(const r of rows.slice(0,limit)){
+  const article=document.createElement('article');root.append(article);
+  if(r.thumbnail){const img=document.createElement('img');img.src=r.thumbnail;img.alt=r.source.split('/').at(-1);img.loading='lazy';article.append(img);}
+  const body=document.createElement('section');article.append(body);
+  text(body,'h2',r.source.split('/').at(-1));text(body,'small',r.asset+' | '+r.placements.toLocaleString()+' placements | '+r.layer);
+  text(body,'p',[...r.errors,...(r.flags||[]),...r.source_issues].join(' | ')||'No automated flag; manual comparison pending','warning');
+  const details=document.createElement('details');body.append(details);text(details,'summary','Materials');for(const m of r.materials)text(details,'p',m);
+  if(r.review_notes?.length){
+    const review=document.createElement('details');body.append(review);text(review,'summary','In-game verification notes');
+    for(const note of r.review_notes){text(review,'strong',note.material.split('/').at(-1));for(const message of note.notes)text(review,'p',message);}
+  }
+  if(r.white_review){
+    const triage=document.createElement('details');body.append(triage);text(triage,'summary','White-material investigation');
+    for(const entry of r.white_review.materials){text(triage,'strong',entry.material.split('/').at(-1)||'Unassigned');text(triage,'p',entry.reason);}
+    for(const [i,view] of (r.white_review.landscape_projection_views??[]).entries())
+      text(triage,'p','View '+(i+1)+': '+(view.atlas_fraction===null?'No opaque samples':(100*view.atlas_fraction).toFixed(1)+'% atlas / '+(100*view.fallback_fraction).toFixed(1)+'% pale fallback')+'.');
+  }
+  if(r.source_review){
+    const evidence=document.createElement('details');body.append(evidence);text(evidence,'summary','Source investigation');
+    text(evidence,'p','Source inspected; in-game verification pending. Original flags: '+r.source_review.baseline_flags.join(', '));
+    for(const entry of r.source_review.materials){
+      text(evidence,'strong',entry.material.split('/').at(-1)||'Unassigned');text(evidence,'p',entry.note);
+      text(evidence,'small','Bound maps: '+(entry.bound_roles.join(', ')||'none')+' | Source expression exports: '+(entry.expression_exports??'unavailable'));
+    }
+  }
+  const link=text(body,'a','Open in World');const params=new URLSearchParams({world:'1'});if(r.section)params.set('section',r.section);if(r.layer==='helpers')params.set('helpers','1');link.href='/RSDWBaseBuilder/tools/World/preview/index.html?'+params+'#view='+encodeURIComponent(JSON.stringify(r.bookmark));link.target='_blank';link.rel='noopener';
+  const select=document.createElement('select');select.setAttribute('aria-label','Manual review status');
+  for(const [value,label] of [['','Manual review pending'],['verified','Verified against game'],['intentional_white','Intentional white verified'],['needs_fix','Needs correction']])select.add(new Option(label,value));
+  select.value=reviews[r.asset]||'';select.onchange=()=>{reviews[r.asset]=select.value;try{localStorage.setItem(key,JSON.stringify(reviews));}catch{document.querySelector('#run').textContent='Browser could not persist review status';}};body.append(select);
+ }
+ document.querySelector('#more').hidden=rows.length<=limit;
+}
+filter.add(new Option('White / pale surfaces only','white'));
+if(report.source_review_provenance)filter.add(new Option('Source-inspected baseline','source_checked'));
+search.oninput=filter.onchange=()=>{limit=48;render();};document.querySelector('#more').onclick=()=>{limit+=48;render();};render();
+</script></html>
