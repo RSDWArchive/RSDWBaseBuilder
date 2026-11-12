@@ -5555,7 +5555,7 @@ import {
     catch (error) { showViewportNotice(`Export unavailable: ${error.message}`); return; }
     const anchor = [...placements.values()].find(p => !p.hidden && p.target.asset_kind === "building_piece" && p.metadata.piece_id === anchorPieceId);
     const intent = await openCollectionDialog({ eyebrow: "Game Export", title: "Delivery Location", showInput: false,
-      message: `Catalog ${index.version}. Saved XYZ bounds (cm): ${savedBuildBoundsLabel()}. Saved World Location: use RSDWTools Deliver Build. Place Using Anchor: use Deliver via Preview. Both export the same JSON. ${WORLD_MODE ? "" : "For a free-space prefab, use World Build > Place Build in World or set absolute XYZ before saved-location delivery. "}Original game captures without version metadata remain unverified.`,
+      message: `Catalog ${index.version}. Saved XYZ bounds (cm): ${savedBuildBoundsLabel()}. Saved World Location: use RSDWTools Deliver Build. Place Using Anchor: use Deliver via Preview. Both export the same JSON. ${WORLD_MODE ? "" : "For a free-space prefab, use World (beta) > Place Build in World or set absolute XYZ before saved-location delivery. "}Original game captures without version metadata remain unverified.`,
       confirmLabel: worldWorkspace.deliveryMode() === "anchor" && anchor ? "Place Using Anchor" : "Saved World Location",
       confirmValue: worldWorkspace.deliveryMode() === "anchor" && anchor ? "anchor" : "saved_world_location",
       secondaryLabel: anchor ? (worldWorkspace.deliveryMode() === "anchor" ? "Saved World Location" : "Place Using Anchor") : "",

@@ -15,7 +15,7 @@ Open <http://127.0.0.1:8765/RSDWBaseBuilder/website/index.html?world=1>.
 Do not start another server if port 8765 is already serving this directory.
 Without `?world=1`, a new project starts in Free Build with no world-data requests.
 Both workspaces use the same project saves and recovery. Recovery restores the
-saved workspace regardless of the query string. World Build is local-only.
+saved workspace regardless of the query string. World (beta) is local-only.
 
 The local config is `website/world/local-config.js`. The current catalog and
 world must both be version `1.0.0.5`. Required generated inputs are:
@@ -31,7 +31,7 @@ The existing Three.js/Draco dependencies still require their configured CDNs.
 
 ## Workspace Behavior
 
-Choose **Free Build** for the grid or **World Build** for the whole-world overview.
+Choose **Free Build** for the grid or **World (beta)** for the whole-world overview.
 Switching preserves all authored data, IDs, collections, anchor and undo, and
 remembers independent cameras. Requests during editing wait until the gesture ends.
 Free Build's **Plane Z** is an absolute centimeter height, not an actor offset.

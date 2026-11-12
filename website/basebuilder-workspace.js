@@ -1,6 +1,9 @@
 import { captureProject, validateProject, migrateFreeAutosave, catalogIdentity } from "./basebuilder-project.js";
 import { openProjectStore, LEGACY_DB_NAME } from "./basebuilder-project-store.js";
 
+const WORLD_WORKSPACE_LABEL = "World (beta)";
+const WORLD_UNAVAILABLE = `${WORLD_WORKSPACE_LABEL} is available in the local preview`;
+
 export async function createBuilderWorkspace(host, { defaultMode = "free", worldAvailable = false } = {}) {
   const store = openProjectStore(), catalogHash = await catalogIdentity(host.catalog);
   const status = document.querySelector("#project-save-status"), worldPanel = document.querySelector("#world-workspace");
@@ -74,7 +77,7 @@ export async function createBuilderWorkspace(host, { defaultMode = "free", world
     for (const button of modeButtons) {
       button.setAttribute("aria-pressed", String(button.dataset.workspaceMode === mode));
       button.disabled = button.dataset.workspaceMode === "world" && !worldAvailable;
-      if (button.disabled) button.title = "World Build is available in the local preview";
+      if (button.disabled) button.title = WORLD_UNAVAILABLE;
     }
     host.setAuthoringMode(mode, free);
     document.querySelector("#place-build-world").hidden = mode !== "world";
@@ -83,7 +86,7 @@ export async function createBuilderWorkspace(host, { defaultMode = "free", world
   }
   async function ensureWorld() {
     if (world) return world;
-    if (!worldAvailable) throw Error("World Build is available in the local preview");
+    if (!worldAvailable) throw Error(WORLD_UNAVAILABLE);
     const { createWorldWorkspace } = await import("./basebuilder-world-workspace.js");
     world = await createWorldWorkspace({ ...host, markChanged, getWorldIdentity: () => dataset.world_sha256 });
     if (!dataset.world_sha256 && world.identity()) dataset.world_sha256 = world.identity();
@@ -91,7 +94,7 @@ export async function createBuilderWorkspace(host, { defaultMode = "free", world
   }
   async function setMode(next, { remember = true } = {}) {
     if (!["free", "world"].includes(next)) throw Error("Invalid workspace mode");
-    if (next === "world" && !worldAvailable) throw Error("World Build is available in the local preview");
+    if (next === "world" && !worldAvailable) throw Error(WORLD_UNAVAILABLE);
     if (transitioning || host.busy()) { pendingMode = next; host.notice("Workspace change queued until editing finishes"); return false; }
     if (next === mode && (next === "free" || world)) return true;
     transitioning = true;
@@ -162,7 +165,7 @@ export async function createBuilderWorkspace(host, { defaultMode = "free", world
   async function newProject({ authoringMode = null, confirm = true } = {}) {
     if (confirm && !await confirmReplace()) return false;
     const chosen = authoringMode || await host.dialog({ eyebrow: "New Project", title: "Choose Workspace", showInput: false,
-      confirmLabel: "Free Build", confirmValue: "free", secondaryLabel: worldAvailable ? "World Build" : "", secondaryValue: "world" });
+      confirmLabel: "Free Build", confirmValue: "free", secondaryLabel: worldAvailable ? WORLD_WORKSPACE_LABEL : "", secondaryValue: "world" });
     if (!chosen) return false;
     if (saving) await saving.catch(() => {});
     suspended = true; pendingMode = null; clearTimeout(timer);
@@ -230,7 +233,7 @@ export async function createBuilderWorkspace(host, { defaultMode = "free", world
           try { validateProject(document, host.catalog, {copy:false}); }
           catch (error) { host.notice("Saved revision retained: " + error.message); continue; }
           const value = `${options.length}`;
-          options.push({ value, label: `${document.build.build_name} | ${document.workspace.authoring_mode === "world" ? "World" : "Free"} | ${document.build.placements.length.toLocaleString()} objects${key === "previous" ? " | Previous Save" : ""}`, document, recovery: key === "current" });
+          options.push({ value, label: `${document.build.build_name} | ${document.workspace.authoring_mode === "world" ? WORLD_WORKSPACE_LABEL : "Free"} | ${document.build.placements.length.toLocaleString()} objects${key === "previous" ? " | Previous Save" : ""}`, document, recovery: key === "current" });
         }
         if (!options.length) throw Error("No compatible saved revisions; source records retained");
         const preferred = options.find(o => o.recovery && o.document.project_id === latest?.current.project_id) || options[0];
